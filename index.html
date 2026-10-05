@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>蘋果裝箱：跳數練習</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background-color: #f1f8e9;
+            margin: 0; padding: 10px;
+            display: flex; flex-direction: column; align-items: center;
+            height: 100dvh; box-sizing: border-box;
+            touch-action: manipulation; user-select: none;
+        }
+
+        #game-container {
+            width: 100%; max-width: 600px;
+            background-color: #ffffff; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: column; gap: 15px;
+            position: relative; overflow: hidden;
+            flex: 1;
+        }
+
+        /* 頂部總進度條 */
+        #top-bar {
+            background-color: #e8f5e9; border: 3px solid #a5d6a7; border-radius: 12px;
+            padding: 10px; font-size: 1.4rem; font-weight: bold; color: #2e7d32;
+            text-align: center; display: none; /* 遊戲開始後顯示 */
+        }
+
+        /* 設定畫面 */
+        #setup-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; padding: 20px; box-sizing: border-box;
+        }
+        
+        .setup-group { margin-bottom: 25px; text-align: center; }
+        .setup-title { font-size: 1.8rem; font-weight: bold; color: #33691e; margin-bottom: 10px; }
+        
+        .opt-btn {
+            padding: 10px 20px; font-size: 1.5rem; font-weight: bold; margin: 5px;
+            background-color: #e0e0e0; border: 3px solid #bdbdbd; border-radius: 10px; cursor: pointer;
+        }
+        .opt-btn.selected { background-color: #8bc34a; border-color: #558b2f; color: white; }
+        
+        .action-btn {
+            padding: 15px 30px; font-size: 2rem; font-weight: bold;
+            background-color: #ff9800; color: white; border: none; border-radius: 15px;
+            cursor: pointer; box-shadow: 0 6px 0 #f57c00; margin-top: 10px; transition: 0.1s;
+        }
+        .action-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #f57c00; }
+
+        /* 輸入區 */
+        #input-area {
+            display: flex; justify-content: center; align-items: center; gap: 15px;
+        }
+        #answer-input {
+            width: 150px; font-size: 3rem; text-align: center; font-weight: bold;
+            padding: 10px; border: 4px solid #64b5f6; border-radius: 15px; color: #1565c0;
+        }
+        #submit-btn {
+            padding: 15px 30px; font-size: 2rem; font-weight: bold;
+            background-color: #4caf50; color: white; border: none; border-radius: 15px;
+            cursor: pointer; box-shadow: 0 6px 0 #388e3c;
+        }
+        #submit-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #388e3c; }
+
+        /* 箱子區 (累積的蘋果) */
+        .area-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 10px; margin-bottom: -10px;
+        }
+        .area-title { font-size: 1.5rem; font-weight: bold; color: #555; }
+        #status-text { font-size: 1.5rem; font-weight: bold; color: #5d4037; }
+
+        #box-area {
+            flex: 1; background-color: #efebe9; border: 4px solid #8d6e63; border-radius: 15px;
+            display: flex; align-content: flex-start; flex-wrap: wrap; gap: 5px; padding: 15px;
+            overflow-y: auto;
+        }
+        
+        .apple { 
+            font-size: 3.5rem; 
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+        }
+        
+        .shake { animation: shake 0.4s; border-color: #f44336 !important; }
+        
+        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+
+        /* 過關畫面 (單箱完成) */
+        #win-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255,255,255,0.95); display: none;
+            flex-direction: column; justify-content: center; align-items: center; z-index: 200;
+        }
+
+        /* 貨車動畫畫面 (全部完成) */
+        #truck-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(224, 247, 250, 0.95); display: none;
+            flex-direction: column; justify-content: center; align-items: center; z-index: 300;
+            overflow: hidden; text-align: center; padding: 20px; box-sizing: border-box;
+        }
+        
+        #truck-animation-container {
+            width: 100%; height: 150px; position: relative; margin-bottom: 20px;
+        }
+        #truck-icon {
+            font-size: 7rem; position: absolute; left: -50%; white-space: nowrap;
+        }
+        .drive-away { animation: driveAway 4s ease-in-out forwards; }
+        
+        @keyframes driveAway {
+            0% { left: -50%; }
+            50% { left: 20%; transform: scale(1.1); }
+            100% { left: 120%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        
+        <!-- 設定畫面 -->
+        <div id="setup-screen">
+            <div class="setup-group">
+                <div class="setup-title">每次裝幾顆？</div>
+                <button class="opt-btn step-btn selected" onclick="selectStep(2, this)">2顆 2顆一數</button>
+                <button class="opt-btn step-btn" onclick="selectStep(5, this)">5顆 5顆一數</button>
+            </div>
+            <div class="setup-group">
+                <div class="setup-title">箱子可以裝幾顆？ (目標)</div>
+                <button class="opt-btn target-btn selected" onclick="selectTarget(10, this)">10 顆</button>
+                <button class="opt-btn target-btn" onclick="selectTarget(20, this)">20 顆</button>
+                <button class="opt-btn target-btn" onclick="selectTarget(30, this)">30 顆</button>
+            </div>
+            <button class="action-btn" onclick="startGame()">🍎 開始裝箱</button>
+        </div>
+
+        <!-- 頂部總進度 -->
+        <!-- 修改點 1：將顯示的總箱數從 10 改為 5 -->
+        <div id="top-bar">🚚 貨車出貨進度: <span id="box-count-text">0</span> / 5 箱</div>
+
+        <!-- 輸入區 -->
+        <div id="input-area">
+            <input type="number" id="answer-input" placeholder="?" min="1" max="100">
+            <button id="submit-btn" onclick="checkAnswer()">確定</button>
+        </div>
+
+        <!-- 遊戲畫面：累積果箱區 -->
+        <div class="area-header">
+            <div class="area-title">果箱 (請數一數有幾顆)</div>
+            <div id="status-text">0 / 0</div>
+        </div>
+        <div id="box-area"></div>
+
+        <!-- 單箱完成畫面 -->
+        <div id="win-screen">
+            <div style="font-size: 6rem; margin-bottom: 10px;">📦✨</div>
+            <h1 style="color: #4caf50; font-size: 3rem; margin: 0;">裝好 1 箱了！</h1>
+            <button class="action-btn" onclick="nextBox()" style="margin-top: 20px;">繼續裝下一箱</button>
+        </div>
+
+        <!-- 貨車出貨畫面 -->
+        <div id="truck-screen">
+            <div id="truck-animation-container">
+                <div id="truck-icon">🚚💨 📦📦📦</div>
+            </div>
+            <h1 style="color: #0277bd; font-size: 2.5rem; margin-bottom: 10px;">太棒了！任務達成！</h1>
+            <!-- 修改點 2：將恭喜文字的 10 箱改為 5 箱 -->
+            <p style="font-size: 1.5rem; color: #555; font-weight: bold;">貨車把 5 箱蘋果都載走囉！</p>
+            <button class="action-btn" onclick="resetToSetup()" style="margin-top: 20px; background-color: #0288d1; box-shadow: 0 6px 0 #0277bd;">🔄 回首頁設定</button>
+        </div>
+
+    </div>
+
+    <script>
+        // 遊戲變數
+        let step = 2;
+        let target = 10;
+        let currentCount = 0;
+        let expectedAnswer = 0;
+        let completedBoxes = 0; 
+        
+        // 修改點 3：將最大過關箱數從 10 改為 5
+        const maxBoxes = 5;
+        
+        // DOM 元素
+        const setupScreen = document.getElementById('setup-screen');
+        const winScreen = document.getElementById('win-screen');
+        const truckScreen = document.getElementById('truck-screen');
+        const boxArea = document.getElementById('box-area');
+        const answerInput = document.getElementById('answer-input');
+        const statusText = document.getElementById('status-text');
+        const topBar = document.getElementById('top-bar');
+        const boxCountText = document.getElementById('box-count-text');
+        const truckIcon = document.getElementById('truck-icon');
+
+        // 音效與語音系統
+        let ttsUtterance = null;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playDing() {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function speakText(text, rate = 0.7) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                ttsUtterance = new SpeechSynthesisUtterance(text);
+                ttsUtterance.lang = 'zh-TW';
+                ttsUtterance.rate = rate;
+                window.speechSynthesis.speak(ttsUtterance);
+            }
+        }
+
+        // 設定介面邏輯
+        function selectStep(val, btn) {
+            step = val;
+            document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function selectTarget(val, btn) {
+            target = val;
+            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        // 遊戲開始
+        function startGame() {
+            initAudio();
+            completedBoxes = 0;
+            boxCountText.innerText = completedBoxes;
+            
+            setupScreen.style.display = 'none';
+            winScreen.style.display = 'none';
+            truckScreen.style.display = 'none';
+            topBar.style.display = 'block';
+            
+            startNewBox();
+        }
+
+        // 啟動一個新箱子
+        function startNewBox() {
+            currentCount = 0;
+            boxArea.innerHTML = '';
+            statusText.innerText = '0 / ' + target;
+            answerInput.value = '';
+            
+            nextTurn();
+        }
+
+        // 單箱完成後點擊繼續
+        function nextBox() {
+            winScreen.style.display = 'none';
+            startNewBox();
+        }
+
+        // 回到首頁重新設定
+        function resetToSetup() {
+            truckScreen.style.display = 'none';
+            winScreen.style.display = 'none';
+            topBar.style.display = 'none';
+            setupScreen.style.display = 'flex';
+            
+            // 重置貨車動畫
+            truckIcon.classList.remove('drive-away');
+        }
+
+        // 產生下一批蘋果
+        function nextTurn() {
+            expectedAnswer = currentCount + step;
+            
+            let applesToShow = step;
+            if (expectedAnswer > target) {
+                applesToShow = target - currentCount;
+                expectedAnswer = target;
+            }
+
+            for(let i=0; i < applesToShow; i++) {
+                const apple = document.createElement('div');
+                apple.className = 'apple';
+                apple.innerText = '🍎';
+                boxArea.appendChild(apple);
+            }
+            
+            answerInput.focus();
+        }
+
+        // 檢查輸入答案
+        function checkAnswer() {
+            const playerInput = parseInt(answerInput.value);
+            
+            if (playerInput === expectedAnswer) {
+                playDing();
+                speakText(playerInput.toString());
+                
+                currentCount = expectedAnswer;
+                statusText.innerText = currentCount + ' / ' + target;
+                answerInput.value = '';
+
+                if (currentCount >= target) {
+                    completedBoxes++;
+                    boxCountText.innerText = completedBoxes;
+
+                    setTimeout(() => {
+                        if (completedBoxes >= maxBoxes) {
+                            // 全部達成：顯示貨車畫面
+                            truckScreen.style.display = 'flex';
+                            truckIcon.classList.add('drive-away');
+                            speakText("太棒了！貨車出發囉！", 0.8);
+                        } else {
+                            // 單箱達成：顯示單箱完成畫面
+                            winScreen.style.display = 'flex';
+                            speakText("裝箱完成", 0.8);
+                        }
+                    }, 1500); 
+                } else {
+                    setTimeout(nextTurn, 1000); 
+                }
+            } else {
+                answerInput.classList.add('shake');
+                setTimeout(() => {
+                    answerInput.classList.remove('shake');
+                    answerInput.value = '';
+                    answerInput.focus();
+                }, 400);
+            }
+        }
+
+        answerInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>

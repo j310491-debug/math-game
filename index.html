@@ -1,358 +1,1395 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>蘋果裝箱：跳數練習</title>
-    <style>
-        body {
-            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-            background-color: #f1f8e9;
-            margin: 0; padding: 10px;
-            display: flex; flex-direction: column; align-items: center;
-            height: 100dvh; box-sizing: border-box;
-            touch-action: manipulation; user-select: none;
-        }
-
-        #game-container {
-            width: 100%; max-width: 600px;
-            background-color: #ffffff; border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            padding: 20px; box-sizing: border-box;
-            display: flex; flex-direction: column; gap: 15px;
-            position: relative; overflow: hidden;
-            flex: 1;
-        }
-
-        /* 頂部總進度條 */
-        #top-bar {
-            background-color: #e8f5e9; border: 3px solid #a5d6a7; border-radius: 12px;
-            padding: 10px; font-size: 1.4rem; font-weight: bold; color: #2e7d32;
-            text-align: center; display: none; /* 遊戲開始後顯示 */
-        }
-
-        /* 設定畫面 */
-        #setup-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255, 255, 255, 0.95);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 100; padding: 20px; box-sizing: border-box;
-        }
-        
-        .setup-group { margin-bottom: 25px; text-align: center; }
-        .setup-title { font-size: 1.8rem; font-weight: bold; color: #33691e; margin-bottom: 10px; }
-        
-        .opt-btn {
-            padding: 10px 20px; font-size: 1.5rem; font-weight: bold; margin: 5px;
-            background-color: #e0e0e0; border: 3px solid #bdbdbd; border-radius: 10px; cursor: pointer;
-        }
-        .opt-btn.selected { background-color: #8bc34a; border-color: #558b2f; color: white; }
-        
-        .action-btn {
-            padding: 15px 30px; font-size: 2rem; font-weight: bold;
-            background-color: #ff9800; color: white; border: none; border-radius: 15px;
-            cursor: pointer; box-shadow: 0 6px 0 #f57c00; margin-top: 10px; transition: 0.1s;
-        }
-        .action-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #f57c00; }
-
-        /* 輸入區 */
-        #input-area {
-            display: flex; justify-content: center; align-items: center; gap: 15px;
-        }
-        #answer-input {
-            width: 150px; font-size: 3rem; text-align: center; font-weight: bold;
-            padding: 10px; border: 4px solid #64b5f6; border-radius: 15px; color: #1565c0;
-        }
-        #submit-btn {
-            padding: 15px 30px; font-size: 2rem; font-weight: bold;
-            background-color: #4caf50; color: white; border: none; border-radius: 15px;
-            cursor: pointer; box-shadow: 0 6px 0 #388e3c;
-        }
-        #submit-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #388e3c; }
-
-        /* 箱子區 (累積的蘋果) */
-        .area-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 10px; margin-bottom: -10px;
-        }
-        .area-title { font-size: 1.5rem; font-weight: bold; color: #555; }
-        #status-text { font-size: 1.5rem; font-weight: bold; color: #5d4037; }
-
-        #box-area {
-            flex: 1; background-color: #efebe9; border: 4px solid #8d6e63; border-radius: 15px;
-            display: flex; align-content: flex-start; flex-wrap: wrap; gap: 5px; padding: 15px;
-            overflow-y: auto;
-        }
-        
-        .apple { 
-            font-size: 3.5rem; 
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
-        }
-        
-        .shake { animation: shake 0.4s; border-color: #f44336 !important; }
-        
-        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
-
-        /* 過關畫面 (單箱完成) */
-        #win-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(255,255,255,0.95); display: none;
-            flex-direction: column; justify-content: center; align-items: center; z-index: 200;
-        }
-
-        /* 貨車動畫畫面 (全部完成) */
-        #truck-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(224, 247, 250, 0.95); display: none;
-            flex-direction: column; justify-content: center; align-items: center; z-index: 300;
-            overflow: hidden; text-align: center; padding: 20px; box-sizing: border-box;
-        }
-        
-        #truck-animation-container {
-            width: 100%; height: 150px; position: relative; margin-bottom: 20px;
-        }
-        #truck-icon {
-            font-size: 7rem; position: absolute; left: -50%; white-space: nowrap;
-        }
-        .drive-away { animation: driveAway 4s ease-in-out forwards; }
-        
-        @keyframes driveAway {
-            0% { left: -50%; }
-            50% { left: 20%; transform: scale(1.1); }
-            100% { left: 120%; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>數數大冒險・娃娃換裝秀 (語音唱數版)</title>
+  <!-- Tailwind CSS provided by gstatic -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @keyframes bounce-gentle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    @keyframes pop-item {
+      0% { transform: scale(0.65) rotate(-6deg); opacity: 0; }
+      75% { transform: scale(1.12) rotate(3deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    @keyframes float-up {
+      0% { opacity: 0; transform: translateY(0) scale(0.8); }
+      40% { opacity: 1; transform: translateY(-16px) scale(1.2); }
+      100% { opacity: 0; transform: translateY(-34px) scale(1); }
+    }
+    @keyframes glow-pulse {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4)); }
+      50% { filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.8)); }
+    }
+    @keyframes wing-flap {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(5deg) scaleX(0.96); }
+    }
+    .animate-pop {
+      animation: pop-item 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .animate-gentle {
+      animation: bounce-gentle 2.6s ease-in-out infinite;
+    }
+    .character-glow {
+      animation: glow-pulse 3s infinite;
+    }
+    .wing-left-anim {
+      transform-origin: 65px 105px;
+      animation: wing-flap 1.8s ease-in-out infinite;
+    }
+    .wing-right-anim {
+      transform-origin: 135px 105px;
+      animation: wing-flap 1.8s ease-in-out infinite reverse;
+    }
+    .floating-count-badge {
+      animation: float-up 0.75s ease-out forwards;
+      pointer-events: none;
+    }
+    /* Touch optimization */
+    canvas {
+      touch-action: none;
+    }
+    .item-counted {
+      transform: scale(1.06);
+      border-color: #F59E0B !important;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+  </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-amber-50 via-sky-50 to-pink-50 min-h-screen text-slate-800 font-sans p-2 sm:p-5 antialiased select-none">
+  <div class="max-w-5xl mx-auto flex flex-col gap-3 sm:gap-4">
 
-    <div id="game-container">
+    <!-- Header Section -->
+    <header class="bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-md border border-amber-200/70 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl sm:text-4xl animate-bounce">🦄</span>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-black bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            數數大冒險・娃娃換裝秀
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-500 font-medium">點擊物品自動語音唱數（1~30），答對立刻幫頁面人物穿上新裝扮！</p>
+        </div>
+      </div>
+
+      <!-- Control & Stats Bar -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-amber-50/90 px-3 py-2 rounded-xl border border-amber-200">
+        <!-- Voice Counting Switch -->
+        <button id="voice-toggle-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-800 hover:bg-amber-100 text-xs font-bold transition shadow-xs" title="點擊切換是否語音唱數">
+          <span id="voice-icon">🗣️</span>
+          <span>唱數語音：<strong id="voice-status-text" class="text-emerald-600">開啟</strong></span>
+        </button>
+
+        <div class="h-7 w-[1px] bg-amber-200 hidden sm:block"></div>
+
+        <!-- Score display -->
+        <div class="text-center px-1">
+          <span class="text-[11px] text-amber-700 font-bold block">得分</span>
+          <span id="score-display" class="text-lg sm:text-xl font-black text-amber-600">0</span>
+        </div>
+
+        <div class="h-7 w-[1px] bg-amber-200"></div>
+
+        <!-- Dress Up status -->
+        <div class="text-center px-1">
+          <span class="text-[11px] text-indigo-700 font-bold block">身上穿戴</span>
+          <span id="accessory-count-display" class="text-lg sm:text-xl font-black text-indigo-600">0 / 10</span>
+        </div>
+
+        <div class="h-7 w-[1px] bg-amber-200"></div>
+
+        <!-- Streak display -->
+        <div class="text-center px-1">
+          <span class="text-[11px] text-emerald-700 font-bold block">連勝</span>
+          <span id="streak-display" class="text-lg sm:text-xl font-black text-emerald-600">0 🔥</span>
+        </div>
+
+        <!-- Sound SFX button -->
+        <button id="sound-toggle-btn" class="p-1.5 rounded-lg bg-white border border-amber-300 text-amber-700 hover:bg-amber-100 transition text-sm" title="音效切換">
+          🔔
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Area -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+      <!-- LEFT COLUMN: Item Counting Board (7 cols) -->
+      <section class="lg:col-span-7 flex flex-col gap-3">
+        <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col h-full">
+          <!-- Question Title & Helpers -->
+          <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-pink-500 animate-ping"></span>
+              <h2 class="font-bold text-slate-700 text-sm sm:text-base flex items-center gap-2">
+                <span>數數看：共有多少個</span>
+                <span id="target-theme-name" class="px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 text-xs font-bold">蘋果</span>
+              </h2>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="next-question-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-xs transition border border-indigo-200 flex items-center gap-1 shadow-xs">
+                🔄 換一題
+              </button>
+            </div>
+          </div>
+
+          <!-- Items Grid Container (With Voice Counting Badges) -->
+          <div id="items-grid" class="flex-1 bg-gradient-to-b from-indigo-50/40 via-purple-50/20 to-pink-50/30 rounded-xl p-3 sm:p-4 border-2 border-dashed border-indigo-200/80 min-h-[300px] sm:min-h-[360px] flex flex-wrap content-start items-center justify-center gap-2.5 sm:gap-3.5 overflow-y-auto relative">
+            <!-- Items injected by JavaScript -->
+          </div>
+
+          <!-- Bottom Voice Counting Status Bar -->
+          <div class="mt-3 flex flex-wrap items-center justify-between text-xs text-slate-600 bg-slate-50 px-3 py-2.5 rounded-xl border border-slate-200/70 gap-2">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-700 flex items-center gap-1">
+                <span>🗣️ 目前已唱數：</span>
+                <strong id="counted-stat" class="text-amber-600 font-black text-lg">0</strong>
+                <span>個</span>
+              </span>
+              <button id="reset-counted-btn" class="text-xs text-slate-400 hover:text-slate-600 underline ml-2">重置唱數標記</button>
+            </div>
+            <div class="text-[11px] text-slate-400 flex items-center gap-1">
+              <span>💡 提示：點擊任何物品會直接語音念出數字</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: Character Stage & Handwriting Input (5 cols) -->
+      <section class="lg:col-span-5 flex flex-col gap-3">
+
+        <!-- Character Dressing Stage -->
+        <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col items-center relative overflow-hidden">
+          <!-- Dressing Room Title Bar -->
+          <div class="w-full flex items-center justify-between mb-1 pb-1.5 border-b border-slate-100">
+            <div class="flex items-center gap-1.5">
+              <span class="text-base">✨</span>
+              <h2 class="font-bold text-slate-700 text-sm sm:text-base">魔法試衣間・人物即時穿搭</h2>
+            </div>
+            <div id="next-reward-hint" class="text-xs text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+              下一件裝扮：再答對 1 題
+            </div>
+          </div>
+
+          <!-- Newly Equipped Flash Banner -->
+          <div id="equip-toast-banner" class="w-full text-center py-1 px-2 my-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200 transition-all duration-300 transform scale-95 opacity-0 pointer-events-none">
+            ✨ 已即時套用全新裝扮！
+          </div>
+
+          <!-- Character Display Stage -->
+          <div class="relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center my-1">
+            <!-- Magical glow backplate -->
+            <div class="absolute inset-2 bg-gradient-to-tr from-amber-200/40 via-pink-200/40 to-sky-200/40 rounded-full blur-xl character-glow"></div>
+
+            <!-- SVG Character Container -->
+            <div id="character-container" class="relative z-10 w-full h-full flex items-center justify-center animate-gentle transition-transform duration-300">
+              <!-- SVG Character dynamically rendered by JS -->
+            </div>
+
+            <!-- Character Speech / Cheer Bubble -->
+            <div id="character-bubble" class="absolute -top-1 -right-1 z-30 bg-white shadow-xl border-2 border-pink-300 rounded-2xl px-3 py-1.5 text-xs font-black text-pink-600 transition-all duration-300 transform scale-0 origin-bottom-left">
+              穿上新裝扮囉！🎉
+            </div>
+          </div>
+
+          <!-- Wardrobe Quick Action Tray -->
+          <div class="w-full mt-1 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-slate-600 flex items-center gap-1">
+                <span>裝備庫（點擊可穿戴/脫下）：</span>
+              </span>
+              <div class="flex items-center gap-1">
+                <button id="equip-all-btn" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">全部穿上</button>
+                <button id="unequip-all-btn" class="text-[11px] font-bold text-slate-500 hover:text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">全部脫下</button>
+              </div>
+            </div>
+
+            <!-- Inventory Grid -->
+            <div id="accessories-inventory" class="grid grid-cols-5 gap-1.5 max-h-36 overflow-y-auto p-1 bg-slate-50/60 rounded-xl border border-slate-100">
+              <!-- Accessory Badges injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Handwriting & Input Card -->
+        <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">✍️</span>
+              <h2 class="font-bold text-slate-700 text-sm sm:text-base">在下方寫下你數出的數字</h2>
+            </div>
+            <!-- Input mode tabs -->
+            <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-bold">
+              <button id="mode-draw-btn" class="px-2.5 py-1 rounded-md bg-white text-indigo-600 shadow-sm transition">手寫畫板</button>
+              <button id="mode-keypad-btn" class="px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition">小鍵盤</button>
+            </div>
+          </div>
+
+          <!-- Drawing Canvas View -->
+          <div id="draw-mode-container" class="flex flex-col gap-2">
+            <div class="relative bg-slate-50 rounded-xl border-2 border-indigo-200 overflow-hidden shadow-inner">
+              <canvas id="handwriting-canvas" width="380" height="140" class="w-full h-32 bg-white cursor-crosshair"></canvas>
+              
+              <!-- Clear Canvas Button -->
+              <button id="clear-canvas-btn" class="absolute top-2 right-2 px-2.5 py-1 bg-slate-100/90 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg border border-slate-300 transition shadow-sm">
+                🧹 清除重寫
+              </button>
+              
+              <!-- Guideline Hint -->
+              <div class="absolute bottom-2 left-3 pointer-events-none text-[11px] text-slate-400 font-medium">
+                可在白板上用滑鼠或手指寫下 1 ~ 30
+              </div>
+            </div>
+
+            <!-- Recognized or Picked Value Bar -->
+            <div class="flex items-center justify-between gap-2 bg-indigo-50/70 p-2.5 rounded-xl border border-indigo-100">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-slate-600">你的答案：</span>
+                <input id="answer-input" type="number" min="1" max="30" placeholder="?" class="w-16 h-10 text-center text-xl font-black bg-white rounded-lg border-2 border-indigo-300 text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-inner">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button id="recognize-ai-btn" class="px-2.5 sm:px-3 py-2 bg-purple-500 hover:bg-purple-600 active:scale-95 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1" title="智能感應筆跡">
+                  ✨ 辨識筆跡
+                </button>
+                <button id="submit-answer-btn" class="px-3.5 sm:px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center gap-1">
+                  確認送出 🚀
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Keypad View (Easy alternative) -->
+          <div id="keypad-mode-container" class="hidden flex-col gap-2">
+            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
+              <span class="text-xs font-medium text-slate-500">已選數字：</span>
+              <span id="keypad-display-val" class="text-2xl font-black text-indigo-600 tracking-wider">--</span>
+              <button id="keypad-clear-btn" class="px-2.5 py-1 text-xs text-rose-500 font-bold bg-rose-50 rounded-lg hover:bg-rose-100">清除</button>
+            </div>
+            <div class="grid grid-cols-5 gap-1.5">
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="1">1</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="2">2</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="3">3</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="4">4</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="5">5</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="6">6</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="7">7</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="8">8</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="9">9</button>
+              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="0">0</button>
+            </div>
+            <button id="keypad-submit-btn" class="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-md transition hover:from-emerald-600 hover:to-teal-600 active:scale-95">
+              確認送出數字 🚀
+            </button>
+          </div>
+
+          <!-- Feedback Banner -->
+          <div id="feedback-banner" class="mt-2 text-center text-xs sm:text-sm font-bold py-1.5 px-3 rounded-xl hidden transition-all duration-300"></div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Celebration Modal -->
+    <div id="unlock-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border-4 border-amber-300 text-center transform scale-95 transition-all">
+        <div class="text-5xl mb-2 animate-bounce">🎉</div>
+        <h3 class="text-xl font-black text-amber-600 mb-1">恭喜解鎖全新裝扮！</h3>
+        <p id="unlock-item-desc" class="text-sm text-slate-600 mb-2">你的夥伴獲得了新裝扮！</p>
+        <p class="text-xs text-emerald-600 font-bold mb-3">已直接套用在頁面人物身上 ✨</p>
         
-        <!-- 設定畫面 -->
-        <div id="setup-screen">
-            <div class="setup-group">
-                <div class="setup-title">每次裝幾顆？</div>
-                <button class="opt-btn step-btn selected" onclick="selectStep(2, this)">2顆 2顆一數</button>
-                <button class="opt-btn step-btn" onclick="selectStep(5, this)">5顆 5顆一數</button>
-            </div>
-            <div class="setup-group">
-                <div class="setup-title">箱子可以裝幾顆？ (目標)</div>
-                <button class="opt-btn target-btn selected" onclick="selectTarget(10, this)">10 顆</button>
-                <button class="opt-btn target-btn" onclick="selectTarget(20, this)">20 顆</button>
-                <button class="opt-btn target-btn" onclick="selectTarget(30, this)">30 顆</button>
-            </div>
-            <button class="action-btn" onclick="startGame()">🍎 開始裝箱</button>
+        <div id="unlock-item-preview" class="w-20 h-20 mx-auto mb-4 bg-amber-50 rounded-2xl flex items-center justify-center text-4xl border-2 border-amber-200 shadow-inner">
+          👑
         </div>
 
-        <!-- 頂部總進度 -->
-        <!-- 修改點 1：將顯示的總箱數從 10 改為 5 -->
-        <div id="top-bar">🚚 貨車出貨進度: <span id="box-count-text">0</span> / 5 箱</div>
-
-        <!-- 輸入區 -->
-        <div id="input-area">
-            <input type="number" id="answer-input" placeholder="?" min="1" max="100">
-            <button id="submit-btn" onclick="checkAnswer()">確定</button>
-        </div>
-
-        <!-- 遊戲畫面：累積果箱區 -->
-        <div class="area-header">
-            <div class="area-title">果箱 (請數一數有幾顆)</div>
-            <div id="status-text">0 / 0</div>
-        </div>
-        <div id="box-area"></div>
-
-        <!-- 單箱完成畫面 -->
-        <div id="win-screen">
-            <div style="font-size: 6rem; margin-bottom: 10px;">📦✨</div>
-            <h1 style="color: #4caf50; font-size: 3rem; margin: 0;">裝好 1 箱了！</h1>
-            <button class="action-btn" onclick="nextBox()" style="margin-top: 20px;">繼續裝下一箱</button>
-        </div>
-
-        <!-- 貨車出貨畫面 -->
-        <div id="truck-screen">
-            <div id="truck-animation-container">
-                <div id="truck-icon">🚚💨 📦📦📦</div>
-            </div>
-            <h1 style="color: #0277bd; font-size: 2.5rem; margin-bottom: 10px;">太棒了！任務達成！</h1>
-            <!-- 修改點 2：將恭喜文字的 10 箱改為 5 箱 -->
-            <p style="font-size: 1.5rem; color: #555; font-weight: bold;">貨車把 5 箱蘋果都載走囉！</p>
-            <button class="action-btn" onclick="resetToSetup()" style="margin-top: 20px; background-color: #0288d1; box-shadow: 0 6px 0 #0277bd;">🔄 回首頁設定</button>
-        </div>
-
+        <button id="modal-close-btn" class="w-full py-2.5 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-base rounded-xl shadow-md transition active:scale-95">
+          太棒了！繼續挑戰 🌟
+        </button>
+      </div>
     </div>
 
-    <script>
-        // 遊戲變數
-        let step = 2;
-        let target = 10;
-        let currentCount = 0;
-        let expectedAnswer = 0;
-        let completedBoxes = 0; 
-        
-        // 修改點 3：將最大過關箱數從 10 改為 5
-        const maxBoxes = 5;
-        
-        // DOM 元素
-        const setupScreen = document.getElementById('setup-screen');
-        const winScreen = document.getElementById('win-screen');
-        const truckScreen = document.getElementById('truck-screen');
-        const boxArea = document.getElementById('box-area');
-        const answerInput = document.getElementById('answer-input');
-        const statusText = document.getElementById('status-text');
-        const topBar = document.getElementById('top-bar');
-        const boxCountText = document.getElementById('box-count-text');
-        const truckIcon = document.getElementById('truck-icon');
+  </div>
 
-        // 音效與語音系統
-        let ttsUtterance = null;
-        let audioCtx = null;
+  <script>
+    /* ====================================================================
+       數數大冒險與娃娃換裝秀 (唱數語音回饋 + 即時裝扮穿戴)
+       ==================================================================== */
 
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // 1. 遊戲核心狀態
+    const state = {
+      score: 0,
+      streak: 0,
+      soundEnabled: true,
+      voiceCountingEnabled: true,
+      currentCount: 8,
+      currentThemeIndex: 0,
+      markedList: [], // 點擊唱數順序的陣列: [itemIdx1, itemIdx2, ...]
+      unlockedAccessories: new Set(), // 已解鎖的配件 ID
+      equippedAccessories: new Set(), // 當前穿在身上的配件 ID
+      inputMode: 'draw', // 'draw' | 'keypad'
+      isDrawing: false,
+      hasDrawnStrokes: false,
+      strokes: []
+    };
+
+    // 2. 隨機物品主題
+    const ITEM_THEMES = [
+      { name: '紅蘋果', emoji: '🍎' },
+      { name: '甜甜圈', emoji: '🍩' },
+      { name: '黃香蕉', emoji: '🍌' },
+      { name: '閃耀星星', emoji: '⭐' },
+      { name: '美味草莓', emoji: '🍓' },
+      { name: '活力小鴨', emoji: '🐥' },
+      { name: '粉紅小花', emoji: '🌸' },
+      { name: '香草冰淇淋', emoji: '🍦' },
+      { name: '快樂足球', emoji: '⚽' },
+      { name: '甜脆胡蘿蔔', emoji: '🥕' }
+    ];
+
+    // 3. 配件庫定義 (共 10 件華麗裝扮，依序解鎖並直接穿上)
+    const ACCESSORIES = [
+      { id: 'shoes', name: '亮晶晶球鞋', icon: '👟', requiredCorrect: 1, desc: '彈跳力 +100！' },
+      { id: 'glasses', name: '酷炫星星墨鏡', icon: '🕶️', requiredCorrect: 2, desc: '帥氣度爆棚！' },
+      { id: 'ribbon', name: '幸運粉紅領結', icon: '🎀', requiredCorrect: 3, desc: '優雅可愛！' },
+      { id: 'shirt', name: '英雄炫彩披風', icon: '🦸', requiredCorrect: 4, desc: '隨風飄動超拉風！' },
+      { id: 'wand', name: '星光魔法棒', icon: '🪄', requiredCorrect: 5, desc: '點石成金的奇妙魔力！' },
+      { id: 'crown', name: '璀璨黃金王冠', icon: '👑', requiredCorrect: 6, desc: '智慧國王的尊榮象徵！' },
+      { id: 'wings', name: '夢幻天使羽翼', icon: '🪽', requiredCorrect: 7, desc: '在雲端輕盈翱翔！' },
+      { id: 'halo', name: '閃耀神聖光環', icon: '😇', requiredCorrect: 8, desc: '散發溫暖聖光！' },
+      { id: 'aura', name: '奇蹟魔法星陣', icon: '🔮', requiredCorrect: 9, desc: '神秘絢麗的光環！' },
+      { id: 'pet', name: '守護萌寵獨角獸', icon: '🦄', requiredCorrect: 10, desc: '最忠心的神奇夥伴！' }
+    ];
+
+    // 4. 中文唱數對照字詞表 (1 ~ 30)
+    const CHINESE_DIGIT_WORDS = [
+      '零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+      '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+      '二十一', '二十二', '二十三', '二十四', '二十五', '二十六', '二十七', '二十八', '二十九', '三十'
+    ];
+
+    // DOM 元素引用
+    const dom = {
+      score: document.getElementById('score-display'),
+      accessoryCount: document.getElementById('accessory-count-display'),
+      streak: document.getElementById('streak-display'),
+      soundBtn: document.getElementById('sound-toggle-btn'),
+      voiceToggleBtn: document.getElementById('voice-toggle-btn'),
+      voiceIcon: document.getElementById('voice-icon'),
+      voiceStatusText: document.getElementById('voice-status-text'),
+      targetThemeName: document.getElementById('target-theme-name'),
+      nextQuestionBtn: document.getElementById('next-question-btn'),
+      itemsGrid: document.getElementById('items-grid'),
+      countedStat: document.getElementById('counted-stat'),
+      resetCountedBtn: document.getElementById('reset-counted-btn'),
+      nextRewardHint: document.getElementById('next-reward-hint'),
+      equipToast: document.getElementById('equip-toast-banner'),
+      characterContainer: document.getElementById('character-container'),
+      characterBubble: document.getElementById('character-bubble'),
+      accessoriesInventory: document.getElementById('accessories-inventory'),
+      equipAllBtn: document.getElementById('equip-all-btn'),
+      unequipAllBtn: document.getElementById('unequip-all-btn'),
+      modeDrawBtn: document.getElementById('mode-draw-btn'),
+      modeKeypadBtn: document.getElementById('mode-keypad-btn'),
+      drawContainer: document.getElementById('draw-mode-container'),
+      keypadContainer: document.getElementById('keypad-mode-container'),
+      canvas: document.getElementById('handwriting-canvas'),
+      clearCanvasBtn: document.getElementById('clear-canvas-btn'),
+      answerInput: document.getElementById('answer-input'),
+      recognizeBtn: document.getElementById('recognize-ai-btn'),
+      submitAnswerBtn: document.getElementById('submit-answer-btn'),
+      keypadDisplayVal: document.getElementById('keypad-display-val'),
+      keypadClearBtn: document.getElementById('keypad-clear-btn'),
+      keypadSubmitBtn: document.getElementById('keypad-submit-btn'),
+      feedbackBanner: document.getElementById('feedback-banner'),
+      unlockModal: document.getElementById('unlock-modal'),
+      unlockItemDesc: document.getElementById('unlock-item-desc'),
+      unlockItemPreview: document.getElementById('unlock-item-preview'),
+      modalCloseBtn: document.getElementById('modal-close-btn')
+    };
+
+    /* ====================================================================
+       語音唱數系統 (Web Speech API)
+       ==================================================================== */
+    let preferredVoice = null;
+
+    function initSpeechEngine() {
+      if (!('speechSynthesis' in window)) {
+        dom.voiceStatusText.textContent = '不支援';
+        return;
+      }
+      const findVoice = () => {
+        const voices = window.speechSynthesis.getVoices();
+        preferredVoice = voices.find(v => v.lang.includes('zh-TW') || v.lang.includes('zh_TW')) ||
+                         voices.find(v => v.lang.toLowerCase().includes('taiwan')) ||
+                         voices.find(v => v.lang.startsWith('zh') || v.lang.includes('cmn')) ||
+                         null;
+      };
+      findVoice();
+      window.speechSynthesis.onvoiceschanged = findVoice;
+    }
+
+    // 唱數發音：朗讀當前點數數字
+    function speakCountNumber(num) {
+      if (!state.voiceCountingEnabled || !('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel(); // 立即取消前一個發音，確保節奏緊湊不延遲
+        const word = CHINESE_DIGIT_WORDS[num] || String(num);
+        const utter = new SpeechSynthesisUtterance(word);
+        utter.lang = 'zh-TW';
+        utter.rate = 1.05; // 稍快、清晰的童趣語速
+        utter.pitch = 1.25; // 活潑清脆音調
+        if (preferredVoice) {
+          utter.voice = preferredVoice;
         }
+        window.speechSynthesis.speak(utter);
+      } catch (err) {
+        console.warn('Speech error:', err);
+      }
+    }
 
-        function playDing() {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.3);
+    // 鼓勵讚美語音
+    function speakVoicePraise(text) {
+      if (!state.voiceCountingEnabled || !('speechSynthesis' in window)) return;
+      try {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'zh-TW';
+        utter.rate = 1.05;
+        utter.pitch = 1.2;
+        if (preferredVoice) utter.voice = preferredVoice;
+        window.speechSynthesis.speak(utter);
+      } catch (e) {}
+    }
+
+    /* ====================================================================
+       Web Audio 效果音合成器
+       ==================================================================== */
+    const audioCtx = (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined')
+      ? new (window.AudioContext || window.webkitAudioContext)()
+      : null;
+
+    function playSound(type) {
+      if (!state.soundEnabled || !audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'pop') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(700, now + 0.07);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+          osc.start(now);
+          osc.stop(now + 0.07);
+        } else if (type === 'unpop') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(500, now);
+          osc.frequency.exponentialRampToValueAtTime(250, now + 0.08);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'correct') {
+          // 勝利三和弦
+          [523.25, 659.25, 783.99].forEach((freq, idx) => {
+            const subOsc = audioCtx.createOscillator();
+            const subGain = audioCtx.createGain();
+            subOsc.connect(subGain);
+            subGain.connect(audioCtx.destination);
+            subOsc.type = 'triangle';
+            subOsc.frequency.setValueAtTime(freq, now + idx * 0.08);
+            subGain.gain.setValueAtTime(0.25, now + idx * 0.08);
+            subGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.35);
+            subOsc.start(now + idx * 0.08);
+            subOsc.stop(now + idx * 0.08 + 0.35);
+          });
+        } else if (type === 'unlock') {
+          // 華麗裝扮解鎖勝利和音
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+            const subOsc = audioCtx.createOscillator();
+            const subGain = audioCtx.createGain();
+            subOsc.connect(subGain);
+            subGain.connect(audioCtx.destination);
+            subOsc.type = 'sine';
+            subOsc.frequency.setValueAtTime(freq, now + idx * 0.1);
+            subGain.gain.setValueAtTime(0.28, now + idx * 0.1);
+            subGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.3);
+            subOsc.start(now + idx * 0.1);
+            subOsc.stop(now + idx * 0.1 + 0.3);
+          });
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(260, now);
+          osc.frequency.exponentialRampToValueAtTime(140, now + 0.22);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+          osc.start(now);
+          osc.stop(now + 0.22);
         }
+      } catch (e) {
+        console.warn('Audio error', e);
+      }
+    }
 
-        function speakText(text, rate = 0.7) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                ttsUtterance = new SpeechSynthesisUtterance(text);
-                ttsUtterance.lang = 'zh-TW';
-                ttsUtterance.rate = rate;
-                window.speechSynthesis.speak(ttsUtterance);
-            }
-        }
+    /* ====================================================================
+       人物與裝扮即時繪製 (SVG 角色動態層級)
+       ==================================================================== */
+    function renderCharacter() {
+      const isEquipped = (id) => state.equippedAccessories.has(id);
 
-        // 設定介面邏輯
-        function selectStep(val, btn) {
-            step = val;
-            document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-        }
+      const hasShoes = isEquipped('shoes');
+      const hasGlasses = isEquipped('glasses');
+      const hasRibbon = isEquipped('ribbon');
+      const hasCape = isEquipped('shirt');
+      const hasWand = isEquipped('wand');
+      const hasCrown = isEquipped('crown');
+      const hasWings = isEquipped('wings');
+      const hasHalo = isEquipped('halo');
+      const hasAura = isEquipped('aura');
+      const hasPet = isEquipped('pet');
 
-        function selectTarget(val, btn) {
-            target = val;
-            document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-        }
+      let svgHtml = `
+        <svg viewBox="0 0 220 220" class="w-full h-full drop-shadow-xl select-none">
+          <defs>
+            <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FED7AA" />
+              <stop offset="100%" stop-color="#FDBA74" />
+            </linearGradient>
+            <linearGradient id="clothGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#818CF8" />
+              <stop offset="100%" stop-color="#4F46E5" />
+            </linearGradient>
+            <linearGradient id="capeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FB7185" />
+              <stop offset="100%" stop-color="#E11D48" />
+            </linearGradient>
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FDE047" />
+              <stop offset="100%" stop-color="#D97706" />
+            </linearGradient>
+            <radialGradient id="wingGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+              <stop offset="60%" stop-color="#C7D2FE" stop-opacity="0.85" />
+              <stop offset="100%" stop-color="#818CF8" stop-opacity="0.7" />
+            </radialGradient>
+            <radialGradient id="auraGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#F472B6" stop-opacity="0.6" />
+              <stop offset="50%" stop-color="#A855F7" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="#6366F1" stop-opacity="0" />
+            </radialGradient>
+          </defs>
 
-        // 遊戲開始
-        function startGame() {
-            initAudio();
-            completedBoxes = 0;
-            boxCountText.innerText = completedBoxes;
-            
-            setupScreen.style.display = 'none';
-            winScreen.style.display = 'none';
-            truckScreen.style.display = 'none';
-            topBar.style.display = 'block';
-            
-            startNewBox();
-        }
+          <!-- 0. 奇蹟魔法星陣光環 (Aura) -->
+          ${hasAura ? `
+            <circle cx="110" cy="115" r="92" fill="url(#auraGrad)" class="animate-pulse" />
+            <circle cx="110" cy="115" r="82" fill="none" stroke="#C084FC" stroke-width="2" stroke-dasharray="6,4" />
+            <polygon points="110,38 128,102 192,115 128,128 110,192 92,128 28,115 92,102" fill="none" stroke="#F472B6" stroke-width="1.2" opacity="0.6" />
+          ` : ''}
 
-        // 啟動一個新箱子
-        function startNewBox() {
-            currentCount = 0;
-            boxArea.innerHTML = '';
-            statusText.innerText = '0 / ' + target;
-            answerInput.value = '';
-            
-            nextTurn();
-        }
+          <!-- 1. 夢幻天使羽翼 (Wings) -->
+          ${hasWings ? `
+            <!-- Left Wing -->
+            <g class="wing-left-anim">
+              <path d="M 70 115 C 20 85, 12 35, 62 48 C 42 70, 56 95, 75 106 Z" fill="url(#wingGrad)" stroke="#6366F1" stroke-width="2.5" />
+              <path d="M 50 68 C 30 80, 26 50, 60 52" fill="none" stroke="#A5B4FC" stroke-width="2" />
+            </g>
+            <!-- Right Wing -->
+            <g class="wing-right-anim">
+              <path d="M 150 115 C 200 85, 208 35, 158 48 C 178 70, 164 95, 145 106 Z" fill="url(#wingGrad)" stroke="#6366F1" stroke-width="2.5" />
+              <path d="M 170 68 C 190 80, 194 50, 160 52" fill="none" stroke="#A5B4FC" stroke-width="2" />
+            </g>
+          ` : ''}
 
-        // 單箱完成後點擊繼續
-        function nextBox() {
-            winScreen.style.display = 'none';
-            startNewBox();
-        }
+          <!-- 2. 英雄炫彩披風 (Cape) -->
+          ${hasCape ? `
+            <path d="M 75 110 Q 42 170 60 188 Q 110 172 160 188 Q 178 170 145 110 Z" fill="url(#capeGrad)" stroke="#9F1239" stroke-width="2">
+              <animate attributeName="d" dur="2.8s" repeatCount="indefinite"
+                values="M 75 110 Q 42 170 60 188 Q 110 172 160 188 Q 178 170 145 110 Z;
+                        M 75 110 Q 36 165 64 185 Q 110 178 156 185 Q 184 165 145 110 Z;
+                        M 75 110 Q 42 170 60 188 Q 110 172 160 188 Q 178 170 145 110 Z" />
+            </path>
+          ` : ''}
 
-        // 回到首頁重新設定
-        function resetToSetup() {
-            truckScreen.style.display = 'none';
-            winScreen.style.display = 'none';
-            topBar.style.display = 'none';
-            setupScreen.style.display = 'flex';
-            
-            // 重置貨車動畫
-            truckIcon.classList.remove('drive-away');
-        }
+          <!-- 3. 人物本體 (Body & Clothes) -->
+          <!-- 雙腿 -->
+          <rect x="90" y="152" width="15" height="28" rx="7" fill="#FDBA74" />
+          <rect x="115" y="152" width="15" height="28" rx="7" fill="#FDBA74" />
 
-        // 產生下一批蘋果
-        function nextTurn() {
-            expectedAnswer = currentCount + step;
-            
-            let applesToShow = step;
-            if (expectedAnswer > target) {
-                applesToShow = target - currentCount;
-                expectedAnswer = target;
-            }
+          <!-- 3.1 亮晶晶球鞋 (Shoes) -->
+          ${hasShoes ? `
+            <!-- Left Shoe -->
+            <ellipse cx="96" cy="182" rx="14" ry="9" fill="#EF4444" stroke="#B91C1C" stroke-width="2" />
+            <ellipse cx="93" cy="180" rx="10" ry="6" fill="#FFFFFF" />
+            <rect x="86" y="184" width="20" height="4" fill="#0F172A" rx="2" />
+            <!-- Star emblem on shoe -->
+            <polygon points="96,177 98,181 102,181 99,183 100,187 96,185 92,187 93,183 90,181 94,181" fill="#FDE047" />
 
-            for(let i=0; i < applesToShow; i++) {
-                const apple = document.createElement('div');
-                apple.className = 'apple';
-                apple.innerText = '🍎';
-                boxArea.appendChild(apple);
-            }
-            
-            answerInput.focus();
-        }
+            <!-- Right Shoe -->
+            <ellipse cx="124" cy="182" rx="14" ry="9" fill="#EF4444" stroke="#B91C1C" stroke-width="2" />
+            <ellipse cx="127" cy="180" rx="10" ry="6" fill="#FFFFFF" />
+            <rect x="114" y="184" width="20" height="4" fill="#0F172A" rx="2" />
+            <!-- Star emblem on shoe -->
+            <polygon points="124,177 126,181 130,181 127,183 128,187 124,185 120,187 121,183 118,181 122,181" fill="#FDE047" />
+          ` : `
+            <!-- 光腳丫 -->
+            <ellipse cx="96" cy="180" rx="9" ry="5" fill="#FDBA74" />
+            <ellipse cx="124" cy="180" rx="9" ry="5" fill="#FDBA74" />
+          `}
 
-        // 檢查輸入答案
-        function checkAnswer() {
-            const playerInput = parseInt(answerInput.value);
-            
-            if (playerInput === expectedAnswer) {
-                playDing();
-                speakText(playerInput.toString());
-                
-                currentCount = expectedAnswer;
-                statusText.innerText = currentCount + ' / ' + target;
-                answerInput.value = '';
+          <!-- 身體上衣 -->
+          <rect x="78" y="105" width="64" height="56" rx="18" fill="url(#clothGrad)" stroke="#312E81" stroke-width="2" />
+          <!-- 上衣星芒徽章 -->
+          <circle cx="110" cy="126" r="14" fill="#FEF08A" opacity="0.95" />
+          <polygon points="110,116 113,123 121,123 115,128 117,136 110,131 103,136 105,128 99,123 107,123" fill="#F59E0B" />
 
-                if (currentCount >= target) {
-                    completedBoxes++;
-                    boxCountText.innerText = completedBoxes;
+          <!-- 4. 幸運領結 (Ribbon) -->
+          ${hasRibbon ? `
+            <g transform="translate(110, 107)">
+              <polygon points="0,0 -15,-8 -15,8" fill="#EC4899" stroke="#9D174D" stroke-width="1.5" />
+              <polygon points="0,0 15,-8 15,8" fill="#EC4899" stroke="#9D174D" stroke-width="1.5" />
+              <circle cx="0" cy="0" r="5" fill="#FDE047" stroke="#D97706" stroke-width="1.5" />
+            </g>
+          ` : ''}
 
-                    setTimeout(() => {
-                        if (completedBoxes >= maxBoxes) {
-                            // 全部達成：顯示貨車畫面
-                            truckScreen.style.display = 'flex';
-                            truckIcon.classList.add('drive-away');
-                            speakText("太棒了！貨車出發囉！", 0.8);
-                        } else {
-                            // 單箱達成：顯示單箱完成畫面
-                            winScreen.style.display = 'flex';
-                            speakText("裝箱完成", 0.8);
-                        }
-                    }, 1500); 
-                } else {
-                    setTimeout(nextTurn, 1000); 
-                }
+          <!-- 雙臂 -->
+          <!-- 左手 -->
+          <path d="M 78 116 Q 58 132 64 146" stroke="#FDBA74" stroke-width="13" stroke-linecap="round" fill="none" />
+          <!-- 右手 -->
+          <path d="M 142 116 Q 162 132 156 146" stroke="#FDBA74" stroke-width="13" stroke-linecap="round" fill="none" />
+
+          <!-- 5. 璀璨星光魔法棒 (Wand) -->
+          ${hasWand ? `
+            <g transform="translate(160, 134) rotate(-28)">
+              <rect x="-2.5" y="0" width="5" height="42" fill="#D97706" stroke="#78350F" stroke-width="1.5" rx="2.5" />
+              <!-- Wand Big Star -->
+              <polygon points="0,-12 4,-3 13,-3 6,3 9,12 0,7 -9,12 -6,3 -13,-3 -4,-3" fill="#FDE047" stroke="#B45309" stroke-width="2" />
+              <circle cx="0" cy="-2" r="4" fill="#FFFFFF" />
+              <!-- Twinkling stars -->
+              <circle cx="12" cy="-18" r="2" fill="#FDE047" class="animate-ping" />
+              <circle cx="-14" cy="-10" r="2" fill="#FDE047" class="animate-ping" />
+            </g>
+          ` : ''}
+
+          <!-- 6. 頭部與五官 -->
+          <circle cx="110" cy="74" r="35" fill="url(#bodyGrad)" stroke="#EA580C" stroke-width="2" />
+          
+          <!-- 萌萌腮紅 -->
+          <ellipse cx="88" cy="83" rx="7" ry="5" fill="#FDA4AF" opacity="0.8" />
+          <ellipse cx="132" cy="83" rx="7" ry="5" fill="#FDA4AF" opacity="0.8" />
+
+          <!-- 水汪汪眼睛 -->
+          <circle cx="96" cy="74" r="5" fill="#0F172A" />
+          <circle cx="94" cy="72" r="2" fill="#FFFFFF" />
+          <circle cx="98" cy="76" r="1" fill="#FFFFFF" />
+
+          <circle cx="124" cy="74" r="5" fill="#0F172A" />
+          <circle cx="122" cy="72" r="2" fill="#FFFFFF" />
+          <circle cx="126" cy="76" r="1" fill="#FFFFFF" />
+
+          <!-- 開心微笑 -->
+          <path d="M 103 85 Q 110 93 117 85" stroke="#9A3412" stroke-width="3" stroke-linecap="round" fill="none" />
+
+          <!-- 可愛頭頂呆毛 -->
+          <path d="M 106 40 Q 110 28 118 39" stroke="#9A3412" stroke-width="3.5" stroke-linecap="round" fill="none" />
+
+          <!-- 7. 酷炫星星墨鏡 (Glasses) -->
+          ${hasGlasses ? `
+            <g transform="translate(0, 1)">
+              <!-- 鏡架中橋 -->
+              <path d="M 105 73 Q 110 70 115 73" stroke="#0F172A" stroke-width="3" fill="none" />
+              <!-- 左鏡片 (星星造型) -->
+              <rect x="83" y="66" width="24" height="17" rx="6" fill="#0F172A" stroke="#FDE047" stroke-width="2" />
+              <line x1="87" y1="70" x2="97" y2="80" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" />
+              <!-- 右鏡片 (星星造型) -->
+              <rect x="113" y="66" width="24" height="17" rx="6" fill="#0F172A" stroke="#FDE047" stroke-width="2" />
+              <line x1="117" y1="70" x2="127" y2="80" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" />
+            </g>
+          ` : ''}
+
+          <!-- 8. 璀璨黃金王冠 (Crown) -->
+          ${hasCrown ? `
+            <g transform="translate(84, 25)">
+              <polygon points="0,20 8,5 26,16 44,5 52,20" fill="url(#goldGrad)" stroke="#B45309" stroke-width="2" />
+              <!-- 皇冠上的紅寶石、藍寶石、綠寶石 -->
+              <circle cx="8" cy="5" r="4" fill="#EF4444" stroke="#991B1B" stroke-width="1" />
+              <circle cx="26" cy="16" r="4" fill="#3B82F6" stroke="#1D4ED8" stroke-width="1" />
+              <circle cx="44" cy="5" r="4" fill="#10B981" stroke="#047857" stroke-width="1" />
+              <!-- 冠帶 -->
+              <rect x="0" y="18" width="52" height="7" fill="#F59E0B" rx="2.5" />
+              <circle cx="13" cy="21.5" r="2" fill="#FFFFFF" />
+              <circle cx="26" cy="21.5" r="2" fill="#FFFFFF" />
+              <circle cx="39" cy="21.5" r="2" fill="#FFFFFF" />
+            </g>
+          ` : ''}
+
+          <!-- 9. 閃耀神聖天使光環 (Halo) -->
+          ${hasHalo ? `
+            <g transform="translate(110, 22)">
+              <ellipse cx="0" cy="0" rx="36" ry="9" fill="none" stroke="#FDE047" stroke-width="4.5" stroke-dasharray="14,2" />
+              <ellipse cx="0" cy="0" rx="36" ry="9" fill="none" stroke="#FFFFFF" stroke-width="2" />
+              <circle cx="25" cy="-4" r="2" fill="#FDE047" class="animate-ping" />
+            </g>
+          ` : ''}
+
+          <!-- 10. 守護萌寵獨角獸 (Pet Unicorn) -->
+          ${hasPet ? `
+            <g transform="translate(18, 136)">
+              <!-- 身體 -->
+              <ellipse cx="22" cy="32" rx="18" ry="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2" />
+              <!-- 頭部 -->
+              <circle cx="34" cy="18" r="13" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2" />
+              <!-- 金色獨角 -->
+              <polygon points="36,5 31,14 41,14" fill="#F59E0B" stroke="#D97706" stroke-width="1.5" />
+              <!-- 獨角獸眼睛 -->
+              <circle cx="38" cy="18" r="2" fill="#1E293B" />
+              <!-- 粉紅腮紅 -->
+              <circle cx="34" cy="24" r="3" fill="#FDA4AF" opacity="0.8" />
+              <!-- 彩虹鬃毛 -->
+              <path d="M 26 8 Q 22 18 25 25" stroke="#EC4899" stroke-width="4" stroke-linecap="round" fill="none" />
+              <!-- 腳腳 -->
+              <rect x="12" y="42" width="6" height="10" rx="3" fill="#E2E8F0" />
+              <rect x="25" y="42" width="6" height="10" rx="3" fill="#E2E8F0" />
+            </g>
+          ` : ''}
+        </svg>
+      `;
+
+      dom.characterContainer.innerHTML = svgHtml;
+      dom.accessoryCount.textContent = `${state.equippedAccessories.size} / ${ACCESSORIES.length}`;
+
+      // 同步更新裝備清單卡片
+      renderAccessoriesInventory();
+    }
+
+    // 渲染裝備庫面板（提供單項點擊套用/卸下功能）
+    function renderAccessoriesInventory() {
+      dom.accessoriesInventory.innerHTML = '';
+
+      ACCESSORIES.forEach((acc) => {
+        const isUnlocked = state.unlockedAccessories.has(acc.id);
+        const isEquipped = state.equippedAccessories.has(acc.id);
+
+        const badgeBtn = document.createElement('button');
+        badgeBtn.className = `flex flex-col items-center justify-center p-1.5 rounded-xl border text-center transition-all ${
+          !isUnlocked
+            ? 'bg-slate-100/70 border-slate-200 opacity-40 cursor-not-allowed'
+            : isEquipped
+              ? 'bg-amber-100/90 border-amber-400 ring-2 ring-amber-300 shadow-sm hover:scale-105'
+              : 'bg-white border-slate-300 text-slate-500 hover:bg-slate-50 hover:scale-105'
+        }`;
+
+        badgeBtn.innerHTML = `
+          <span class="text-xl sm:text-2xl">${acc.icon}</span>
+          <span class="text-[10px] font-black truncate w-full mt-0.5 ${isEquipped ? 'text-amber-900' : 'text-slate-500'}">
+            ${acc.name}
+          </span>
+          <span class="text-[9px] font-bold px-1 rounded-full mt-0.5 ${
+            !isUnlocked ? 'text-slate-400' : isEquipped ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'
+          }">
+            ${!isUnlocked ? '未解鎖' : isEquipped ? '穿戴中' : '可穿上'}
+          </span>
+        `;
+
+        if (isUnlocked) {
+          badgeBtn.addEventListener('click', () => {
+            playSound('pop');
+            if (state.equippedAccessories.has(acc.id)) {
+              state.equippedAccessories.delete(acc.id);
             } else {
-                answerInput.classList.add('shake');
-                setTimeout(() => {
-                    answerInput.classList.remove('shake');
-                    answerInput.value = '';
-                    answerInput.focus();
-                }, 400);
+              state.equippedAccessories.add(acc.id);
+              triggerEquipNotification(`已穿戴【${acc.name}】！`);
             }
+            renderCharacter();
+          });
         }
 
-        answerInput.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                checkAnswer();
-            }
+        dom.accessoriesInventory.appendChild(badgeBtn);
+      });
+
+      // 更新下一件裝扮提示
+      const remaining = ACCESSORIES.filter(a => !state.unlockedAccessories.has(a.id));
+      if (remaining.length > 0) {
+        dom.nextRewardHint.textContent = `下一件「${remaining[0].name}」：再答對 1 題`;
+      } else {
+        dom.nextRewardHint.textContent = `🎉 10件全套神裝已集齊！`;
+      }
+    }
+
+    // 觸發角色穿戴提示氣泡與橫幅
+    function triggerEquipNotification(text) {
+      dom.equipToast.textContent = `✨ ${text} 直接套用在人物身上！`;
+      dom.equipToast.classList.remove('opacity-0', 'scale-95');
+      dom.equipToast.classList.add('opacity-100', 'scale-100');
+
+      dom.characterContainer.classList.add('animate-bounce');
+      setTimeout(() => {
+        dom.characterContainer.classList.remove('animate-bounce');
+      }, 1000);
+
+      setTimeout(() => {
+        dom.equipToast.classList.remove('opacity-100', 'scale-100');
+        dom.equipToast.classList.add('opacity-0', 'scale-95');
+      }, 2400);
+    }
+
+    /* ====================================================================
+       出題與唱數點數系統
+       ==================================================================== */
+    function generateNewQuestion() {
+      // 隨機出題：1 到 30 個物品
+      state.currentCount = Math.floor(Math.random() * 30) + 1;
+      state.currentThemeIndex = Math.floor(Math.random() * ITEM_THEMES.length);
+      const theme = ITEM_THEMES[state.currentThemeIndex];
+      dom.targetThemeName.textContent = theme.name;
+
+      // 清空點選唱數紀錄
+      state.markedList = [];
+      updateCountedStatus();
+
+      // 清空輸入
+      clearCanvas();
+      dom.answerInput.value = '';
+      dom.keypadDisplayVal.textContent = '--';
+      hideFeedback();
+
+      // 產生題目物品
+      dom.itemsGrid.innerHTML = '';
+      for (let i = 0; i < state.currentCount; i++) {
+        const itemBtn = document.createElement('button');
+        itemBtn.className = `relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-2xl sm:text-3xl bg-white border border-slate-200 shadow-xs hover:scale-110 active:scale-95 transition-all select-none animate-pop cursor-pointer`;
+        itemBtn.style.animationDelay = `${Math.min(i * 0.02, 0.45)}s`;
+        itemBtn.setAttribute('data-idx', i);
+
+        itemBtn.innerHTML = `
+          <span>${theme.emoji}</span>
+          <!-- 唱數順序標籤 -->
+          <span class="count-badge absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black flex items-center justify-center shadow-md border-2 border-white hidden">
+            1
+          </span>
+        `;
+
+        itemBtn.addEventListener('click', (e) => {
+          handleItemClick(i, itemBtn, e);
         });
-    </script>
+
+        dom.itemsGrid.appendChild(itemBtn);
+      }
+    }
+
+    // 點擊物品：核心唱數語音邏輯
+    function handleItemClick(idx, itemBtn, event) {
+      const existingPos = state.markedList.indexOf(idx);
+
+      if (existingPos === -1) {
+        // 新標記此物品 -> 唱數下一個數字！
+        state.markedList.push(idx);
+        const curCount = state.markedList.length;
+
+        playSound('pop');
+        // 核心要求：點擊時有唱數的語音回饋
+        speakCountNumber(curCount);
+
+        itemBtn.classList.add('item-counted');
+        const badge = itemBtn.querySelector('.count-badge');
+        if (badge) {
+          badge.classList.remove('hidden');
+          badge.textContent = curCount;
+        }
+
+        // 噴射動態浮動唱數小數字
+        spawnFloatingNumber(event.clientX, event.clientY, curCount);
+
+      } else {
+        // 取消標記此物品
+        state.markedList.splice(existingPos, 1);
+        playSound('unpop');
+        itemBtn.classList.remove('item-counted');
+        const badge = itemBtn.querySelector('.count-badge');
+        if (badge) badge.classList.add('hidden');
+
+        // 重新依順序更新所有已標記物品上的號碼，保持 1, 2, 3... 連續
+        refreshAllItemBadges();
+      }
+
+      updateCountedStatus();
+    }
+
+    function refreshAllItemBadges() {
+      const allBtns = dom.itemsGrid.querySelectorAll('button');
+      allBtns.forEach(btn => {
+        const itemIdx = parseInt(btn.getAttribute('data-idx'), 10);
+        const order = state.markedList.indexOf(itemIdx);
+        const badge = btn.querySelector('.count-badge');
+        if (order !== -1) {
+          btn.classList.add('item-counted');
+          if (badge) {
+            badge.classList.remove('hidden');
+            badge.textContent = order + 1;
+          }
+        } else {
+          btn.classList.remove('item-counted');
+          if (badge) badge.classList.add('hidden');
+        }
+      });
+    }
+
+    function spawnFloatingNumber(x, y, num) {
+      const floater = document.createElement('div');
+      floater.className = 'fixed z-50 floating-count-badge font-black text-amber-500 text-lg sm:text-xl drop-shadow-md';
+      floater.textContent = `+${num}`;
+      floater.style.left = `${x - 12}px`;
+      floater.style.top = `${y - 20}px`;
+      document.body.appendChild(floater);
+      setTimeout(() => floater.remove(), 750);
+    }
+
+    function updateCountedStatus() {
+      dom.countedStat.textContent = state.markedList.length;
+    }
+
+    function resetMarkedItems() {
+      playSound('unpop');
+      state.markedList = [];
+      updateCountedStatus();
+      refreshAllItemBadges();
+    }
+
+    /* ====================================================================
+       手寫板繪圖與筆跡辨識
+       ==================================================================== */
+    const canvas = dom.canvas;
+    const ctx = canvas.getContext('2d');
+
+    function initCanvasResolution() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+      redrawCanvas();
+    }
+
+    function clearCanvas() {
+      state.strokes = [];
+      state.hasDrawnStrokes = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawCanvasGuidelines();
+    }
+
+    function drawCanvasGuidelines() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.save();
+      ctx.strokeStyle = '#E2E8F0';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.moveTo(10, rect.height * 0.72);
+      ctx.lineTo(rect.width - 10, rect.height * 0.72);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function getCanvasPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      let clientX = e.clientX;
+      let clientY = e.clientY;
+      if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+      }
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function startDrawing(e) {
+      e.preventDefault();
+      state.isDrawing = true;
+      state.hasDrawnStrokes = true;
+      const pos = getCanvasPos(e);
+      state.strokes.push([pos]);
+
+      ctx.save();
+      ctx.strokeStyle = '#4F46E5';
+      ctx.lineWidth = 6.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    }
+
+    function continueDrawing(e) {
+      if (!state.isDrawing) return;
+      e.preventDefault();
+      const pos = getCanvasPos(e);
+      const curStroke = state.strokes[state.strokes.length - 1];
+      if (curStroke) curStroke.push(pos);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+
+    function stopDrawing() {
+      if (!state.isDrawing) return;
+      state.isDrawing = false;
+      ctx.restore();
+    }
+
+    function redrawCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      drawCanvasGuidelines();
+
+      ctx.save();
+      ctx.strokeStyle = '#4F46E5';
+      ctx.lineWidth = 6.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      state.strokes.forEach(stroke => {
+        if (stroke.length < 2) return;
+        ctx.beginPath();
+        ctx.moveTo(stroke[0].x, stroke[0].y);
+        for (let i = 1; i < stroke.length; i++) {
+          ctx.lineTo(stroke[i].x, stroke[i].y);
+        }
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    window.addEventListener('mousemove', continueDrawing);
+    window.addEventListener('mouseup', stopDrawing);
+
+    canvas.addEventListener('touchstart', startDrawing, { passive: false });
+    window.addEventListener('touchmove', continueDrawing, { passive: false });
+    window.addEventListener('touchend', stopDrawing);
+
+    // 智能筆跡分析器 (支援 1~30)
+    function recognizeHandwriting() {
+      if (!state.hasDrawnStrokes || state.strokes.length === 0) {
+        showFeedback('請先在畫板上寫下數字喔！✍️', 'warning');
+        return null;
+      }
+
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      state.strokes.forEach(st => {
+        st.forEach(pt => {
+          if (pt.x < minX) minX = pt.x;
+          if (pt.x > maxX) maxX = pt.x;
+          if (pt.y < minY) minY = pt.y;
+          if (pt.y > maxY) maxY = pt.y;
+        });
+      });
+
+      const totalW = maxX - minX;
+      const totalH = maxY - minY;
+
+      let recognizedNum = null;
+
+      // 檢查雙位數（寬高比或筆劃橫向分布）
+      if (totalW / totalH > 0.85 && totalW > 55) {
+        const midX = minX + totalW * 0.5;
+        const leftStrokes = [];
+        const rightStrokes = [];
+
+        state.strokes.forEach(st => {
+          const avgX = st.reduce((s, p) => s + p.x, 0) / st.length;
+          if (avgX < midX) leftStrokes.push(st);
+          else rightStrokes.push(st);
+        });
+
+        if (leftStrokes.length > 0 && rightStrokes.length > 0) {
+          const d1 = recognizeSingleDigit(leftStrokes);
+          const d2 = recognizeSingleDigit(rightStrokes);
+          if (d1 !== null && d2 !== null) {
+            recognizedNum = d1 * 10 + d2;
+          }
+        }
+      }
+
+      if (recognizedNum === null) {
+        recognizedNum = recognizeSingleDigit(state.strokes);
+      }
+
+      if (recognizedNum !== null && recognizedNum >= 0 && recognizedNum <= 30) {
+        dom.answerInput.value = recognizedNum;
+        dom.keypadDisplayVal.textContent = recognizedNum;
+        showFeedback(`筆跡辨識成功：填入【${recognizedNum}】`, 'info');
+        playSound('pop');
+        return recognizedNum;
+      } else {
+        showFeedback('已感應筆劃！若數字不符可直接修改數字框', 'info');
+        return null;
+      }
+    }
+
+    function recognizeSingleDigit(strokes) {
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      let startPt = strokes[0][0];
+      let lastStroke = strokes[strokes.length - 1];
+      let endPt = lastStroke[lastStroke.length - 1];
+
+      strokes.forEach(st => {
+        st.forEach(pt => {
+          if (pt.x < minX) minX = pt.x;
+          if (pt.x > maxX) maxX = pt.x;
+          if (pt.y < minY) minY = pt.y;
+          if (pt.y > maxY) maxY = pt.y;
+        });
+      });
+
+      const w = Math.max(1, maxX - minX);
+      const h = Math.max(1, maxY - minY);
+      const aspectRatio = w / h;
+      const dStartEnd = Math.sqrt(Math.pow(endPt.x - startPt.x, 2) + Math.pow(endPt.y - startPt.y, 2));
+      const isClosed = dStartEnd < Math.max(w, h) * 0.35;
+
+      if (aspectRatio < 0.35 && strokes.length <= 2) return 1;
+      if (isClosed && aspectRatio > 0.45 && strokes.length === 1) return 0;
+      if (strokes.length >= 2) return 4;
+      if (startPt.y < minY + h * 0.3 && endPt.y > maxY - h * 0.3 && endPt.x < minX + w * 0.6) return 7;
+      if (endPt.y > maxY - h * 0.25 && endPt.x > minX + w * 0.5) return 2;
+      if (aspectRatio > 0.4 && aspectRatio < 0.9 && !isClosed) return 3;
+      return 1;
+    }
+
+    /* ====================================================================
+       驗證答案、得分與即時換裝解鎖
+       ==================================================================== */
+    function checkAnswer() {
+      let playerAns = parseInt(dom.answerInput.value, 10);
+
+      // 若手寫板有畫但輸入框為空，先嘗試自動辨識
+      if (isNaN(playerAns) && state.hasDrawnStrokes) {
+        const rec = recognizeHandwriting();
+        if (rec !== null) playerAns = rec;
+      }
+
+      if (isNaN(playerAns)) {
+        showFeedback('請先寫下或選出你數出的數字喔！', 'warning');
+        return;
+      }
+
+      if (playerAns === state.currentCount) {
+        handleCorrectAnswer();
+      } else {
+        handleWrongAnswer(playerAns);
+      }
+    }
+
+    function handleCorrectAnswer() {
+      state.score += 10;
+      state.streak += 1;
+      playSound('correct');
+
+      dom.score.textContent = state.score;
+      dom.streak.textContent = `${state.streak} 🔥`;
+
+      // 讚美對話氣泡與語音
+      const praises = ['太神啦！🎉', '完全正確！💯', '數數大師！🏆', '眼力一級棒！✨'];
+      const praiseText = praises[Math.floor(Math.random() * praises.length)];
+      triggerCharacterReaction(praiseText);
+      speakVoicePraise(`答對了！就是${state.currentCount}個，${praiseText}`);
+
+      // 核心需求：解鎖的裝扮直接套用在頁面人物上
+      unlockAndEquipNextAccessory();
+
+      showFeedback(`答對了！恭喜獲得 10 分！🎉`, 'success');
+
+      // 延遲後自動出下一題
+      setTimeout(() => {
+        generateNewQuestion();
+      }, 1800);
+    }
+
+    function handleWrongAnswer(guessed) {
+      state.streak = 0;
+      dom.streak.textContent = '0';
+      playSound('wrong');
+
+      const hint = guessed < state.currentCount ? '再多一點喔！' : '多數了幾隻喔！';
+      showFeedback(`差一點點！你填的是 ${guessed}，${hint} 可點擊唱數再確認一次～💪`, 'error');
+      triggerCharacterReaction('再試一次！你可以的～💡');
+      speakVoicePraise(`差一點點，${hint} 再數一次看看喔！`);
+    }
+
+    // 核心解鎖並直接穿上裝備邏輯
+    function unlockAndEquipNextAccessory() {
+      // 找出下一件未解鎖的裝扮
+      const nextAcc = ACCESSORIES.find(acc => !state.unlockedAccessories.has(acc.id));
+
+      if (nextAcc) {
+        state.unlockedAccessories.add(nextAcc.id);
+        // 重要：解鎖的裝扮直接套用在頁面人物上！
+        state.equippedAccessories.add(nextAcc.id);
+
+        playSound('unlock');
+        // 重新繪製人物，新裝備立刻顯現！
+        renderCharacter();
+
+        // 浮現穿戴橫幅與彈窗
+        triggerEquipNotification(`解鎖全新【${nextAcc.name}】`);
+        showUnlockModal(nextAcc);
+      } else {
+        // 全套已滿，依然確保全部穿戴
+        renderCharacter();
+      }
+    }
+
+    function showUnlockModal(acc) {
+      dom.unlockItemDesc.textContent = `你的夥伴獲得了「${acc.name}」！${acc.desc}`;
+      dom.unlockItemPreview.textContent = acc.icon;
+      dom.unlockModal.classList.remove('hidden');
+    }
+
+    function triggerCharacterReaction(text) {
+      dom.characterBubble.textContent = text;
+      dom.characterBubble.classList.remove('scale-0');
+      dom.characterBubble.classList.add('scale-100');
+      setTimeout(() => {
+        dom.characterBubble.classList.remove('scale-100');
+        dom.characterBubble.classList.add('scale-0');
+      }, 2500);
+    }
+
+    function showFeedback(msg, type = 'info') {
+      dom.feedbackBanner.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800', 'bg-indigo-100', 'text-indigo-800');
+
+      if (type === 'success') {
+        dom.feedbackBanner.classList.add('bg-emerald-100', 'text-emerald-800');
+      } else if (type === 'error') {
+        dom.feedbackBanner.classList.add('bg-rose-100', 'text-rose-800');
+      } else if (type === 'warning') {
+        dom.feedbackBanner.classList.add('bg-amber-100', 'text-amber-800');
+      } else {
+        dom.feedbackBanner.classList.add('bg-indigo-100', 'text-indigo-800');
+      }
+
+      dom.feedbackBanner.textContent = msg;
+    }
+
+    function hideFeedback() {
+      dom.feedbackBanner.classList.add('hidden');
+    }
+
+    /* ====================================================================
+       事件監聽與功能綁定
+       ==================================================================== */
+    // 唱數語音開關
+    dom.voiceToggleBtn.addEventListener('click', () => {
+      state.voiceCountingEnabled = !state.voiceCountingEnabled;
+      dom.voiceStatusText.textContent = state.voiceCountingEnabled ? '開啟' : '關閉';
+      dom.voiceStatusText.className = state.voiceCountingEnabled ? 'text-emerald-600' : 'text-slate-400';
+      dom.voiceIcon.textContent = state.voiceCountingEnabled ? '🗣️' : '🔇';
+      playSound('pop');
+      if (state.voiceCountingEnabled) {
+        speakCountNumber(state.markedList.length || 1);
+      }
+    });
+
+    // 試衣間一鍵換裝按鈕
+    dom.equipAllBtn.addEventListener('click', () => {
+      state.unlockedAccessories.forEach(id => state.equippedAccessories.add(id));
+      playSound('pop');
+      renderCharacter();
+      triggerEquipNotification('已穿戴全部已解鎖裝備');
+    });
+
+    dom.unequipAllBtn.addEventListener('click', () => {
+      state.equippedAccessories.clear();
+      playSound('unpop');
+      renderCharacter();
+    });
+
+    // 模式切換
+    dom.modeDrawBtn.addEventListener('click', () => {
+      state.inputMode = 'draw';
+      dom.modeDrawBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+      dom.modeDrawBtn.classList.remove('text-slate-500');
+      dom.modeKeypadBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+      dom.modeKeypadBtn.classList.add('text-slate-500');
+      dom.drawContainer.classList.remove('hidden');
+      dom.keypadContainer.classList.add('hidden');
+      initCanvasResolution();
+    });
+
+    dom.modeKeypadBtn.addEventListener('click', () => {
+      state.inputMode = 'keypad';
+      dom.modeKeypadBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+      dom.modeKeypadBtn.classList.remove('text-slate-500');
+      dom.modeDrawBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+      dom.modeDrawBtn.classList.add('text-slate-500');
+      dom.keypadContainer.classList.remove('hidden');
+      dom.drawContainer.classList.add('hidden');
+    });
+
+    // 數字鍵盤
+    let currentKeypadStr = '';
+    document.querySelectorAll('.key-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        playSound('pop');
+        const val = e.currentTarget.getAttribute('data-val');
+        if (currentKeypadStr.length >= 2) return;
+        currentKeypadStr += val;
+        const num = parseInt(currentKeypadStr, 10);
+        dom.keypadDisplayVal.textContent = currentKeypadStr;
+        dom.answerInput.value = num;
+      });
+    });
+
+    dom.keypadClearBtn.addEventListener('click', () => {
+      playSound('unpop');
+      currentKeypadStr = '';
+      dom.keypadDisplayVal.textContent = '--';
+      dom.answerInput.value = '';
+    });
+
+    dom.keypadSubmitBtn.addEventListener('click', checkAnswer);
+    dom.submitAnswerBtn.addEventListener('click', checkAnswer);
+    dom.recognizeBtn.addEventListener('click', recognizeHandwriting);
+
+    dom.clearCanvasBtn.addEventListener('click', () => {
+      playSound('unpop');
+      clearCanvas();
+    });
+
+    dom.nextQuestionBtn.addEventListener('click', () => {
+      playSound('pop');
+      generateNewQuestion();
+    });
+
+    dom.resetCountedBtn.addEventListener('click', resetMarkedItems);
+
+    dom.modalCloseBtn.addEventListener('click', () => {
+      playSound('pop');
+      dom.unlockModal.classList.add('hidden');
+    });
+
+    dom.soundBtn.addEventListener('click', () => {
+      state.soundEnabled = !state.soundEnabled;
+      dom.soundBtn.textContent = state.soundEnabled ? '🔔' : '🔕';
+    });
+
+    dom.answerInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkAnswer();
+    });
+
+    window.addEventListener('resize', initCanvasResolution);
+
+    // 啟動遊戲
+    initSpeechEngine();
+    initCanvasResolution();
+    renderCharacter();
+    generateNewQuestion();
+  </script>
 </body>
 </html>

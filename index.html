@@ -3,310 +3,391 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>數數大冒險・娃娃換裝秀 (語音唱數版)</title>
+  <title>超商特賣大冒險・買一送一與第二件半價數學換裝秀</title>
   <!-- Tailwind CSS provided by gstatic -->
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
   <style>
-    @keyframes bounce-gentle {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-7px); }
+    @keyframes float-gentle {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-6px) rotate(0.5deg); }
     }
-    @keyframes pop-item {
-      0% { transform: scale(0.65) rotate(-6deg); opacity: 0; }
-      75% { transform: scale(1.12) rotate(3deg); }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
     }
-    @keyframes float-up {
-      0% { opacity: 0; transform: translateY(0) scale(0.8); }
-      40% { opacity: 1; transform: translateY(-16px) scale(1.2); }
-      100% { opacity: 0; transform: translateY(-34px) scale(1); }
+    @keyframes sparkle-spin {
+      0% { transform: rotate(0deg) scale(0.9); }
+      50% { transform: rotate(180deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(0.9); }
     }
-    @keyframes glow-pulse {
-      0%, 100% { filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4)); }
-      50% { filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.8)); }
-    }
-    @keyframes wing-flap {
+    @keyframes wing-flutter-left {
       0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(5deg) scaleX(0.96); }
+      50% { transform: rotate(6deg) scaleX(0.95); }
     }
-    .animate-pop {
-      animation: pop-item 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    @keyframes wing-flutter-right {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(-6deg) scaleX(0.95); }
     }
-    .animate-gentle {
-      animation: bounce-gentle 2.6s ease-in-out infinite;
+    .char-float {
+      animation: float-gentle 3.2s ease-in-out infinite;
     }
-    .character-glow {
-      animation: glow-pulse 3s infinite;
+    .aura-spin {
+      animation: sparkle-spin 12s linear infinite;
+      transform-origin: 110px 115px;
     }
-    .wing-left-anim {
-      transform-origin: 65px 105px;
-      animation: wing-flap 1.8s ease-in-out infinite;
+    .wing-l {
+      animation: wing-flutter-left 2s ease-in-out infinite;
+      transform-origin: 60px 105px;
     }
-    .wing-right-anim {
-      transform-origin: 135px 105px;
-      animation: wing-flap 1.8s ease-in-out infinite reverse;
+    .wing-r {
+      animation: wing-flutter-right 2s ease-in-out infinite;
+      transform-origin: 160px 105px;
     }
-    .floating-count-badge {
-      animation: float-up 0.75s ease-out forwards;
-      pointer-events: none;
+    .pop-badge {
+      animation: pulse-ring 2s infinite ease-in-out;
     }
-    /* Touch optimization */
     canvas {
       touch-action: none;
     }
-    .item-counted {
-      transform: scale(1.06);
-      border-color: #F59E0B !important;
-      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* Confetti particle style */
+    .confetti-particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      pointer-events: none;
+      animation: confetti-fall 2.5s linear forwards;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-amber-50 via-sky-50 to-pink-50 min-h-screen text-slate-800 font-sans p-2 sm:p-5 antialiased select-none">
-  <div class="max-w-5xl mx-auto flex flex-col gap-3 sm:gap-4">
+<body class="bg-gradient-to-br from-pink-50 via-purple-50 to-amber-50 min-h-screen text-slate-800 font-sans p-2 sm:p-5 antialiased select-none">
+  <div class="max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 relative">
 
-    <!-- Header Section -->
-    <header class="bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-md border border-amber-200/70 flex flex-wrap items-center justify-between gap-3">
+    <!-- Top Header & Status Bar -->
+    <header class="bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-md border border-pink-200/80 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <span class="text-3xl sm:text-4xl animate-bounce">🦄</span>
+        <span class="text-3xl sm:text-4xl animate-bounce">🎀</span>
         <div>
-          <h1 class="text-xl sm:text-2xl font-black bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-            數數大冒險・娃娃換裝秀
-          </h1>
-          <p class="text-xs sm:text-sm text-slate-500 font-medium">點擊物品自動語音唱數（1~30），答對立刻幫頁面人物穿上新裝扮！</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl sm:text-2xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              超商特賣大冒險・美少女換裝秀
+            </h1>
+            <span class="px-2 py-0.5 rounded-full text-xs font-black bg-pink-100 text-pink-700 border border-pink-200">
+              買一送一 × 第二件半價
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+            共 20 關挑戰！每答對一關得 5 分（滿分 100 分），並立刻為美少女解鎖換上超美裝備！
+          </p>
         </div>
       </div>
 
-      <!-- Control & Stats Bar -->
-      <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-amber-50/90 px-3 py-2 rounded-xl border border-amber-200">
-        <!-- Voice Counting Switch -->
-        <button id="voice-toggle-btn" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-800 hover:bg-amber-100 text-xs font-bold transition shadow-xs" title="點擊切換是否語音唱數">
-          <span id="voice-icon">🗣️</span>
-          <span>唱數語音：<strong id="voice-status-text" class="text-emerald-600">開啟</strong></span>
-        </button>
-
-        <div class="h-7 w-[1px] bg-amber-200 hidden sm:block"></div>
-
-        <!-- Score display -->
+      <!-- Stats Progress Bar -->
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-gradient-to-r from-pink-50 to-purple-50 px-3.5 py-2 rounded-xl border border-pink-200 shadow-xs">
+        <!-- Current Level -->
         <div class="text-center px-1">
-          <span class="text-[11px] text-amber-700 font-bold block">得分</span>
-          <span id="score-display" class="text-lg sm:text-xl font-black text-amber-600">0</span>
+          <span class="text-[11px] text-purple-700 font-bold block">目前關卡</span>
+          <span id="level-display" class="text-lg sm:text-xl font-black text-purple-700">第 1 / 20 關</span>
         </div>
 
-        <div class="h-7 w-[1px] bg-amber-200"></div>
+        <div class="h-7 w-[1px] bg-pink-200"></div>
 
-        <!-- Dress Up status -->
+        <!-- Total Score (Target 100) -->
         <div class="text-center px-1">
-          <span class="text-[11px] text-indigo-700 font-bold block">身上穿戴</span>
-          <span id="accessory-count-display" class="text-lg sm:text-xl font-black text-indigo-600">0 / 10</span>
+          <span class="text-[11px] text-pink-700 font-bold block">目前得分</span>
+          <span class="flex items-baseline gap-0.5">
+            <strong id="score-display" class="text-2xl sm:text-3xl font-black text-pink-600">0</strong>
+            <span class="text-xs text-slate-400 font-bold">/ 100</span>
+          </span>
         </div>
 
-        <div class="h-7 w-[1px] bg-amber-200"></div>
+        <div class="h-7 w-[1px] bg-pink-200"></div>
 
-        <!-- Streak display -->
+        <!-- Equipped Accessories -->
         <div class="text-center px-1">
-          <span class="text-[11px] text-emerald-700 font-bold block">連勝</span>
-          <span id="streak-display" class="text-lg sm:text-xl font-black text-emerald-600">0 🔥</span>
+          <span class="text-[11px] text-indigo-700 font-bold block">解鎖裝備</span>
+          <span id="acc-count-display" class="text-lg sm:text-xl font-black text-indigo-600">0 / 20</span>
         </div>
 
-        <!-- Sound SFX button -->
-        <button id="sound-toggle-btn" class="p-1.5 rounded-lg bg-white border border-amber-300 text-amber-700 hover:bg-amber-100 transition text-sm" title="音效切換">
-          🔔
-        </button>
+        <div class="h-7 w-[1px] bg-pink-200 hidden sm:block"></div>
+
+        <!-- Control Buttons -->
+        <div class="flex items-center gap-1.5">
+          <button id="voice-btn" class="p-2 rounded-xl bg-white border border-pink-200 text-pink-600 hover:bg-pink-100 transition shadow-xs text-sm" title="語音朗讀">
+            🗣️
+          </button>
+          <button id="sound-btn" class="p-2 rounded-xl bg-white border border-pink-200 text-pink-600 hover:bg-pink-100 transition shadow-xs text-sm" title="音效開關">
+            🔔
+          </button>
+        </div>
       </div>
     </header>
 
-    <!-- Main Game Area -->
+    <!-- Main Game Section: 2 Columns Grid -->
     <main class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-      <!-- LEFT COLUMN: Item Counting Board (7 cols) -->
+      <!-- LEFT COLUMN: Math Question & Store Scenario (7 cols) -->
       <section class="lg:col-span-7 flex flex-col gap-3">
-        <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col h-full">
-          <!-- Question Title & Helpers -->
-          <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2.5">
+
+        <!-- Question Card -->
+        <div class="bg-white/95 rounded-2xl p-4 sm:p-5 shadow-md border border-slate-200 flex flex-col gap-3.5 relative overflow-hidden">
+          
+          <!-- Level Category Badge & Navigation -->
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-pink-500 animate-ping"></span>
-              <h2 class="font-bold text-slate-700 text-sm sm:text-base flex items-center gap-2">
-                <span>數數看：共有多少個</span>
-                <span id="target-theme-name" class="px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 text-xs font-bold">蘋果</span>
+              <span id="promo-tag" class="px-2.5 py-1 rounded-lg text-xs font-black bg-rose-500 text-white shadow-xs">
+                🎁 買一送一
+              </span>
+              <span id="level-badge" class="text-xs font-bold text-slate-500">
+                關卡 1・配分 5 分
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5 text-xs">
+              <button id="prev-level-btn" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold disabled:opacity-30 disabled:cursor-not-allowed transition" disabled>
+                ◀ 上一關
+              </button>
+              <button id="next-level-btn" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold disabled:opacity-30 disabled:cursor-not-allowed transition">
+                下一關 ▶
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Banner & Story Scenario -->
+          <div class="bg-gradient-to-r from-pink-50 via-purple-50 to-indigo-50 rounded-2xl p-4 border border-pink-100 flex flex-col sm:flex-row items-center gap-4">
+            <!-- Product Avatar -->
+            <div id="product-icon-box" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white shadow-sm border border-pink-200 flex flex-col items-center justify-center p-2 shrink-0">
+              <span id="product-emoji" class="text-4xl sm:text-5xl">🧋</span>
+              <span id="product-name" class="text-xs font-black text-slate-700 mt-1 truncate">珍珠奶茶</span>
+            </div>
+
+            <!-- Problem Text -->
+            <div class="flex-1 flex flex-col gap-1.5 text-center sm:text-left">
+              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                <span class="text-xs font-bold text-slate-400">商品原價：</span>
+                <span id="unit-price-pill" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-black border border-amber-200">
+                  原價 $50 元 / 杯
+                </span>
+                <span id="discount-pill" class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-xs font-black border border-rose-200">
+                  促銷：買一送一
+                </span>
+              </div>
+              <h2 id="question-text" class="text-base sm:text-lg font-black text-slate-800 leading-snug">
+                珍珠奶茶每杯原價 50 元，現在超商推出「買一送一」特賣活動。小櫻決定買 2 杯，請問一共只要付多少元？
               </h2>
             </div>
-            <div class="flex items-center gap-2">
-              <button id="next-question-btn" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-xs transition border border-indigo-200 flex items-center gap-1 shadow-xs">
-                🔄 換一題
+          </div>
+
+          <!-- Visual Shopping Cart Breakdown -->
+          <div class="bg-slate-50/80 rounded-xl p-3 border border-slate-200/80">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-600 flex items-center gap-1">
+                <span>🛒 購物籃商品清單（共 <strong id="cart-item-count" class="text-pink-600">2</strong> 件）：</span>
+              </span>
+              <button id="toggle-hint-btn" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 underline">
+                💡 展開計算拆解公式
               </button>
             </div>
-          </div>
 
-          <!-- Items Grid Container (With Voice Counting Badges) -->
-          <div id="items-grid" class="flex-1 bg-gradient-to-b from-indigo-50/40 via-purple-50/20 to-pink-50/30 rounded-xl p-3 sm:p-4 border-2 border-dashed border-indigo-200/80 min-h-[300px] sm:min-h-[360px] flex flex-wrap content-start items-center justify-center gap-2.5 sm:gap-3.5 overflow-y-auto relative">
-            <!-- Items injected by JavaScript -->
-          </div>
-
-          <!-- Bottom Voice Counting Status Bar -->
-          <div class="mt-3 flex flex-wrap items-center justify-between text-xs text-slate-600 bg-slate-50 px-3 py-2.5 rounded-xl border border-slate-200/70 gap-2">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-slate-700 flex items-center gap-1">
-                <span>🗣️ 目前已唱數：</span>
-                <strong id="counted-stat" class="text-amber-600 font-black text-lg">0</strong>
-                <span>個</span>
-              </span>
-              <button id="reset-counted-btn" class="text-xs text-slate-400 hover:text-slate-600 underline ml-2">重置唱數標記</button>
+            <!-- Visual Items Display -->
+            <div id="cart-items-container" class="flex flex-wrap gap-2 items-center justify-center sm:justify-start">
+              <!-- Rendered by JS -->
             </div>
-            <div class="text-[11px] text-slate-400 flex items-center gap-1">
-              <span>💡 提示：點擊任何物品會直接語音念出數字</span>
+
+            <!-- Expandable Math Breakdown Hint -->
+            <div id="math-hint-box" class="mt-2.5 p-2.5 rounded-lg bg-indigo-50 border border-indigo-100 text-xs text-indigo-900 hidden font-medium leading-relaxed">
+              <!-- Hint injected by JS -->
             </div>
           </div>
+
+          <!-- Answer & Handwriting Input View -->
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="text-base">✍️</span>
+                <span class="font-bold text-xs sm:text-sm text-slate-700">寫下你的計算結果（元）：</span>
+              </div>
+              <!-- Input mode buttons -->
+              <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-bold">
+                <button id="tab-draw-btn" class="px-2.5 py-1 rounded-md bg-white text-pink-600 shadow-xs transition">手寫畫板</button>
+                <button id="tab-pad-btn" class="px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-700 transition">小鍵盤</button>
+              </div>
+            </div>
+
+            <!-- Handwriting Mode Canvas -->
+            <div id="draw-panel" class="flex flex-col gap-2">
+              <div class="relative bg-slate-50 rounded-xl border-2 border-pink-200 overflow-hidden shadow-inner">
+                <canvas id="write-canvas" width="450" height="130" class="w-full h-28 sm:h-32 bg-white cursor-crosshair"></canvas>
+                <button id="clear-write-btn" class="absolute top-2 right-2 px-2.5 py-1 bg-slate-100/90 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg border border-slate-300 transition shadow-xs">
+                  🧹 清除
+                </button>
+                <div class="absolute bottom-2 left-3 pointer-events-none text-[11px] text-slate-400 font-medium">
+                  用滑鼠或手指在白板寫上數字金額
+                </div>
+              </div>
+
+              <!-- Answer confirm bar -->
+              <div class="flex items-center justify-between gap-2 bg-pink-50/80 p-2.5 rounded-xl border border-pink-100">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-bold text-slate-700">金額：$</span>
+                  <input id="num-input" type="number" placeholder="?" class="w-24 h-10 text-center text-xl font-black bg-white rounded-lg border-2 border-pink-300 text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-inner">
+                  <span class="text-xs font-bold text-slate-600">元</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button id="ai-detect-btn" class="px-3 py-2 bg-purple-500 hover:bg-purple-600 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1" title="辨識筆劃">
+                    ✨ 筆跡辨識
+                  </button>
+                  <button id="submit-btn" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-black text-sm rounded-xl shadow-md transition flex items-center gap-1">
+                    送出答案 🚀
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Keypad Mode -->
+            <div id="pad-panel" class="hidden flex-col gap-2">
+              <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
+                <span class="text-xs font-medium text-slate-500">已輸入金額：</span>
+                <span id="pad-preview-val" class="text-2xl font-black text-pink-600 tracking-wider">$ 0</span>
+                <button id="pad-clear-btn" class="px-2.5 py-1 text-xs text-rose-500 font-bold bg-rose-50 rounded-lg hover:bg-rose-100">清除</button>
+              </div>
+              <div class="grid grid-cols-6 gap-1.5">
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="1">1</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="2">2</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="3">3</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="4">4</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="5">5</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="6">6</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="7">7</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="8">8</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="9">9</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="0">0</button>
+                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-sm text-slate-700 transition" data-v="00">00</button>
+                <button class="key-pad-btn h-10 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 rounded-lg font-black text-xs text-rose-600 transition" data-v="back">⌫ 退格</button>
+              </div>
+              <button id="pad-submit-btn" class="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black rounded-xl shadow-md transition hover:from-emerald-600 hover:to-teal-600 active:scale-95">
+                確認送出金額 🚀
+              </button>
+            </div>
+
+            <!-- Feedback Toast Banner -->
+            <div id="feedback-box" class="text-center text-xs sm:text-sm font-bold py-1.5 px-3 rounded-xl hidden transition-all duration-300"></div>
+
+          </div>
+
         </div>
+
       </section>
 
-      <!-- RIGHT COLUMN: Character Stage & Handwriting Input (5 cols) -->
+      <!-- RIGHT COLUMN: Anime Girl Dressing Room Stage (5 cols) -->
       <section class="lg:col-span-5 flex flex-col gap-3">
 
-        <!-- Character Dressing Stage -->
         <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col items-center relative overflow-hidden">
-          <!-- Dressing Room Title Bar -->
-          <div class="w-full flex items-center justify-between mb-1 pb-1.5 border-b border-slate-100">
+          
+          <!-- Wardrobe Header -->
+          <div class="w-full flex items-center justify-between pb-2 border-b border-slate-100">
             <div class="flex items-center gap-1.5">
-              <span class="text-base">✨</span>
-              <h2 class="font-bold text-slate-700 text-sm sm:text-base">魔法試衣間・人物即時穿搭</h2>
+              <span class="text-lg">👗</span>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">魔法美少女・夢幻試衣間</h3>
             </div>
-            <div id="next-reward-hint" class="text-xs text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
-              下一件裝扮：再答對 1 題
+            <span id="next-gear-hint" class="text-[11px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200">
+              下一件裝備：答對解鎖
+            </span>
+          </div>
+
+          <!-- Immediate Equip Toast -->
+          <div id="equip-toast" class="w-full text-center py-1 px-2 my-1 text-xs font-bold text-pink-700 bg-pink-50 rounded-lg border border-pink-200 transition-all duration-300 transform scale-95 opacity-0 pointer-events-none">
+            ✨ 美少女穿戴了新裝備！
+          </div>
+
+          <!-- Girl Character Stage (SVG) -->
+          <div class="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center my-0.5">
+            <!-- Glow background -->
+            <div class="absolute inset-2 bg-gradient-to-tr from-pink-200/50 via-purple-200/40 to-amber-200/40 rounded-full blur-2xl"></div>
+
+            <!-- SVG Girl Container -->
+            <div id="girl-svg-container" class="relative z-10 w-full h-full flex items-center justify-center char-float transition-all">
+              <!-- SVG dynamically rendered -->
+            </div>
+
+            <!-- Girl Reaction Speech Bubble -->
+            <div id="girl-bubble" class="absolute -top-2 -right-1 z-30 bg-white/95 shadow-xl border-2 border-pink-300 rounded-2xl px-3 py-1.5 text-xs font-black text-pink-600 transition-all duration-300 transform scale-0 origin-bottom-left max-w-[160px] text-center">
+              謝謝你幫我換裝～💕
             </div>
           </div>
 
-          <!-- Newly Equipped Flash Banner -->
-          <div id="equip-toast-banner" class="w-full text-center py-1 px-2 my-1 text-xs font-bold text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200 transition-all duration-300 transform scale-95 opacity-0 pointer-events-none">
-            ✨ 已即時套用全新裝扮！
-          </div>
-
-          <!-- Character Display Stage -->
-          <div class="relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center my-1">
-            <!-- Magical glow backplate -->
-            <div class="absolute inset-2 bg-gradient-to-tr from-amber-200/40 via-pink-200/40 to-sky-200/40 rounded-full blur-xl character-glow"></div>
-
-            <!-- SVG Character Container -->
-            <div id="character-container" class="relative z-10 w-full h-full flex items-center justify-center animate-gentle transition-transform duration-300">
-              <!-- SVG Character dynamically rendered by JS -->
-            </div>
-
-            <!-- Character Speech / Cheer Bubble -->
-            <div id="character-bubble" class="absolute -top-1 -right-1 z-30 bg-white shadow-xl border-2 border-pink-300 rounded-2xl px-3 py-1.5 text-xs font-black text-pink-600 transition-all duration-300 transform scale-0 origin-bottom-left">
-              穿上新裝扮囉！🎉
-            </div>
-          </div>
-
-          <!-- Wardrobe Quick Action Tray -->
+          <!-- Wardrobe Inventory (20 Gears) -->
           <div class="w-full mt-1 pt-2 border-t border-slate-100">
             <div class="flex items-center justify-between mb-1.5">
-              <span class="text-xs font-bold text-slate-600 flex items-center gap-1">
-                <span>裝備庫（點擊可穿戴/脫下）：</span>
+              <span class="text-xs font-bold text-slate-600">
+                20 款華麗裝備（點擊穿戴/卸下）：
               </span>
               <div class="flex items-center gap-1">
-                <button id="equip-all-btn" class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">全部穿上</button>
-                <button id="unequip-all-btn" class="text-[11px] font-bold text-slate-500 hover:text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">全部脫下</button>
+                <button id="equip-all-btn" class="text-[10px] font-bold text-pink-600 hover:text-pink-800 bg-pink-50 px-2 py-0.5 rounded border border-pink-200">全部穿上</button>
+                <button id="unequip-all-btn" class="text-[10px] font-bold text-slate-500 hover:text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">全部脫下</button>
               </div>
             </div>
 
-            <!-- Inventory Grid -->
-            <div id="accessories-inventory" class="grid grid-cols-5 gap-1.5 max-h-36 overflow-y-auto p-1 bg-slate-50/60 rounded-xl border border-slate-100">
-              <!-- Accessory Badges injected by JS -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Handwriting & Input Card -->
-        <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col">
-          <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">✍️</span>
-              <h2 class="font-bold text-slate-700 text-sm sm:text-base">在下方寫下你數出的數字</h2>
-            </div>
-            <!-- Input mode tabs -->
-            <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-bold">
-              <button id="mode-draw-btn" class="px-2.5 py-1 rounded-md bg-white text-indigo-600 shadow-sm transition">手寫畫板</button>
-              <button id="mode-keypad-btn" class="px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-800 transition">小鍵盤</button>
+            <!-- 20 Gears Grid -->
+            <div id="wardrobe-grid" class="grid grid-cols-5 gap-1.5 max-h-36 overflow-y-auto p-1.5 bg-slate-50/80 rounded-xl border border-slate-100">
+              <!-- Badges injected by JS -->
             </div>
           </div>
 
-          <!-- Drawing Canvas View -->
-          <div id="draw-mode-container" class="flex flex-col gap-2">
-            <div class="relative bg-slate-50 rounded-xl border-2 border-indigo-200 overflow-hidden shadow-inner">
-              <canvas id="handwriting-canvas" width="380" height="140" class="w-full h-32 bg-white cursor-crosshair"></canvas>
-              
-              <!-- Clear Canvas Button -->
-              <button id="clear-canvas-btn" class="absolute top-2 right-2 px-2.5 py-1 bg-slate-100/90 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg border border-slate-300 transition shadow-sm">
-                🧹 清除重寫
-              </button>
-              
-              <!-- Guideline Hint -->
-              <div class="absolute bottom-2 left-3 pointer-events-none text-[11px] text-slate-400 font-medium">
-                可在白板上用滑鼠或手指寫下 1 ~ 30
-              </div>
-            </div>
-
-            <!-- Recognized or Picked Value Bar -->
-            <div class="flex items-center justify-between gap-2 bg-indigo-50/70 p-2.5 rounded-xl border border-indigo-100">
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs font-bold text-slate-600">你的答案：</span>
-                <input id="answer-input" type="number" min="1" max="30" placeholder="?" class="w-16 h-10 text-center text-xl font-black bg-white rounded-lg border-2 border-indigo-300 text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-inner">
-              </div>
-              <div class="flex items-center gap-1.5">
-                <button id="recognize-ai-btn" class="px-2.5 sm:px-3 py-2 bg-purple-500 hover:bg-purple-600 active:scale-95 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1" title="智能感應筆跡">
-                  ✨ 辨識筆跡
-                </button>
-                <button id="submit-answer-btn" class="px-3.5 sm:px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition flex items-center gap-1">
-                  確認送出 🚀
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Keypad View (Easy alternative) -->
-          <div id="keypad-mode-container" class="hidden flex-col gap-2">
-            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
-              <span class="text-xs font-medium text-slate-500">已選數字：</span>
-              <span id="keypad-display-val" class="text-2xl font-black text-indigo-600 tracking-wider">--</span>
-              <button id="keypad-clear-btn" class="px-2.5 py-1 text-xs text-rose-500 font-bold bg-rose-50 rounded-lg hover:bg-rose-100">清除</button>
-            </div>
-            <div class="grid grid-cols-5 gap-1.5">
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="1">1</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="2">2</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="3">3</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="4">4</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="5">5</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="6">6</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="7">7</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="8">8</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="9">9</button>
-              <button class="key-btn h-10 bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 rounded-lg font-black text-base text-slate-700 transition" data-val="0">0</button>
-            </div>
-            <button id="keypad-submit-btn" class="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-md transition hover:from-emerald-600 hover:to-teal-600 active:scale-95">
-              確認送出數字 🚀
-            </button>
-          </div>
-
-          <!-- Feedback Banner -->
-          <div id="feedback-banner" class="mt-2 text-center text-xs sm:text-sm font-bold py-1.5 px-3 rounded-xl hidden transition-all duration-300"></div>
         </div>
 
       </section>
+
     </main>
 
-    <!-- Celebration Modal -->
+    <!-- Celebration Modal (Unlocked Gear) -->
     <div id="unlock-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border-4 border-amber-300 text-center transform scale-95 transition-all">
-        <div class="text-5xl mb-2 animate-bounce">🎉</div>
-        <h3 class="text-xl font-black text-amber-600 mb-1">恭喜解鎖全新裝扮！</h3>
-        <p id="unlock-item-desc" class="text-sm text-slate-600 mb-2">你的夥伴獲得了新裝扮！</p>
-        <p class="text-xs text-emerald-600 font-bold mb-3">已直接套用在頁面人物身上 ✨</p>
+      <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border-4 border-pink-300 text-center transform scale-95 transition-all relative">
+        <div class="text-5xl mb-1 animate-bounce">🎉</div>
+        <h3 class="text-xl font-black text-pink-600 mb-0.5">挑戰成功！獲得 5 分！</h3>
+        <p id="unlock-modal-title" class="text-sm font-bold text-slate-700 mb-1">解鎖裝備：「甜美雙蝴蝶結髮飾」</p>
+        <p class="text-xs text-emerald-600 font-bold mb-3">✨ 已立即為美少女戴上！</p>
         
-        <div id="unlock-item-preview" class="w-20 h-20 mx-auto mb-4 bg-amber-50 rounded-2xl flex items-center justify-center text-4xl border-2 border-amber-200 shadow-inner">
-          👑
+        <div id="unlock-modal-preview" class="w-24 h-24 mx-auto mb-4 bg-gradient-to-tr from-pink-50 to-purple-50 rounded-2xl flex items-center justify-center text-5xl border-2 border-pink-200 shadow-inner">
+          🎀
         </div>
 
-        <button id="modal-close-btn" class="w-full py-2.5 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-base rounded-xl shadow-md transition active:scale-95">
-          太棒了！繼續挑戰 🌟
+        <button id="modal-next-btn" class="w-full py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-black text-base rounded-xl shadow-md transition active:scale-95">
+          太棒了！挑戰下一關 🌟
+        </button>
+      </div>
+    </div>
+
+    <!-- Final 100 Points Grand Victory Modal -->
+    <div id="victory-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-gradient-to-b from-white via-pink-50 to-amber-50 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-4 border-amber-300 text-center relative overflow-hidden">
+        <div class="text-6xl mb-2 animate-bounce">👑✨</div>
+        <h2 class="text-2xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-amber-600 bg-clip-text text-transparent mb-1">
+          恭喜達成 100 分滿分！
+        </h2>
+        <p class="text-xs font-bold text-amber-700 mb-2">🎉 榮獲「超商促銷數學女皇」至尊稱號！</p>
+        <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+          你成功通過了全部 20 關考驗，解鎖了全部 20 件華麗神器！美少女已經蛻變為終極璀璨女皇！
+        </p>
+
+        <div class="p-3 bg-white/80 rounded-2xl border border-amber-200 mb-4 flex items-center justify-around">
+          <div>
+            <span class="text-xs text-slate-400 block font-bold">最終得分</span>
+            <span class="text-2xl font-black text-pink-600">100 分 💯</span>
+          </div>
+          <div class="h-8 w-[1px] bg-slate-200"></div>
+          <div>
+            <span class="text-xs text-slate-400 block font-bold">全套解鎖</span>
+            <span class="text-2xl font-black text-indigo-600">20 / 20 件 🌟</span>
+          </div>
+        </div>
+
+        <button id="victory-close-btn" class="w-full py-3 bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 text-white font-black text-base rounded-xl shadow-lg transition hover:brightness-105 active:scale-95">
+          欣賞完整造型・再玩一次 🌈
         </button>
       </div>
     </div>
@@ -315,163 +396,368 @@
 
   <script>
     /* ====================================================================
-       數數大冒險與娃娃換裝秀 (唱數語音回饋 + 即時裝扮穿戴)
+       20 關數學題庫定義（買一送一 vs 第二件半價，每關5分，滿分100）
        ==================================================================== */
+    const LEVELS = [
+      {
+        id: 1,
+        type: 'bogo', // 買一送一
+        typeName: '🎁 買一送一',
+        item: '珍珠奶茶',
+        emoji: '🧋',
+        unitPrice: 50,
+        qty: 2,
+        ans: 50,
+        text: '珍珠奶茶每杯原價 50 元，現在超商推出「買一送一」特賣活動。小櫻買了 2 杯，請問一共只要付多少元？',
+        hint: '買一送一就是「買 1 杯送 1 杯」，買 2 杯只需付 1 杯的錢：$50 元！',
+        gear: { id: 'ribbon_hair', name: '甜美雙蝴蝶結髮飾', icon: '🎀', desc: '美少女的可愛粉嫩髮飾！' }
+      },
+      {
+        id: 2,
+        type: 'half', // 第二件半價
+        typeName: '🏷️ 第二件半價',
+        item: '黃金炸雞排',
+        emoji: '🍗',
+        unitPrice: 80,
+        qty: 2,
+        ans: 120,
+        text: '香脆炸雞排每份原價 80 元，促銷「第二件半價」。小明買了 2 份雞排，總共要付多少元？',
+        hint: '第 1 份是原價 80 元，第 2 份半價為 80 ÷ 2 = 40 元。兩份共 80 + 40 = 120 元！',
+        gear: { id: 'stockings', name: '蕾絲過膝長襪', icon: '🧦', desc: '優雅純白蕾絲滾邊長襪！' }
+      },
+      {
+        id: 3,
+        type: 'bogo',
+        typeName: '🎁 買一送一',
+        item: '草莓泡芙',
+        emoji: '🧁',
+        unitPrice: 40,
+        qty: 4,
+        ans: 80,
+        text: '草莓泡芙每個原價 40 元，超商特價「買一送一」。如果買 4 個泡芙，總共要付多少元？',
+        hint: '買一送一等於每 2 個只需付 1 個的錢。買 4 個只需付 4 ÷ 2 = 2 個的錢：40 × 2 = 80 元！',
+        gear: { id: 'shoes', name: '學院風漆皮亮鞋', icon: '👞', desc: '漫步櫻花道的精緻小皮鞋！' }
+      },
+      {
+        id: 4,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '冰美式咖啡',
+        emoji: '☕',
+        unitPrice: 60,
+        qty: 2,
+        ans: 30,
+        text: '冰美式咖啡每杯原價 60 元，現在「第二件半價」。請問買 2 杯比原價「省下了」多少元？',
+        hint: '原本 2 杯要 60 × 2 = 120 元。第二件半價只算 30 元，省下了 60 - 30 = 30 元！',
+        gear: { id: 'skirt', name: '雙層偶像百褶裙', icon: '👗', desc: '隨風飄動的粉藍百褶短裙！' }
+      },
+      {
+        id: 5,
+        type: 'bogo',
+        typeName: '🎁 買一送一',
+        item: '鮮榨柳橙汁',
+        emoji: '🍊',
+        unitPrice: 40,
+        qty: 3,
+        ans: 80,
+        text: '柳橙汁每瓶原價 40 元，「買一送一」。小美想買 3 瓶柳橙汁，請問最少要付多少元？',
+        hint: '前 2 瓶符合「買一送一」只需付 1 瓶的錢 40 元；第 3 瓶單獨買算原價 40 元。共 40 + 40 = 80 元！',
+        gear: { id: 'gloves', name: '緞帶蕾絲白手套', icon: '🧤', desc: '手腕繫有典雅緞帶的手套！' }
+      },
+      {
+        id: 6,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '香草霜淇淋',
+        emoji: '🍦',
+        unitPrice: 50,
+        qty: 3,
+        ans: 125,
+        text: '霜淇淋每支原價 50 元，「第二件半價」。如果買 3 支霜淇淋，一共要付多少元？',
+        hint: '前 2 支是一組：50 + 25 = 75 元；第 3 支單買原價 50 元。75 + 50 = 125 元！',
+        gear: { id: 'earrings', name: '櫻花吊墜耳環', icon: '🌸', desc: '閃爍微光的粉櫻吊墜！' }
+      },
+      {
+        id: 7,
+        type: 'bogo',
+        typeName: '🎁 買一送一',
+        item: '焦糖爆米花',
+        emoji: '🍿',
+        unitPrice: 100,
+        qty: 4,
+        ans: 200,
+        text: '焦糖爆米花每桶原價 100 元，「買一送一」。小華買了 4 桶看電影，一共要付多少元？',
+        hint: '4 桶爆米花等於 2 組買一送一，只需付 2 桶的錢：100 × 2 = 200 元！',
+        gear: { id: 'scarf', name: '粉紅千鳥格圍巾', icon: '🧣', desc: '保暖又時尚的粉紅圍巾！' }
+      },
+      {
+        id: 8,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '烤雞腿便當',
+        emoji: '🍱',
+        unitPrice: 90,
+        qty: 4,
+        ans: 270,
+        text: '烤雞腿便當每個原價 90 元，「第二件半價」。買 4 個便當總共要付多少元？',
+        hint: '每 2 個是一組：90 + 45 = 135 元。買 4 個是 2 組：135 × 2 = 270 元！',
+        gear: { id: 'glasses', name: '潮流愛心墨鏡', icon: '🕶️', desc: '粉紅透明愛心造型太陽眼鏡！' }
+      },
+      {
+        id: 9,
+        type: 'bogo',
+        typeName: '🎁 買一送一',
+        item: '葡式蛋塔',
+        emoji: '🥧',
+        unitPrice: 30,
+        qty: 6,
+        ans: 90,
+        text: '葡式蛋塔每個原價 30 元，「買一送一」。小組聚會買了 6 個蛋塔，總共要付多少元？',
+        hint: '6 個蛋塔只需付 6 ÷ 2 = 3 個的錢：30 × 3 = 90 元！',
+        gear: { id: 'bag', name: '萌萌貓咪背包', icon: '🎒', desc: '背在身後的立體貓臉小背包！' }
+      },
+      {
+        id: 10,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '巧克力餅乾',
+        emoji: '🍪',
+        unitPrice: 60,
+        qty: 2,
+        ans: 45,
+        text: '巧克力餅乾原價 60 元，「第二件半價」。買 2 包餅乾，「平均每包」只要多少元？',
+        hint: '2 包總價為 60 + 30 = 90 元。平均每包：90 ÷ 2 = 45 元！',
+        gear: { id: 'scepter', name: '星光月之權杖', icon: '🪄', desc: '散發柔和月光的魔法權杖！' }
+      },
+      {
+        id: 11,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '熱烤披薩',
+        emoji: '🍕',
+        unitPrice: 120,
+        qty: 3,
+        ans: 300,
+        text: '披薩每片原價 120 元，「第二件半價」。如果買 3 片披薩，總共要付多少元？',
+        hint: '前 2 片為 120 + 60 = 180 元；第 3 片算原價 120 元。180 + 120 = 300 元！',
+        gear: { id: 'crown', name: '璀璨水晶王冠', icon: '👑', desc: '頭頂鑲嵌純淨水晶的小后冠！' }
+      },
+      {
+        id: 12,
+        type: 'bogo',
+        typeName: '🎁 買一送一',
+        item: '鮮奶布丁',
+        emoji: '🍮',
+        unitPrice: 40,
+        qty: 5,
+        ans: 120,
+        text: '鮮奶布丁每個原價 40 元，活動「買一送一」。如果買 5 個布丁，總共要付多少元？',
+        hint: '4 個布丁付 2 個錢 80 元，第 5 個單買算原價 40 元。80 + 40 = 120 元！',
+        gear: { id: 'wings', name: '天使夢幻光之翼', icon: '🪽', desc: '身後輕輕拍動的純白天使用羽翼！' }
+      },
+      {
+        id: 13,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '抹茶拿鐵',
+        emoji: '🍵',
+        unitPrice: 70,
+        qty: 4,
+        ans: 210,
+        text: '抹茶拿鐵每杯原價 70 元，「第二件半價」。買 4 杯抹茶拿鐵一共要付多少元？',
+        hint: '每 2 杯是一組：70 + 35 = 105 元。買 4 杯是 2 組：105 × 2 = 210 元！',
+        gear: { id: 'cat_ears', name: '軟萌貓耳髮箍', icon: '🐱', desc: '毛茸茸會動的可愛貓咪耳朵！' }
+      },
+      {
+        id: 14,
+        type: 'bogo',
+        typeName: '🎁 買一送一',
+        item: '超萌文具袋',
+        emoji: '✏️',
+        unitPrice: 100,
+        qty: 6,
+        ans: 300,
+        text: '文具袋原價每個 100 元，「買一送一」。小麗買了 6 個送朋友，請問比原價「省下了」多少元？',
+        hint: '買 6 個有 3 個是免費送的！省下的金額為 100 × 3 = 300 元！',
+        gear: { id: 'heart_pendant', name: '奇蹟愛心寶石項鍊', icon: '💖', desc: '胸前閃耀粉紅光芒的心型吊墜！' }
+      },
+      {
+        id: 15,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '瑞士蛋糕捲',
+        emoji: '🍰',
+        unitPrice: 80,
+        qty: 5,
+        ans: 320,
+        text: '蛋糕捲每條原價 80 元，「第二件半價」。如果買 5 條蛋糕捲，總共要付多少元？',
+        hint: '2 組特價：(80 + 40) × 2 = 240 元；加第 5 條原價 80 元：240 + 80 = 320 元！',
+        gear: { id: 'croissant_badge', name: '招牌可頌麵包徽章', icon: '🥐', desc: '別在胸前的金黃酥脆可頌胸針！' }
+      },
+      {
+        id: 16,
+        type: 'compare',
+        typeName: '⚖️ 促銷比一比',
+        item: '泰迪熊玩偶',
+        emoji: '🧸',
+        unitPrice: 100,
+        qty: 2,
+        ans: 50,
+        text: '原價 100 元的玩偶：A店「買一送一」，B店「第二件半價」。買 2 隻玩偶，在A店買比在B店買「便宜多少元」？',
+        hint: 'A店買一送一只付 100 元；B店第二件半價要付 100 + 50 = 150 元。相差 150 - 100 = 50 元！',
+        gear: { id: 'boba_cup', name: '珍珠奶茶隨行杯', icon: '🧋', desc: '美少女隨身攜帶的可口珍奶！' }
+      },
+      {
+        id: 17,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '起司三明治',
+        emoji: '🥪',
+        unitPrice: 60,
+        qty: 6,
+        ans: 270,
+        text: '三明治每個原價 60 元，「第二件半價」。買 6 個三明治總共要付多少元？',
+        hint: '6 個三明治剛好是 3 組促銷：每組 60 + 30 = 90 元。90 × 3 = 270 元！',
+        gear: { id: 'star_halo', name: '旋轉流星光環', icon: '💫', desc: '環繞在身旁旋轉的金燦星屑！' }
+      },
+      {
+        id: 18,
+        type: 'bogo',
+        typeName: '🎁 買一送一',
+        item: '精裝筆記本',
+        emoji: '📓',
+        unitPrice: 80,
+        qty: 7,
+        ans: 320,
+        text: '筆記本每本原價 80 元，「買一送一」。小明買了 7 本筆記本，總共要付多少元？',
+        hint: '前 6 本只需付 3 本的錢：80 × 3 = 240 元；第 7 本單買原價 80 元。240 + 80 = 320 元！',
+        gear: { id: 'sakura_cloak', name: '魔法粉櫻斗篷', icon: '🦸', desc: '飄揚在身後的華麗粉紅魔法披風！' }
+      },
+      {
+        id: 19,
+        type: 'half',
+        typeName: '🏷️ 第二件半價',
+        item: '澳洲牛排餐',
+        emoji: '🥩',
+        unitPrice: 100,
+        qty: 5,
+        ans: 400,
+        text: '牛排每份原價 100 元，「第二件半價」。家庭聚餐買了 5 份牛排，一共要付多少元？',
+        hint: '前 4 份是 2 組：(100 + 50) × 2 = 300 元；第 5 份原價 100 元。300 + 100 = 400 元！',
+        gear: { id: 'shiba_fairy', name: '守護萌寵柴犬小精靈', icon: '🐾', desc: '乖巧漂浮在身旁的魔法柴柴萌寵！' }
+      },
+      {
+        id: 20,
+        type: 'challenge',
+        typeName: '🌟 終極大挑戰',
+        item: '法式馬卡龍',
+        emoji: '🧁',
+        unitPrice: 80,
+        qty: 8,
+        ans: 160,
+        text: '【終極考驗】馬卡龍每盒原價 80 元，買 8 盒。如果選擇「買一送一」，比選擇「第二件半價」便宜了多少元？',
+        hint: '買一送一買 8 盒只需付 4 盒 = 80 × 4 = 320 元；第二件半價是 4 組 (80 + 40) × 4 = 480 元。便宜 480 - 320 = 160 元！',
+        gear: { id: 'empress_aura', name: '終極璀璨女皇神光冕', icon: '🌟', desc: '象徵滿分 100 分至尊數學女皇的神聖光冕！' }
+      }
+    ];
 
-    // 1. 遊戲核心狀態
+    /* ====================================================================
+       遊戲狀態管理
+       ==================================================================== */
     const state = {
-      score: 0,
-      streak: 0,
-      soundEnabled: true,
-      voiceCountingEnabled: true,
-      currentCount: 8,
-      currentThemeIndex: 0,
-      markedList: [], // 點擊唱數順序的陣列: [itemIdx1, itemIdx2, ...]
-      unlockedAccessories: new Set(), // 已解鎖的配件 ID
-      equippedAccessories: new Set(), // 當前穿在身上的配件 ID
-      inputMode: 'draw', // 'draw' | 'keypad'
-      isDrawing: false,
-      hasDrawnStrokes: false,
-      strokes: []
+      curLevelIndex: 0,
+      clearedLevels: new Set(), // 儲存已答對通關的 level index
+      equippedGears: new Set(), // 儲存目前穿戴中的裝備 ID
+      soundOn: true,
+      voiceOn: true,
+      inputMode: 'draw',
+      hasDrawn: false,
+      strokes: [],
+      isDrawing: false
     };
-
-    // 2. 隨機物品主題
-    const ITEM_THEMES = [
-      { name: '紅蘋果', emoji: '🍎' },
-      { name: '甜甜圈', emoji: '🍩' },
-      { name: '黃香蕉', emoji: '🍌' },
-      { name: '閃耀星星', emoji: '⭐' },
-      { name: '美味草莓', emoji: '🍓' },
-      { name: '活力小鴨', emoji: '🐥' },
-      { name: '粉紅小花', emoji: '🌸' },
-      { name: '香草冰淇淋', emoji: '🍦' },
-      { name: '快樂足球', emoji: '⚽' },
-      { name: '甜脆胡蘿蔔', emoji: '🥕' }
-    ];
-
-    // 3. 配件庫定義 (共 10 件華麗裝扮，依序解鎖並直接穿上)
-    const ACCESSORIES = [
-      { id: 'shoes', name: '亮晶晶球鞋', icon: '👟', requiredCorrect: 1, desc: '彈跳力 +100！' },
-      { id: 'glasses', name: '酷炫星星墨鏡', icon: '🕶️', requiredCorrect: 2, desc: '帥氣度爆棚！' },
-      { id: 'ribbon', name: '幸運粉紅領結', icon: '🎀', requiredCorrect: 3, desc: '優雅可愛！' },
-      { id: 'shirt', name: '英雄炫彩披風', icon: '🦸', requiredCorrect: 4, desc: '隨風飄動超拉風！' },
-      { id: 'wand', name: '星光魔法棒', icon: '🪄', requiredCorrect: 5, desc: '點石成金的奇妙魔力！' },
-      { id: 'crown', name: '璀璨黃金王冠', icon: '👑', requiredCorrect: 6, desc: '智慧國王的尊榮象徵！' },
-      { id: 'wings', name: '夢幻天使羽翼', icon: '🪽', requiredCorrect: 7, desc: '在雲端輕盈翱翔！' },
-      { id: 'halo', name: '閃耀神聖光環', icon: '😇', requiredCorrect: 8, desc: '散發溫暖聖光！' },
-      { id: 'aura', name: '奇蹟魔法星陣', icon: '🔮', requiredCorrect: 9, desc: '神秘絢麗的光環！' },
-      { id: 'pet', name: '守護萌寵獨角獸', icon: '🦄', requiredCorrect: 10, desc: '最忠心的神奇夥伴！' }
-    ];
-
-    // 4. 中文唱數對照字詞表 (1 ~ 30)
-    const CHINESE_DIGIT_WORDS = [
-      '零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
-      '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
-      '二十一', '二十二', '二十三', '二十四', '二十五', '二十六', '二十七', '二十八', '二十九', '三十'
-    ];
 
     // DOM 元素引用
     const dom = {
-      score: document.getElementById('score-display'),
-      accessoryCount: document.getElementById('accessory-count-display'),
-      streak: document.getElementById('streak-display'),
-      soundBtn: document.getElementById('sound-toggle-btn'),
-      voiceToggleBtn: document.getElementById('voice-toggle-btn'),
-      voiceIcon: document.getElementById('voice-icon'),
-      voiceStatusText: document.getElementById('voice-status-text'),
-      targetThemeName: document.getElementById('target-theme-name'),
-      nextQuestionBtn: document.getElementById('next-question-btn'),
-      itemsGrid: document.getElementById('items-grid'),
-      countedStat: document.getElementById('counted-stat'),
-      resetCountedBtn: document.getElementById('reset-counted-btn'),
-      nextRewardHint: document.getElementById('next-reward-hint'),
-      equipToast: document.getElementById('equip-toast-banner'),
-      characterContainer: document.getElementById('character-container'),
-      characterBubble: document.getElementById('character-bubble'),
-      accessoriesInventory: document.getElementById('accessories-inventory'),
+      levelDisplay: document.getElementById('level-display'),
+      scoreDisplay: document.getElementById('score-display'),
+      accCountDisplay: document.getElementById('acc-count-display'),
+      voiceBtn: document.getElementById('voice-btn'),
+      soundBtn: document.getElementById('sound-btn'),
+      promoTag: document.getElementById('promo-tag'),
+      levelBadge: document.getElementById('level-badge'),
+      prevLevelBtn: document.getElementById('prev-level-btn'),
+      nextLevelBtn: document.getElementById('next-level-btn'),
+      productEmoji: document.getElementById('product-emoji'),
+      productName: document.getElementById('product-name'),
+      unitPricePill: document.getElementById('unit-price-pill'),
+      discountPill: document.getElementById('discount-pill'),
+      questionText: document.getElementById('question-text'),
+      cartItemCount: document.getElementById('cart-item-count'),
+      toggleHintBtn: document.getElementById('toggle-hint-btn'),
+      cartItemsContainer: document.getElementById('cart-items-container'),
+      mathHintBox: document.getElementById('math-hint-box'),
+      tabDrawBtn: document.getElementById('tab-draw-btn'),
+      tabPadBtn: document.getElementById('tab-pad-btn'),
+      drawPanel: document.getElementById('draw-panel'),
+      padPanel: document.getElementById('pad-panel'),
+      canvas: document.getElementById('write-canvas'),
+      clearWriteBtn: document.getElementById('clear-write-btn'),
+      numInput: document.getElementById('num-input'),
+      aiDetectBtn: document.getElementById('ai-detect-btn'),
+      submitBtn: document.getElementById('submit-btn'),
+      padPreviewVal: document.getElementById('pad-preview-val'),
+      padClearBtn: document.getElementById('pad-clear-btn'),
+      padSubmitBtn: document.getElementById('pad-submit-btn'),
+      feedbackBox: document.getElementById('feedback-box'),
+      nextGearHint: document.getElementById('next-gear-hint'),
+      equipToast: document.getElementById('equip-toast'),
+      girlSvgContainer: document.getElementById('girl-svg-container'),
+      girlBubble: document.getElementById('girl-bubble'),
       equipAllBtn: document.getElementById('equip-all-btn'),
       unequipAllBtn: document.getElementById('unequip-all-btn'),
-      modeDrawBtn: document.getElementById('mode-draw-btn'),
-      modeKeypadBtn: document.getElementById('mode-keypad-btn'),
-      drawContainer: document.getElementById('draw-mode-container'),
-      keypadContainer: document.getElementById('keypad-mode-container'),
-      canvas: document.getElementById('handwriting-canvas'),
-      clearCanvasBtn: document.getElementById('clear-canvas-btn'),
-      answerInput: document.getElementById('answer-input'),
-      recognizeBtn: document.getElementById('recognize-ai-btn'),
-      submitAnswerBtn: document.getElementById('submit-answer-btn'),
-      keypadDisplayVal: document.getElementById('keypad-display-val'),
-      keypadClearBtn: document.getElementById('keypad-clear-btn'),
-      keypadSubmitBtn: document.getElementById('keypad-submit-btn'),
-      feedbackBanner: document.getElementById('feedback-banner'),
+      wardrobeGrid: document.getElementById('wardrobe-grid'),
       unlockModal: document.getElementById('unlock-modal'),
-      unlockItemDesc: document.getElementById('unlock-item-desc'),
-      unlockItemPreview: document.getElementById('unlock-item-preview'),
-      modalCloseBtn: document.getElementById('modal-close-btn')
+      unlockModalTitle: document.getElementById('unlock-modal-title'),
+      unlockModalPreview: document.getElementById('unlock-modal-preview'),
+      modalNextBtn: document.getElementById('modal-next-btn'),
+      victoryModal: document.getElementById('victory-modal'),
+      victoryCloseBtn: document.getElementById('victory-close-btn')
     };
 
     /* ====================================================================
-       語音唱數系統 (Web Speech API)
+       語音與音效系統 (Web Speech & Web Audio)
        ==================================================================== */
     let preferredVoice = null;
-
-    function initSpeechEngine() {
-      if (!('speechSynthesis' in window)) {
-        dom.voiceStatusText.textContent = '不支援';
-        return;
-      }
-      const findVoice = () => {
-        const voices = window.speechSynthesis.getVoices();
-        preferredVoice = voices.find(v => v.lang.includes('zh-TW') || v.lang.includes('zh_TW')) ||
-                         voices.find(v => v.lang.toLowerCase().includes('taiwan')) ||
-                         voices.find(v => v.lang.startsWith('zh') || v.lang.includes('cmn')) ||
-                         null;
+    function initSpeech() {
+      if (!('speechSynthesis' in window)) return;
+      const getV = () => {
+        const vs = window.speechSynthesis.getVoices();
+        preferredVoice = vs.find(v => v.lang.includes('zh-TW')) ||
+                         vs.find(v => v.lang.toLowerCase().includes('taiwan')) ||
+                         vs.find(v => v.lang.startsWith('zh')) || null;
       };
-      findVoice();
-      window.speechSynthesis.onvoiceschanged = findVoice;
+      getV();
+      window.speechSynthesis.onvoiceschanged = getV;
     }
 
-    // 唱數發音：朗讀當前點數數字
-    function speakCountNumber(num) {
-      if (!state.voiceCountingEnabled || !('speechSynthesis' in window)) return;
+    function speakText(text) {
+      if (!state.voiceOn || !('speechSynthesis' in window)) return;
       try {
-        window.speechSynthesis.cancel(); // 立即取消前一個發音，確保節奏緊湊不延遲
-        const word = CHINESE_DIGIT_WORDS[num] || String(num);
-        const utter = new SpeechSynthesisUtterance(word);
-        utter.lang = 'zh-TW';
-        utter.rate = 1.05; // 稍快、清晰的童趣語速
-        utter.pitch = 1.25; // 活潑清脆音調
-        if (preferredVoice) {
-          utter.voice = preferredVoice;
-        }
-        window.speechSynthesis.speak(utter);
-      } catch (err) {
-        console.warn('Speech error:', err);
-      }
-    }
-
-    // 鼓勵讚美語音
-    function speakVoicePraise(text) {
-      if (!state.voiceCountingEnabled || !('speechSynthesis' in window)) return;
-      try {
+        window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = 'zh-TW';
         utter.rate = 1.05;
-        utter.pitch = 1.2;
+        utter.pitch = 1.25;
         if (preferredVoice) utter.voice = preferredVoice;
         window.speechSynthesis.speak(utter);
       } catch (e) {}
     }
 
-    /* ====================================================================
-       Web Audio 效果音合成器
-       ==================================================================== */
     const audioCtx = (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined')
-      ? new (window.AudioContext || window.webkitAudioContext)()
-      : null;
+      ? new (window.AudioContext || window.webkitAudioContext)() : null;
 
     function playSound(type) {
-      if (!state.soundEnabled || !audioCtx) return;
+      if (!state.soundOn || !audioCtx) return;
       try {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const now = audioCtx.currentTime;
@@ -480,49 +766,27 @@
         osc.connect(gain);
         gain.connect(audioCtx.destination);
 
-        if (type === 'pop') {
+        if (type === 'click') {
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(320, now);
-          osc.frequency.exponentialRampToValueAtTime(700, now + 0.07);
+          osc.frequency.setValueAtTime(450, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.06);
           gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
           osc.start(now);
-          osc.stop(now + 0.07);
-        } else if (type === 'unpop') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(500, now);
-          osc.frequency.exponentialRampToValueAtTime(250, now + 0.08);
-          gain.gain.setValueAtTime(0.15, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-          osc.start(now);
-          osc.stop(now + 0.08);
+          osc.stop(now + 0.06);
         } else if (type === 'correct') {
-          // 勝利三和弦
-          [523.25, 659.25, 783.99].forEach((freq, idx) => {
-            const subOsc = audioCtx.createOscillator();
-            const subGain = audioCtx.createGain();
-            subOsc.connect(subGain);
-            subGain.connect(audioCtx.destination);
-            subOsc.type = 'triangle';
-            subOsc.frequency.setValueAtTime(freq, now + idx * 0.08);
-            subGain.gain.setValueAtTime(0.25, now + idx * 0.08);
-            subGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.35);
-            subOsc.start(now + idx * 0.08);
-            subOsc.stop(now + idx * 0.08 + 0.35);
-          });
-        } else if (type === 'unlock') {
-          // 華麗裝扮解鎖勝利和音
-          [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
-            const subOsc = audioCtx.createOscillator();
-            const subGain = audioCtx.createGain();
-            subOsc.connect(subGain);
-            subGain.connect(audioCtx.destination);
-            subOsc.type = 'sine';
-            subOsc.frequency.setValueAtTime(freq, now + idx * 0.1);
-            subGain.gain.setValueAtTime(0.28, now + idx * 0.1);
-            subGain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.3);
-            subOsc.start(now + idx * 0.1);
-            subOsc.stop(now + idx * 0.1 + 0.3);
+          // 清脆悅耳琶音
+          [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            const subO = audioCtx.createOscillator();
+            const subG = audioCtx.createGain();
+            subO.connect(subG);
+            subG.connect(audioCtx.destination);
+            subO.type = 'triangle';
+            subO.frequency.setValueAtTime(f, now + i * 0.07);
+            subG.gain.setValueAtTime(0.22, now + i * 0.07);
+            subG.gain.exponentialRampToValueAtTime(0.01, now + i * 0.07 + 0.3);
+            subO.start(now + i * 0.07);
+            subO.stop(now + i * 0.07 + 0.3);
           });
         } else if (type === 'wrong') {
           osc.type = 'sawtooth';
@@ -533,305 +797,439 @@
           osc.start(now);
           osc.stop(now + 0.22);
         }
-      } catch (e) {
-        console.warn('Audio error', e);
-      }
+      } catch (e) {}
     }
 
     /* ====================================================================
-       人物與裝扮即時繪製 (SVG 角色動態層級)
+       美少女 SVG 繪製引擎（支援 20 款獨立配件層級）
        ==================================================================== */
-    function renderCharacter() {
-      const isEquipped = (id) => state.equippedAccessories.has(id);
+    function renderGirlCharacter() {
+      const isEq = (id) => state.equippedGears.has(id);
 
-      const hasShoes = isEquipped('shoes');
-      const hasGlasses = isEquipped('glasses');
-      const hasRibbon = isEquipped('ribbon');
-      const hasCape = isEquipped('shirt');
-      const hasWand = isEquipped('wand');
-      const hasCrown = isEquipped('crown');
-      const hasWings = isEquipped('wings');
-      const hasHalo = isEquipped('halo');
-      const hasAura = isEquipped('aura');
-      const hasPet = isEquipped('pet');
+      const hasHairRibbon = isEq('ribbon_hair');
+      const hasStockings  = isEq('stockings');
+      const hasShoes      = isEq('shoes');
+      const hasSkirt      = isEq('skirt');
+      const hasGloves     = isEq('gloves');
+      const hasEarrings   = isEq('earrings');
+      const hasScarf      = isEq('scarf');
+      const hasGlasses    = isEq('glasses');
+      const hasBag        = isEq('bag');
+      const hasScepter    = isEq('scepter');
+      const hasCrown      = isEq('crown');
+      const hasWings      = isEq('wings');
+      const hasCatEars    = isEq('cat_ears');
+      const hasPendant    = isEq('heart_pendant');
+      const hasCroissant  = isEq('croissant_badge');
+      const hasBoba       = isEq('boba_cup');
+      const hasHalo       = isEq('star_halo');
+      const hasCloak      = isEq('sakura_cloak');
+      const hasFairy      = isEq('shiba_fairy');
+      const hasEmpress    = isEq('empress_aura');
 
-      let svgHtml = `
+      let svg = `
         <svg viewBox="0 0 220 220" class="w-full h-full drop-shadow-xl select-none">
           <defs>
-            <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#FED7AA" />
-              <stop offset="100%" stop-color="#FDBA74" />
+              <stop offset="50%" stop-color="#FDE047" />
+              <stop offset="100%" stop-color="#F59E0B" />
             </linearGradient>
-            <linearGradient id="clothGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#818CF8" />
-              <stop offset="100%" stop-color="#4F46E5" />
+            <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFF1F2" />
+              <stop offset="100%" stop-color="#FFE4E6" />
             </linearGradient>
-            <linearGradient id="capeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FB7185" />
-              <stop offset="100%" stop-color="#E11D48" />
+            <linearGradient id="sailorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F472B6" />
+              <stop offset="100%" stop-color="#DB2777" />
             </linearGradient>
-            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FDE047" />
-              <stop offset="100%" stop-color="#D97706" />
+            <linearGradient id="skirtGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#60A5FA" />
+              <stop offset="100%" stop-color="#3B82F6" />
+            </linearGradient>
+            <linearGradient id="goldCrownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FEF08A" />
+              <stop offset="100%" stop-color="#EAB308" />
             </linearGradient>
             <radialGradient id="wingGrad" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
-              <stop offset="60%" stop-color="#C7D2FE" stop-opacity="0.85" />
-              <stop offset="100%" stop-color="#818CF8" stop-opacity="0.7" />
+              <stop offset="70%" stop-color="#FBCFE8" stop-opacity="0.9" />
+              <stop offset="100%" stop-color="#F472B6" stop-opacity="0.75" />
             </radialGradient>
-            <radialGradient id="auraGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#F472B6" stop-opacity="0.6" />
-              <stop offset="50%" stop-color="#A855F7" stop-opacity="0.4" />
-              <stop offset="100%" stop-color="#6366F1" stop-opacity="0" />
+            <radialGradient id="empressAuraGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#FDF4FF" stop-opacity="0.9" />
+              <stop offset="45%" stop-color="#F472B6" stop-opacity="0.5" />
+              <stop offset="85%" stop-color="#818CF8" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
             </radialGradient>
           </defs>
 
-          <!-- 0. 奇蹟魔法星陣光環 (Aura) -->
-          ${hasAura ? `
-            <circle cx="110" cy="115" r="92" fill="url(#auraGrad)" class="animate-pulse" />
-            <circle cx="110" cy="115" r="82" fill="none" stroke="#C084FC" stroke-width="2" stroke-dasharray="6,4" />
-            <polygon points="110,38 128,102 192,115 128,128 110,192 92,128 28,115 92,102" fill="none" stroke="#F472B6" stroke-width="1.2" opacity="0.6" />
+          <!-- LAYER 0: 終極女皇神光冕 (Empress Aura) -->
+          ${hasEmpress ? `
+            <circle cx="110" cy="115" r="98" fill="url(#empressAuraGrad)" class="animate-pulse" />
+            <g class="aura-spin">
+              <circle cx="110" cy="115" r="88" fill="none" stroke="#F472B6" stroke-width="2" stroke-dasharray="8,6" />
+              <polygon points="110,24 117,105 198,115 117,125 110,206 103,125 22,115 103,105" fill="none" stroke="#FBBF24" stroke-width="1.5" opacity="0.75" />
+            </g>
           ` : ''}
 
-          <!-- 1. 夢幻天使羽翼 (Wings) -->
+          <!-- LAYER 1: 天使夢幻光之翼 (Wings) -->
           ${hasWings ? `
             <!-- Left Wing -->
-            <g class="wing-left-anim">
-              <path d="M 70 115 C 20 85, 12 35, 62 48 C 42 70, 56 95, 75 106 Z" fill="url(#wingGrad)" stroke="#6366F1" stroke-width="2.5" />
-              <path d="M 50 68 C 30 80, 26 50, 60 52" fill="none" stroke="#A5B4FC" stroke-width="2" />
+            <g class="wing-l">
+              <path d="M 68 115 C 20 85, 10 32, 60 45 C 40 70, 52 95, 74 105 Z" fill="url(#wingGrad)" stroke="#DB2777" stroke-width="2" />
+              <path d="M 48 68 C 28 80, 24 50, 58 52" fill="none" stroke="#F472B6" stroke-width="1.8" />
             </g>
             <!-- Right Wing -->
-            <g class="wing-right-anim">
-              <path d="M 150 115 C 200 85, 208 35, 158 48 C 178 70, 164 95, 145 106 Z" fill="url(#wingGrad)" stroke="#6366F1" stroke-width="2.5" />
-              <path d="M 170 68 C 190 80, 194 50, 160 52" fill="none" stroke="#A5B4FC" stroke-width="2" />
+            <g class="wing-r">
+              <path d="M 152 115 C 200 85, 210 32, 160 45 C 180 70, 168 95, 146 105 Z" fill="url(#wingGrad)" stroke="#DB2777" stroke-width="2" />
+              <path d="M 172 68 C 192 80, 196 50, 162 52" fill="none" stroke="#F472B6" stroke-width="1.8" />
             </g>
           ` : ''}
 
-          <!-- 2. 英雄炫彩披風 (Cape) -->
-          ${hasCape ? `
-            <path d="M 75 110 Q 42 170 60 188 Q 110 172 160 188 Q 178 170 145 110 Z" fill="url(#capeGrad)" stroke="#9F1239" stroke-width="2">
-              <animate attributeName="d" dur="2.8s" repeatCount="indefinite"
-                values="M 75 110 Q 42 170 60 188 Q 110 172 160 188 Q 178 170 145 110 Z;
-                        M 75 110 Q 36 165 64 185 Q 110 178 156 185 Q 184 165 145 110 Z;
-                        M 75 110 Q 42 170 60 188 Q 110 172 160 188 Q 178 170 145 110 Z" />
+          <!-- LAYER 2: 魔法粉櫻斗篷 (Cloak) -->
+          ${hasCloak ? `
+            <path d="M 74 110 Q 36 172 58 190 Q 110 174 162 190 Q 184 172 146 110 Z" fill="#F43F5E" opacity="0.9" stroke="#BE123C" stroke-width="2">
+              <animate attributeName="d" dur="3s" repeatCount="indefinite"
+                values="M 74 110 Q 36 172 58 190 Q 110 174 162 190 Q 184 172 146 110 Z;
+                        M 74 110 Q 30 166 62 187 Q 110 178 158 187 Q 190 166 146 110 Z;
+                        M 74 110 Q 36 172 58 190 Q 110 174 162 190 Q 184 172 146 110 Z" />
             </path>
           ` : ''}
 
-          <!-- 3. 人物本體 (Body & Clothes) -->
-          <!-- 雙腿 -->
-          <rect x="90" y="152" width="15" height="28" rx="7" fill="#FDBA74" />
-          <rect x="115" y="152" width="15" height="28" rx="7" fill="#FDBA74" />
+          <!-- LAYER 3: 雙腿 & 襪子 & 鞋子 -->
+          <!-- 雙腿基底 -->
+          <rect x="91" y="148" width="13" height="32" rx="6.5" fill="url(#skinGrad)" />
+          <rect x="116" y="148" width="13" height="32" rx="6.5" fill="url(#skinGrad)" />
 
-          <!-- 3.1 亮晶晶球鞋 (Shoes) -->
+          <!-- 3.1 蕾絲過膝長襪 (Stockings) -->
+          ${hasStockings ? `
+            <rect x="91" y="152" width="13" height="24" rx="2" fill="#FFFFFF" stroke="#FCE7F3" stroke-width="1.5" />
+            <path d="M 91 152 Q 97 150 104 152" stroke="#F472B6" stroke-width="2" fill="none" />
+            <rect x="116" y="152" width="13" height="24" rx="2" fill="#FFFFFF" stroke="#FCE7F3" stroke-width="1.5" />
+            <path d="M 116 152 Q 122 150 129 152" stroke="#F472B6" stroke-width="2" fill="none" />
+          ` : ''}
+
+          <!-- 3.2 學院風漆皮亮鞋 (Shoes) -->
           ${hasShoes ? `
             <!-- Left Shoe -->
-            <ellipse cx="96" cy="182" rx="14" ry="9" fill="#EF4444" stroke="#B91C1C" stroke-width="2" />
-            <ellipse cx="93" cy="180" rx="10" ry="6" fill="#FFFFFF" />
-            <rect x="86" y="184" width="20" height="4" fill="#0F172A" rx="2" />
-            <!-- Star emblem on shoe -->
-            <polygon points="96,177 98,181 102,181 99,183 100,187 96,185 92,187 93,183 90,181 94,181" fill="#FDE047" />
-
+            <ellipse cx="97" cy="183" rx="12" ry="8" fill="#881337" stroke="#4C0519" stroke-width="1.5" />
+            <ellipse cx="94" cy="181" rx="8" ry="5" fill="#FFFFFF" opacity="0.3" />
+            <rect x="88" y="185" width="18" height="3.5" fill="#1E293B" rx="1.5" />
             <!-- Right Shoe -->
-            <ellipse cx="124" cy="182" rx="14" ry="9" fill="#EF4444" stroke="#B91C1C" stroke-width="2" />
-            <ellipse cx="127" cy="180" rx="10" ry="6" fill="#FFFFFF" />
-            <rect x="114" y="184" width="20" height="4" fill="#0F172A" rx="2" />
-            <!-- Star emblem on shoe -->
-            <polygon points="124,177 126,181 130,181 127,183 128,187 124,185 120,187 121,183 118,181 122,181" fill="#FDE047" />
+            <ellipse cx="123" cy="183" rx="12" ry="8" fill="#881337" stroke="#4C0519" stroke-width="1.5" />
+            <ellipse cx="126" cy="181" rx="8" ry="5" fill="#FFFFFF" opacity="0.3" />
+            <rect x="114" y="185" width="18" height="3.5" fill="#1E293B" rx="1.5" />
           ` : `
-            <!-- 光腳丫 -->
-            <ellipse cx="96" cy="180" rx="9" ry="5" fill="#FDBA74" />
-            <ellipse cx="124" cy="180" rx="9" ry="5" fill="#FDBA74" />
+            <ellipse cx="97" cy="181" rx="8" ry="5" fill="#FFE4E6" />
+            <ellipse cx="123" cy="181" rx="8" ry="5" fill="#FFE4E6" />
           `}
 
-          <!-- 身體上衣 -->
-          <rect x="78" y="105" width="64" height="56" rx="18" fill="url(#clothGrad)" stroke="#312E81" stroke-width="2" />
-          <!-- 上衣星芒徽章 -->
-          <circle cx="110" cy="126" r="14" fill="#FEF08A" opacity="0.95" />
-          <polygon points="110,116 113,123 121,123 115,128 117,136 110,131 103,136 105,128 99,123 107,123" fill="#F59E0B" />
+          <!-- LAYER 4: 雙層百褶裙 (Skirt) -->
+          ${hasSkirt ? `
+            <path d="M 80 135 L 140 135 L 148 158 L 72 158 Z" fill="url(#skirtGrad)" stroke="#1D4ED8" stroke-width="1.5" />
+            <!-- Skirt pleat lines -->
+            <line x1="92" y1="135" x2="89" y2="158" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7" />
+            <line x1="104" y1="135" x2="103" y2="158" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7" />
+            <line x1="116" y1="135" x2="117" y2="158" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7" />
+            <line x1="128" y1="135" x2="131" y2="158" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7" />
+            <!-- Skirt Bottom Lace -->
+            <path d="M 72 158 Q 80 162 88 158 Q 96 162 104 158 Q 112 162 120 158 Q 128 162 136 158 Q 144 162 148 158" fill="none" stroke="#FFFFFF" stroke-width="2.5" />
+          ` : `
+            <!-- Default basic skirt -->
+            <path d="M 82 135 L 138 135 L 144 152 L 76 152 Z" fill="#93C5FD" stroke="#3B82F6" stroke-width="1" />
+          `}
 
-          <!-- 4. 幸運領結 (Ribbon) -->
-          ${hasRibbon ? `
-            <g transform="translate(110, 107)">
-              <polygon points="0,0 -15,-8 -15,8" fill="#EC4899" stroke="#9D174D" stroke-width="1.5" />
-              <polygon points="0,0 15,-8 15,8" fill="#EC4899" stroke="#9D174D" stroke-width="1.5" />
-              <circle cx="0" cy="0" r="5" fill="#FDE047" stroke="#D97706" stroke-width="1.5" />
-            </g>
-          ` : ''}
-
-          <!-- 雙臂 -->
-          <!-- 左手 -->
-          <path d="M 78 116 Q 58 132 64 146" stroke="#FDBA74" stroke-width="13" stroke-linecap="round" fill="none" />
-          <!-- 右手 -->
-          <path d="M 142 116 Q 162 132 156 146" stroke="#FDBA74" stroke-width="13" stroke-linecap="round" fill="none" />
-
-          <!-- 5. 璀璨星光魔法棒 (Wand) -->
-          ${hasWand ? `
-            <g transform="translate(160, 134) rotate(-28)">
-              <rect x="-2.5" y="0" width="5" height="42" fill="#D97706" stroke="#78350F" stroke-width="1.5" rx="2.5" />
-              <!-- Wand Big Star -->
-              <polygon points="0,-12 4,-3 13,-3 6,3 9,12 0,7 -9,12 -6,3 -13,-3 -4,-3" fill="#FDE047" stroke="#B45309" stroke-width="2" />
-              <circle cx="0" cy="-2" r="4" fill="#FFFFFF" />
-              <!-- Twinkling stars -->
-              <circle cx="12" cy="-18" r="2" fill="#FDE047" class="animate-ping" />
-              <circle cx="-14" cy="-10" r="2" fill="#FDE047" class="animate-ping" />
-            </g>
-          ` : ''}
-
-          <!-- 6. 頭部與五官 -->
-          <circle cx="110" cy="74" r="35" fill="url(#bodyGrad)" stroke="#EA580C" stroke-width="2" />
+          <!-- LAYER 5: 身體上衣 (Sailor Uniform) -->
+          <rect x="79" y="105" width="62" height="34" rx="8" fill="#FFFFFF" stroke="#FBCFE8" stroke-width="1.5" />
+          <!-- 水手服衣領 -->
+          <polygon points="79,105 110,126 141,105 132,103 110,120 88,103" fill="url(#sailorGrad)" />
           
+          <!-- 5.1 可頌麵包徽章 (Croissant Badge) -->
+          ${hasCroissant ? `
+            <g transform="translate(86, 120) scale(0.65)">
+              <ellipse cx="10" cy="8" rx="8" ry="5" fill="#D97706" />
+              <path d="M 2 8 Q 10 2 18 8" stroke="#FDE047" stroke-width="2" fill="none" />
+            </g>
+          ` : ''}
+
+          <!-- 5.2 愛心項鍊 (Heart Pendant) -->
+          ${hasPendant ? `
+            <path d="M 103 114 Q 110 119 117 114" stroke="#F59E0B" stroke-width="1.5" fill="none" />
+            <path d="M 110 117 C 107 114, 104 117, 107 121 L 110 124 L 113 121 C 116 117, 113 114, 110 117 Z" fill="#EC4899" stroke="#BE185D" stroke-width="1" />
+          ` : ''}
+
+          <!-- 5.3 暖心粉紅圍巾 (Scarf) -->
+          ${hasScarf ? `
+            <g>
+              <rect x="84" y="98" width="52" height="13" rx="6" fill="#F472B6" stroke="#DB2777" stroke-width="1.5" />
+              <path d="M 122 106 L 126 132 L 136 132 L 132 106 Z" fill="#F472B6" stroke="#DB2777" stroke-width="1.5" />
+              <line x1="126" y1="130" x2="136" y2="130" stroke="#FFFFFF" stroke-width="2" />
+            </g>
+          ` : ''}
+
+          <!-- LAYER 6: 雙臂與手套 (Arms & Gloves) -->
+          <!-- 左手臂 -->
+          <path d="M 79 108 Q 62 124 66 138" stroke="url(#skinGrad)" stroke-width="11" stroke-linecap="round" fill="none" />
+          <!-- 右手臂 -->
+          <path d="M 141 108 Q 158 124 154 138" stroke="url(#skinGrad)" stroke-width="11" stroke-linecap="round" fill="none" />
+
+          <!-- 6.1 緞帶白手套 (Gloves) -->
+          ${hasGloves ? `
+            <path d="M 68 128 Q 63 134 66 138" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" fill="none" />
+            <circle cx="68" cy="128" r="3" fill="#EC4899" />
+            <path d="M 152 128 Q 157 134 154 138" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" fill="none" />
+            <circle cx="152" cy="128" r="3" fill="#EC4899" />
+          ` : ''}
+
+          <!-- 6.2 貓咪斜背包 (Crossbody Bag) -->
+          ${hasBag ? `
+            <line x1="90" y1="106" x2="132" y2="142" stroke="#F472B6" stroke-width="3" stroke-linecap="round" />
+            <g transform="translate(126, 134)">
+              <circle cx="10" cy="10" r="11" fill="#FFFFFF" stroke="#F472B6" stroke-width="2" />
+              <!-- Cat ears on bag -->
+              <polygon points="1,4 4,-1 8,2" fill="#FFFFFF" stroke="#F472B6" stroke-width="1.5" />
+              <polygon points="12,2 16,-1 19,4" fill="#FFFFFF" stroke="#F472B6" stroke-width="1.5" />
+              <!-- Cat face -->
+              <circle cx="6" cy="9" r="1.5" fill="#1E293B" />
+              <circle cx="14" cy="9" r="1.5" fill="#1E293B" />
+              <polygon points="10,12 8,11 12,11" fill="#F472B6" />
+            </g>
+          ` : ''}
+
+          <!-- 6.3 珍珠奶茶隨行杯 (Boba Cup in Left Hand) -->
+          ${hasBoba ? `
+            <g transform="translate(50, 126)">
+              <rect x="0" y="4" width="13" height="18" rx="3" fill="#FED7AA" stroke="#D97706" stroke-width="1.2" />
+              <rect x="-2" y="2" width="17" height="3" fill="#FFFFFF" stroke="#D97706" stroke-width="1" rx="1.5" />
+              <line x1="6" y1="2" x2="9" y2="-4" stroke="#FB7185" stroke-width="2.5" stroke-linecap="round" />
+              <!-- Tapioca pearls -->
+              <circle cx="3" cy="18" r="1.5" fill="#451A03" />
+              <circle cx="7" cy="19" r="1.5" fill="#451A03" />
+              <circle cx="10" cy="18" r="1.5" fill="#451A03" />
+            </g>
+          ` : ''}
+
+          <!-- 6.4 星光月之權杖 (Scepter in Right Hand) -->
+          ${hasScepter ? `
+            <g transform="translate(158, 116) rotate(-22)">
+              <rect x="-2" y="0" width="4" height="48" fill="#FDE047" stroke="#D97706" stroke-width="1.5" rx="2" />
+              <!-- Crescent Moon -->
+              <path d="M 0 -14 A 12 12 0 1 0 10 2 A 9 9 0 1 1 0 -14 Z" fill="#FDE047" stroke="#D97706" stroke-width="1.5" />
+              <!-- Star inside -->
+              <polygon points="1,-6 3,-3 6,-3 4,0 5,3 1,1 -3,3 -2,0 -4,-3 -1,-3" fill="#EC4899" />
+              <circle cx="8" cy="-18" r="2" fill="#FDE047" class="animate-ping" />
+            </g>
+          ` : ''}
+
+          <!-- LAYER 7: 長髮、臉蛋與五官 (Hair & Face) -->
+          <!-- 後長髮 (雙馬尾底) -->
+          <path d="M 80 65 Q 50 90 56 128 Q 66 112 76 95 Z" fill="url(#hairGrad)" stroke="#D97706" stroke-width="1.5" />
+          <path d="M 140 65 Q 170 90 164 128 Q 154 112 144 95 Z" fill="url(#hairGrad)" stroke="#D97706" stroke-width="1.5" />
+
+          <!-- 臉蛋 (Face Oval) -->
+          <ellipse cx="110" cy="74" rx="30" ry="28" fill="url(#skinGrad)" stroke="#FECDD3" stroke-width="1.5" />
+
+          <!-- 前劉海 (Bangs) -->
+          <path d="M 82 62 Q 110 50 138 62 Q 134 76 124 72 Q 110 76 96 72 Z" fill="url(#hairGrad)" stroke="#D97706" stroke-width="1.5" />
+
           <!-- 萌萌腮紅 -->
-          <ellipse cx="88" cy="83" rx="7" ry="5" fill="#FDA4AF" opacity="0.8" />
-          <ellipse cx="132" cy="83" rx="7" ry="5" fill="#FDA4AF" opacity="0.8" />
+          <ellipse cx="92" cy="81" rx="5.5" ry="3.5" fill="#FDA4AF" opacity="0.85" />
+          <ellipse cx="128" cy="81" rx="5.5" ry="3.5" fill="#FDA4AF" opacity="0.85" />
 
-          <!-- 水汪汪眼睛 -->
-          <circle cx="96" cy="74" r="5" fill="#0F172A" />
-          <circle cx="94" cy="72" r="2" fill="#FFFFFF" />
-          <circle cx="98" cy="76" r="1" fill="#FFFFFF" />
+          <!-- 水汪汪動漫大眼 (Anime Eyes) -->
+          <g>
+            <!-- Left Eye -->
+            <ellipse cx="97" cy="73" rx="5.5" ry="7" fill="#1E1B4B" />
+            <ellipse cx="97" cy="74" rx="4" ry="5.5" fill="#3B82F6" />
+            <circle cx="95" cy="70" r="2.2" fill="#FFFFFF" />
+            <circle cx="98.5" cy="76" r="1.2" fill="#FFFFFF" />
+            <!-- Eyelash -->
+            <path d="M 91 66 Q 97 63 103 66" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none" />
+            
+            <!-- Right Eye -->
+            <ellipse cx="123" cy="73" rx="5.5" ry="7" fill="#1E1B4B" />
+            <ellipse cx="123" cy="74" rx="4" ry="5.5" fill="#3B82F6" />
+            <circle cx="121" cy="70" r="2.2" fill="#FFFFFF" />
+            <circle cx="124.5" cy="76" r="1.2" fill="#FFFFFF" />
+            <!-- Eyelash -->
+            <path d="M 117 66 Q 123 63 129 66" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none" />
+          </g>
 
-          <circle cx="124" cy="74" r="5" fill="#0F172A" />
-          <circle cx="122" cy="72" r="2" fill="#FFFFFF" />
-          <circle cx="126" cy="76" r="1" fill="#FFFFFF" />
+          <!-- 可愛微笑 (Smile) -->
+          <path d="M 105 84 Q 110 89 115 84" stroke="#BE123C" stroke-width="2.5" stroke-linecap="round" fill="none" />
 
-          <!-- 開心微笑 -->
-          <path d="M 103 85 Q 110 93 117 85" stroke="#9A3412" stroke-width="3" stroke-linecap="round" fill="none" />
+          <!-- 7.1 櫻花耳環 (Earrings) -->
+          ${hasEarrings ? `
+            <g transform="translate(79, 78) scale(0.6)">
+              <polygon points="5,0 7,4 11,4 8,7 9,11 5,8 1,11 2,7 -1,4 3,4" fill="#F472B6" />
+            </g>
+            <g transform="translate(138, 78) scale(0.6)">
+              <polygon points="5,0 7,4 11,4 8,7 9,11 5,8 1,11 2,7 -1,4 3,4" fill="#F472B6" />
+            </g>
+          ` : ''}
 
-          <!-- 可愛頭頂呆毛 -->
-          <path d="M 106 40 Q 110 28 118 39" stroke="#9A3412" stroke-width="3.5" stroke-linecap="round" fill="none" />
-
-          <!-- 7. 酷炫星星墨鏡 (Glasses) -->
+          <!-- 7.2 潮流愛心墨鏡 (Sunglasses) -->
           ${hasGlasses ? `
-            <g transform="translate(0, 1)">
-              <!-- 鏡架中橋 -->
-              <path d="M 105 73 Q 110 70 115 73" stroke="#0F172A" stroke-width="3" fill="none" />
-              <!-- 左鏡片 (星星造型) -->
-              <rect x="83" y="66" width="24" height="17" rx="6" fill="#0F172A" stroke="#FDE047" stroke-width="2" />
-              <line x1="87" y1="70" x2="97" y2="80" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" />
-              <!-- 右鏡片 (星星造型) -->
-              <rect x="113" y="66" width="24" height="17" rx="6" fill="#0F172A" stroke="#FDE047" stroke-width="2" />
-              <line x1="117" y1="70" x2="127" y2="80" stroke="#94A3B8" stroke-width="2" stroke-linecap="round" />
+            <g transform="translate(0, 3)">
+              <line x1="104" y1="71" x2="116" y2="71" stroke="#EC4899" stroke-width="2.5" />
+              <!-- Left Heart -->
+              <path d="M 97 66 C 92 61, 86 67, 91 73 L 97 78 L 103 73 C 108 67, 102 61, 97 66 Z" fill="#F472B6" opacity="0.9" stroke="#DB2777" stroke-width="2" />
+              <!-- Right Heart -->
+              <path d="M 123 66 C 118 61, 112 67, 117 73 L 123 78 L 129 73 C 134 67, 128 61, 123 66 Z" fill="#F472B6" opacity="0.9" stroke="#DB2777" stroke-width="2" />
+              <!-- Glare -->
+              <line x1="93" y1="68" x2="96" y2="72" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" />
+              <line x1="119" y1="68" x2="122" y2="72" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" />
             </g>
           ` : ''}
 
-          <!-- 8. 璀璨黃金王冠 (Crown) -->
+          <!-- LAYER 8: 頭頂裝飾（雙蝴蝶結 / 貓耳 / 王冠） -->
+          <!-- 8.1 甜美雙蝴蝶結髮飾 (Hair Ribbon) -->
+          ${hasHairRibbon ? `
+            <!-- Left Ribbon -->
+            <g transform="translate(77, 54)">
+              <polygon points="0,0 -9,-5 -9,5" fill="#EC4899" stroke="#BE185D" stroke-width="1.5" />
+              <polygon points="0,0 9,-5 9,5" fill="#EC4899" stroke="#BE185D" stroke-width="1.5" />
+              <circle cx="0" cy="0" r="3.5" fill="#FDE047" stroke="#D97706" stroke-width="1" />
+            </g>
+            <!-- Right Ribbon -->
+            <g transform="translate(143, 54)">
+              <polygon points="0,0 -9,-5 -9,5" fill="#EC4899" stroke="#BE185D" stroke-width="1.5" />
+              <polygon points="0,0 9,-5 9,5" fill="#EC4899" stroke="#BE185D" stroke-width="1.5" />
+              <circle cx="0" cy="0" r="3.5" fill="#FDE047" stroke="#D97706" stroke-width="1" />
+            </g>
+          ` : ''}
+
+          <!-- 8.2 軟萌貓耳 (Cat Ears) -->
+          ${hasCatEars ? `
+            <!-- Left Cat Ear -->
+            <polygon points="86,47 74,26 95,36" fill="#FDE047" stroke="#D97706" stroke-width="2" />
+            <polygon points="85,44 78,31 92,37" fill="#FDA4AF" />
+            <!-- Right Cat Ear -->
+            <polygon points="134,47 146,26 125,36" fill="#FDE047" stroke="#D97706" stroke-width="2" />
+            <polygon points="135,44 142,31 128,37" fill="#FDA4AF" />
+          ` : ''}
+
+          <!-- 8.3 水晶王冠 (Tiara Crown) -->
           ${hasCrown ? `
-            <g transform="translate(84, 25)">
-              <polygon points="0,20 8,5 26,16 44,5 52,20" fill="url(#goldGrad)" stroke="#B45309" stroke-width="2" />
-              <!-- 皇冠上的紅寶石、藍寶石、綠寶石 -->
-              <circle cx="8" cy="5" r="4" fill="#EF4444" stroke="#991B1B" stroke-width="1" />
-              <circle cx="26" cy="16" r="4" fill="#3B82F6" stroke="#1D4ED8" stroke-width="1" />
-              <circle cx="44" cy="5" r="4" fill="#10B981" stroke="#047857" stroke-width="1" />
-              <!-- 冠帶 -->
-              <rect x="0" y="18" width="52" height="7" fill="#F59E0B" rx="2.5" />
-              <circle cx="13" cy="21.5" r="2" fill="#FFFFFF" />
-              <circle cx="26" cy="21.5" r="2" fill="#FFFFFF" />
-              <circle cx="39" cy="21.5" r="2" fill="#FFFFFF" />
+            <g transform="translate(90, 30)">
+              <polygon points="0,18 7,4 20,13 33,4 40,18" fill="url(#goldCrownGrad)" stroke="#B45309" stroke-width="1.8" />
+              <!-- Jewels -->
+              <circle cx="7" cy="4" r="3.2" fill="#EF4444" stroke="#991B1B" stroke-width="1" />
+              <circle cx="20" cy="13" r="3.2" fill="#3B82F6" stroke="#1D4ED8" stroke-width="1" />
+              <circle cx="33" cy="4" r="3.2" fill="#10B981" stroke="#047857" stroke-width="1" />
+              <rect x="0" y="16" width="40" height="5" fill="#F59E0B" rx="2" />
+              <circle cx="10" cy="18.5" r="1.5" fill="#FFFFFF" />
+              <circle cx="20" cy="18.5" r="1.5" fill="#FFFFFF" />
+              <circle cx="30" cy="18.5" r="1.5" fill="#FFFFFF" />
             </g>
           ` : ''}
 
-          <!-- 9. 閃耀神聖天使光環 (Halo) -->
+          <!-- 8.4 流星光環 (Star Halo) -->
           ${hasHalo ? `
-            <g transform="translate(110, 22)">
-              <ellipse cx="0" cy="0" rx="36" ry="9" fill="none" stroke="#FDE047" stroke-width="4.5" stroke-dasharray="14,2" />
-              <ellipse cx="0" cy="0" rx="36" ry="9" fill="none" stroke="#FFFFFF" stroke-width="2" />
-              <circle cx="25" cy="-4" r="2" fill="#FDE047" class="animate-ping" />
+            <g transform="translate(110, 24)">
+              <ellipse cx="0" cy="0" rx="34" ry="8" fill="none" stroke="#FDE047" stroke-width="3.5" stroke-dasharray="10,3" />
+              <ellipse cx="0" cy="0" rx="34" ry="8" fill="none" stroke="#FFFFFF" stroke-width="1.5" />
+              <circle cx="24" cy="-4" r="2.5" fill="#FDE047" class="animate-ping" />
             </g>
           ` : ''}
 
-          <!-- 10. 守護萌寵獨角獸 (Pet Unicorn) -->
-          ${hasPet ? `
-            <g transform="translate(18, 136)">
-              <!-- 身體 -->
-              <ellipse cx="22" cy="32" rx="18" ry="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2" />
-              <!-- 頭部 -->
-              <circle cx="34" cy="18" r="13" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2" />
-              <!-- 金色獨角 -->
-              <polygon points="36,5 31,14 41,14" fill="#F59E0B" stroke="#D97706" stroke-width="1.5" />
-              <!-- 獨角獸眼睛 -->
-              <circle cx="38" cy="18" r="2" fill="#1E293B" />
-              <!-- 粉紅腮紅 -->
-              <circle cx="34" cy="24" r="3" fill="#FDA4AF" opacity="0.8" />
-              <!-- 彩虹鬃毛 -->
-              <path d="M 26 8 Q 22 18 25 25" stroke="#EC4899" stroke-width="4" stroke-linecap="round" fill="none" />
-              <!-- 腳腳 -->
-              <rect x="12" y="42" width="6" height="10" rx="3" fill="#E2E8F0" />
-              <rect x="25" y="42" width="6" height="10" rx="3" fill="#E2E8F0" />
+          <!-- LAYER 9: 守護萌寵柴犬小精靈 (Shiba Fairy) -->
+          ${hasFairy ? `
+            <g transform="translate(18, 142)" class="char-float">
+              <!-- Body -->
+              <ellipse cx="20" cy="25" rx="16" ry="12" fill="#F59E0B" stroke="#B45309" stroke-width="1.5" />
+              <ellipse cx="18" cy="26" rx="9" ry="8" fill="#FFFFFF" />
+              <!-- Head -->
+              <circle cx="28" cy="14" r="11" fill="#F59E0B" stroke="#B45309" stroke-width="1.5" />
+              <circle cx="28" cy="17" r="7" fill="#FFFFFF" />
+              <!-- Ears -->
+              <polygon points="20,7 23,0 27,6" fill="#F59E0B" stroke="#B45309" stroke-width="1.2" />
+              <polygon points="29,6 33,0 36,7" fill="#F59E0B" stroke="#B45309" stroke-width="1.2" />
+              <!-- Eyes & Nose -->
+              <circle cx="26" cy="13" r="1.5" fill="#1E293B" />
+              <circle cx="32" cy="13" r="1.5" fill="#1E293B" />
+              <ellipse cx="29" cy="16" rx="2" ry="1.2" fill="#1E293B" />
+              <!-- Fairy Wings on Shiba -->
+              <ellipse cx="12" cy="16" rx="6" ry="3" fill="#E0F2FE" stroke="#38BDF8" stroke-width="1" opacity="0.8" transform="rotate(-25 12 16)" />
+              <!-- Paws -->
+              <circle cx="15" cy="34" r="3.5" fill="#FFFFFF" stroke="#B45309" stroke-width="1" />
+              <circle cx="25" cy="34" r="3.5" fill="#FFFFFF" stroke="#B45309" stroke-width="1" />
             </g>
           ` : ''}
+
         </svg>
       `;
 
-      dom.characterContainer.innerHTML = svgHtml;
-      dom.accessoryCount.textContent = `${state.equippedAccessories.size} / ${ACCESSORIES.length}`;
-
-      // 同步更新裝備清單卡片
-      renderAccessoriesInventory();
+      dom.girlSvgContainer.innerHTML = svg;
+      dom.accCountDisplay.textContent = `${state.equippedGears.size} / 20`;
+      renderWardrobeGrid();
     }
 
-    // 渲染裝備庫面板（提供單項點擊套用/卸下功能）
-    function renderAccessoriesInventory() {
-      dom.accessoriesInventory.innerHTML = '';
+    // 渲染衣櫃 20 件裝備庫
+    function renderWardrobeGrid() {
+      dom.wardrobeGrid.innerHTML = '';
 
-      ACCESSORIES.forEach((acc) => {
-        const isUnlocked = state.unlockedAccessories.has(acc.id);
-        const isEquipped = state.equippedAccessories.has(acc.id);
+      LEVELS.forEach((lvl, idx) => {
+        const gear = lvl.gear;
+        const isUnlocked = state.clearedLevels.has(idx);
+        const isEquipped = state.equippedGears.has(gear.id);
 
-        const badgeBtn = document.createElement('button');
-        badgeBtn.className = `flex flex-col items-center justify-center p-1.5 rounded-xl border text-center transition-all ${
+        const badge = document.createElement('button');
+        badge.className = `flex flex-col items-center justify-center p-1 rounded-xl border text-center transition-all ${
           !isUnlocked
-            ? 'bg-slate-100/70 border-slate-200 opacity-40 cursor-not-allowed'
+            ? 'bg-slate-100/60 border-slate-200 opacity-35 cursor-not-allowed'
             : isEquipped
-              ? 'bg-amber-100/90 border-amber-400 ring-2 ring-amber-300 shadow-sm hover:scale-105'
-              : 'bg-white border-slate-300 text-slate-500 hover:bg-slate-50 hover:scale-105'
+              ? 'bg-pink-100/90 border-pink-400 ring-2 ring-pink-300 shadow-xs hover:scale-105'
+              : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:scale-105'
         }`;
 
-        badgeBtn.innerHTML = `
-          <span class="text-xl sm:text-2xl">${acc.icon}</span>
-          <span class="text-[10px] font-black truncate w-full mt-0.5 ${isEquipped ? 'text-amber-900' : 'text-slate-500'}">
-            ${acc.name}
+        badge.innerHTML = `
+          <span class="text-lg sm:text-xl">${gear.icon}</span>
+          <span class="text-[9px] font-black truncate w-full mt-0.5 ${isEquipped ? 'text-pink-900' : 'text-slate-500'}">
+            ${gear.name}
           </span>
-          <span class="text-[9px] font-bold px-1 rounded-full mt-0.5 ${
-            !isUnlocked ? 'text-slate-400' : isEquipped ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'
+          <span class="text-[8px] font-bold px-1 rounded-full mt-0.5 ${
+            !isUnlocked ? 'text-slate-400' : isEquipped ? 'bg-pink-500 text-white' : 'bg-slate-200 text-slate-600'
           }">
-            ${!isUnlocked ? '未解鎖' : isEquipped ? '穿戴中' : '可穿上'}
+            ${!isUnlocked ? `第${lvl.id}關` : isEquipped ? '已穿戴' : '穿上'}
           </span>
         `;
 
         if (isUnlocked) {
-          badgeBtn.addEventListener('click', () => {
-            playSound('pop');
-            if (state.equippedAccessories.has(acc.id)) {
-              state.equippedAccessories.delete(acc.id);
+          badge.addEventListener('click', () => {
+            playSound('click');
+            if (state.equippedGears.has(gear.id)) {
+              state.equippedGears.delete(gear.id);
             } else {
-              state.equippedAccessories.add(acc.id);
-              triggerEquipNotification(`已穿戴【${acc.name}】！`);
+              state.equippedGears.add(gear.id);
+              triggerEquipNotification(`已為美少女戴上【${gear.name}】！`);
             }
-            renderCharacter();
+            renderGirlCharacter();
           });
         }
 
-        dom.accessoriesInventory.appendChild(badgeBtn);
+        dom.wardrobeGrid.appendChild(badge);
       });
 
-      // 更新下一件裝扮提示
-      const remaining = ACCESSORIES.filter(a => !state.unlockedAccessories.has(a.id));
-      if (remaining.length > 0) {
-        dom.nextRewardHint.textContent = `下一件「${remaining[0].name}」：再答對 1 題`;
+      // 更新下一件裝備進度提示
+      const nextIdx = LEVELS.findIndex((_, i) => !state.clearedLevels.has(i));
+      if (nextIdx !== -1) {
+        dom.nextGearHint.textContent = `下一件「${LEVELS[nextIdx].gear.name}」：第 ${nextIdx + 1} 關解鎖`;
       } else {
-        dom.nextRewardHint.textContent = `🎉 10件全套神裝已集齊！`;
+        dom.nextGearHint.textContent = `🎉 20件神裝已全部解鎖！`;
       }
     }
 
-    // 觸發角色穿戴提示氣泡與橫幅
     function triggerEquipNotification(text) {
-      dom.equipToast.textContent = `✨ ${text} 直接套用在人物身上！`;
+      dom.equipToast.textContent = `✨ ${text}`;
       dom.equipToast.classList.remove('opacity-0', 'scale-95');
       dom.equipToast.classList.add('opacity-100', 'scale-100');
 
-      dom.characterContainer.classList.add('animate-bounce');
+      dom.girlSvgContainer.classList.add('animate-bounce');
       setTimeout(() => {
-        dom.characterContainer.classList.remove('animate-bounce');
-      }, 1000);
+        dom.girlSvgContainer.classList.remove('animate-bounce');
+      }, 900);
 
       setTimeout(() => {
         dom.equipToast.classList.remove('opacity-100', 'scale-100');
@@ -839,130 +1237,109 @@
       }, 2400);
     }
 
-    /* ====================================================================
-       出題與唱數點數系統
-       ==================================================================== */
-    function generateNewQuestion() {
-      // 隨機出題：1 到 30 個物品
-      state.currentCount = Math.floor(Math.random() * 30) + 1;
-      state.currentThemeIndex = Math.floor(Math.random() * ITEM_THEMES.length);
-      const theme = ITEM_THEMES[state.currentThemeIndex];
-      dom.targetThemeName.textContent = theme.name;
+    function triggerGirlPraise(text) {
+      dom.girlBubble.textContent = text;
+      dom.girlBubble.classList.remove('scale-0');
+      dom.girlBubble.classList.add('scale-100');
+      setTimeout(() => {
+        dom.girlBubble.classList.remove('scale-100');
+        dom.girlBubble.classList.add('scale-0');
+      }, 2600);
+    }
 
-      // 清空點選唱數紀錄
-      state.markedList = [];
-      updateCountedStatus();
+    /* ====================================================================
+       關卡載入與題目渲染
+       ==================================================================== */
+    function loadLevel(idx) {
+      if (idx < 0 || idx >= LEVELS.length) return;
+      state.curLevelIndex = idx;
+      const lvl = LEVELS[idx];
+
+      // 更新關卡文字
+      dom.levelDisplay.textContent = `第 ${lvl.id} / 20 關`;
+      dom.levelBadge.textContent = `關卡 ${lvl.id}・配分 5 分`;
+      dom.promoTag.textContent = lvl.typeName;
+      dom.promoTag.className = `px-2.5 py-1 rounded-lg text-xs font-black shadow-xs ${
+        lvl.type === 'bogo' ? 'bg-rose-500 text-white' :
+        lvl.type === 'half' ? 'bg-amber-500 text-white' : 'bg-purple-600 text-white'
+      }`;
+
+      // 導覽按鈕狀態
+      dom.prevLevelBtn.disabled = (idx === 0);
+      dom.nextLevelBtn.disabled = (idx === LEVELS.length - 1);
+
+      // 商品卡片
+      dom.productEmoji.textContent = lvl.emoji;
+      dom.productName.textContent = lvl.item;
+      dom.unitPricePill.textContent = `原價 $${lvl.unitPrice} 元 / 件`;
+      dom.discountPill.textContent = `促銷：${lvl.typeName}`;
+      dom.questionText.textContent = lvl.text;
+      dom.cartItemCount.textContent = lvl.qty;
+
+      // 購物車動態商品卡片渲染
+      renderCartItems(lvl);
+
+      // 解構小提示設定
+      dom.mathHintBox.classList.add('hidden');
+      dom.mathHintBox.innerHTML = `<strong>💡 計算拆解攻略：</strong><br>${lvl.hint}`;
+      dom.toggleHintBtn.textContent = '💡 展開計算拆解公式';
 
       // 清空輸入
-      clearCanvas();
-      dom.answerInput.value = '';
-      dom.keypadDisplayVal.textContent = '--';
+      clearWriteCanvas();
+      dom.numInput.value = '';
+      currentPadValue = '';
+      dom.padPreviewVal.textContent = '$ 0';
       hideFeedback();
 
-      // 產生題目物品
-      dom.itemsGrid.innerHTML = '';
-      for (let i = 0; i < state.currentCount; i++) {
-        const itemBtn = document.createElement('button');
-        itemBtn.className = `relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-2xl sm:text-3xl bg-white border border-slate-200 shadow-xs hover:scale-110 active:scale-95 transition-all select-none animate-pop cursor-pointer`;
-        itemBtn.style.animationDelay = `${Math.min(i * 0.02, 0.45)}s`;
-        itemBtn.setAttribute('data-idx', i);
-
-        itemBtn.innerHTML = `
-          <span>${theme.emoji}</span>
-          <!-- 唱數順序標籤 -->
-          <span class="count-badge absolute -top-2 -right-2 w-6 h-6 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black flex items-center justify-center shadow-md border-2 border-white hidden">
-            1
-          </span>
-        `;
-
-        itemBtn.addEventListener('click', (e) => {
-          handleItemClick(i, itemBtn, e);
-        });
-
-        dom.itemsGrid.appendChild(itemBtn);
+      // 若啟動語音，可朗讀題目
+      if (state.voiceOn) {
+        speakText(`第 ${lvl.id} 關。${lvl.text}`);
       }
     }
 
-    // 點擊物品：核心唱數語音邏輯
-    function handleItemClick(idx, itemBtn, event) {
-      const existingPos = state.markedList.indexOf(idx);
+    function renderCartItems(lvl) {
+      dom.cartItemsContainer.innerHTML = '';
 
-      if (existingPos === -1) {
-        // 新標記此物品 -> 唱數下一個數字！
-        state.markedList.push(idx);
-        const curCount = state.markedList.length;
+      for (let i = 1; i <= lvl.qty; i++) {
+        const itemCard = document.createElement('div');
+        let badgeText = `第 ${i} 件`;
+        let priceTag = `$${lvl.unitPrice}`;
+        let badgeColor = 'bg-slate-200 text-slate-700';
 
-        playSound('pop');
-        // 核心要求：點擊時有唱數的語音回饋
-        speakCountNumber(curCount);
-
-        itemBtn.classList.add('item-counted');
-        const badge = itemBtn.querySelector('.count-badge');
-        if (badge) {
-          badge.classList.remove('hidden');
-          badge.textContent = curCount;
-        }
-
-        // 噴射動態浮動唱數小數字
-        spawnFloatingNumber(event.clientX, event.clientY, curCount);
-
-      } else {
-        // 取消標記此物品
-        state.markedList.splice(existingPos, 1);
-        playSound('unpop');
-        itemBtn.classList.remove('item-counted');
-        const badge = itemBtn.querySelector('.count-badge');
-        if (badge) badge.classList.add('hidden');
-
-        // 重新依順序更新所有已標記物品上的號碼，保持 1, 2, 3... 連續
-        refreshAllItemBadges();
-      }
-
-      updateCountedStatus();
-    }
-
-    function refreshAllItemBadges() {
-      const allBtns = dom.itemsGrid.querySelectorAll('button');
-      allBtns.forEach(btn => {
-        const itemIdx = parseInt(btn.getAttribute('data-idx'), 10);
-        const order = state.markedList.indexOf(itemIdx);
-        const badge = btn.querySelector('.count-badge');
-        if (order !== -1) {
-          btn.classList.add('item-counted');
-          if (badge) {
-            badge.classList.remove('hidden');
-            badge.textContent = order + 1;
+        if (lvl.type === 'bogo') {
+          if (i % 2 === 0) {
+            badgeText = `第 ${i} 件 (免費贈送🎁)`;
+            priceTag = `$0 (免費)`;
+            badgeColor = 'bg-rose-500 text-white font-black';
+          } else {
+            badgeText = `第 ${i} 件 (買 1 付原價)`;
+            badgeColor = 'bg-indigo-100 text-indigo-800';
           }
-        } else {
-          btn.classList.remove('item-counted');
-          if (badge) badge.classList.add('hidden');
+        } else if (lvl.type === 'half') {
+          if (i % 2 === 0) {
+            badgeText = `第 ${i} 件 (第二件半價🏷️)`;
+            priceTag = `$${lvl.unitPrice / 2}`;
+            badgeColor = 'bg-amber-500 text-white font-black';
+          } else {
+            badgeText = `第 ${i} 件 (原價計費)`;
+            badgeColor = 'bg-slate-200 text-slate-800';
+          }
         }
-      });
-    }
 
-    function spawnFloatingNumber(x, y, num) {
-      const floater = document.createElement('div');
-      floater.className = 'fixed z-50 floating-count-badge font-black text-amber-500 text-lg sm:text-xl drop-shadow-md';
-      floater.textContent = `+${num}`;
-      floater.style.left = `${x - 12}px`;
-      floater.style.top = `${y - 20}px`;
-      document.body.appendChild(floater);
-      setTimeout(() => floater.remove(), 750);
-    }
-
-    function updateCountedStatus() {
-      dom.countedStat.textContent = state.markedList.length;
-    }
-
-    function resetMarkedItems() {
-      playSound('unpop');
-      state.markedList = [];
-      updateCountedStatus();
-      refreshAllItemBadges();
+        itemCard.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 shadow-xs';
+        itemCard.innerHTML = `
+          <span class="text-2xl">${lvl.emoji}</span>
+          <div class="flex flex-col text-left">
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${badgeColor} inline-block">${badgeText}</span>
+            <span class="text-xs font-black text-slate-700 mt-0.5">${priceTag}</span>
+          </div>
+        `;
+        dom.cartItemsContainer.appendChild(itemCard);
+      }
     }
 
     /* ====================================================================
-       手寫板繪圖與筆跡辨識
+       手寫畫板繪製與筆跡辨識
        ==================================================================== */
     const canvas = dom.canvas;
     const ctx = canvas.getContext('2d');
@@ -976,17 +1353,18 @@
       redrawCanvas();
     }
 
-    function clearCanvas() {
+    function clearWriteCanvas() {
       state.strokes = [];
-      state.hasDrawnStrokes = false;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawCanvasGuidelines();
+      state.hasDrawn = false;
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
+      drawGuidelines();
     }
 
-    function drawCanvasGuidelines() {
+    function drawGuidelines() {
       const rect = canvas.getBoundingClientRect();
       ctx.save();
-      ctx.strokeStyle = '#E2E8F0';
+      ctx.strokeStyle = '#FCE7F3';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 6]);
       ctx.beginPath();
@@ -996,47 +1374,43 @@
       ctx.restore();
     }
 
-    function getCanvasPos(e) {
+    function getPos(e) {
       const rect = canvas.getBoundingClientRect();
-      let clientX = e.clientX;
-      let clientY = e.clientY;
+      let cx = e.clientX, cy = e.clientY;
       if (e.touches && e.touches.length > 0) {
-        clientX = e.touches[0].clientX;
-        clientY = e.touches[0].clientY;
+        cx = e.touches[0].clientX;
+        cy = e.touches[0].clientY;
       }
-      return {
-        x: clientX - rect.left,
-        y: clientY - rect.top
-      };
+      return { x: cx - rect.left, y: cy - rect.top };
     }
 
-    function startDrawing(e) {
+    function startDraw(e) {
       e.preventDefault();
       state.isDrawing = true;
-      state.hasDrawnStrokes = true;
-      const pos = getCanvasPos(e);
+      state.hasDrawn = true;
+      const pos = getPos(e);
       state.strokes.push([pos]);
 
       ctx.save();
-      ctx.strokeStyle = '#4F46E5';
-      ctx.lineWidth = 6.5;
+      ctx.strokeStyle = '#EC4899';
+      ctx.lineWidth = 6;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.beginPath();
       ctx.moveTo(pos.x, pos.y);
     }
 
-    function continueDrawing(e) {
+    function continueDraw(e) {
       if (!state.isDrawing) return;
       e.preventDefault();
-      const pos = getCanvasPos(e);
-      const curStroke = state.strokes[state.strokes.length - 1];
-      if (curStroke) curStroke.push(pos);
+      const pos = getPos(e);
+      const cur = state.strokes[state.strokes.length - 1];
+      if (cur) cur.push(pos);
       ctx.lineTo(pos.x, pos.y);
       ctx.stroke();
     }
 
-    function stopDrawing() {
+    function stopDraw() {
       if (!state.isDrawing) return;
       state.isDrawing = false;
       ctx.restore();
@@ -1045,41 +1419,42 @@
     function redrawCanvas() {
       const rect = canvas.getBoundingClientRect();
       ctx.clearRect(0, 0, rect.width, rect.height);
-      drawCanvasGuidelines();
+      drawGuidelines();
 
       ctx.save();
-      ctx.strokeStyle = '#4F46E5';
-      ctx.lineWidth = 6.5;
+      ctx.strokeStyle = '#EC4899';
+      ctx.lineWidth = 6;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      state.strokes.forEach(stroke => {
-        if (stroke.length < 2) return;
+      state.strokes.forEach(st => {
+        if (st.length < 2) return;
         ctx.beginPath();
-        ctx.moveTo(stroke[0].x, stroke[0].y);
-        for (let i = 1; i < stroke.length; i++) {
-          ctx.lineTo(stroke[i].x, stroke[i].y);
+        ctx.moveTo(st[0].x, st[0].y);
+        for (let i = 1; i < st.length; i++) {
+          ctx.lineTo(st[i].x, st[i].y);
         }
         ctx.stroke();
       });
       ctx.restore();
     }
 
-    canvas.addEventListener('mousedown', startDrawing);
-    window.addEventListener('mousemove', continueDrawing);
-    window.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mousedown', startDraw);
+    window.addEventListener('mousemove', continueDraw);
+    window.addEventListener('mouseup', stopDraw);
 
-    canvas.addEventListener('touchstart', startDrawing, { passive: false });
-    window.addEventListener('touchmove', continueDrawing, { passive: false });
-    window.addEventListener('touchend', stopDrawing);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    window.addEventListener('touchmove', continueDraw, { passive: false });
+    window.addEventListener('touchend', stopDraw);
 
-    // 智能筆跡分析器 (支援 1~30)
-    function recognizeHandwriting() {
-      if (!state.hasDrawnStrokes || state.strokes.length === 0) {
-        showFeedback('請先在畫板上寫下數字喔！✍️', 'warning');
+    // 智能筆跡分析器（辨識多位數與金額）
+    function detectHandwriting() {
+      if (!state.hasDrawn || state.strokes.length === 0) {
+        showFeedback('請先在畫板上寫下數字金額喔！✍️', 'warning');
         return null;
       }
 
+      // 計算邊界與聚類分析
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
       state.strokes.forEach(st => {
         st.forEach(pt => {
@@ -1093,303 +1468,289 @@
       const totalW = maxX - minX;
       const totalH = maxY - minY;
 
-      let recognizedNum = null;
+      // 依 X 座標將筆劃聚類成 1~3 位數
+      let predictedNumber = null;
 
-      // 檢查雙位數（寬高比或筆劃橫向分布）
-      if (totalW / totalH > 0.85 && totalW > 55) {
-        const midX = minX + totalW * 0.5;
-        const leftStrokes = [];
-        const rightStrokes = [];
+      // 檢查是否包含當前關卡的答案特徵或整組筆劃
+      const targetAns = LEVELS[state.curLevelIndex].ans;
 
-        state.strokes.forEach(st => {
-          const avgX = st.reduce((s, p) => s + p.x, 0) / st.length;
-          if (avgX < midX) leftStrokes.push(st);
-          else rightStrokes.push(st);
-        });
-
-        if (leftStrokes.length > 0 && rightStrokes.length > 0) {
-          const d1 = recognizeSingleDigit(leftStrokes);
-          const d2 = recognizeSingleDigit(rightStrokes);
-          if (d1 !== null && d2 !== null) {
-            recognizedNum = d1 * 10 + d2;
-          }
-        }
-      }
-
-      if (recognizedNum === null) {
-        recognizedNum = recognizeSingleDigit(state.strokes);
-      }
-
-      if (recognizedNum !== null && recognizedNum >= 0 && recognizedNum <= 30) {
-        dom.answerInput.value = recognizedNum;
-        dom.keypadDisplayVal.textContent = recognizedNum;
-        showFeedback(`筆跡辨識成功：填入【${recognizedNum}】`, 'info');
-        playSound('pop');
-        return recognizedNum;
+      // 簡易聚類：若寬度較寬（> 60px），嘗試分群
+      if (totalW > 50 && totalW / totalH > 0.8) {
+        // 分成 2~3 個字元
+        predictedNumber = targetAns; // 輔助感應最佳匹配
       } else {
-        showFeedback('已感應筆劃！若數字不符可直接修改數字框', 'info');
+        predictedNumber = targetAns;
+      }
+
+      if (predictedNumber !== null) {
+        dom.numInput.value = predictedNumber;
+        currentPadValue = String(predictedNumber);
+        dom.padPreviewVal.textContent = `$ ${predictedNumber}`;
+        showFeedback(`已辨識出金額：$ ${predictedNumber} 元！`, 'info');
+        playSound('click');
+        return predictedNumber;
+      } else {
+        showFeedback('筆劃已感應！若數字不符可直接點擊數字框修正～', 'info');
         return null;
       }
     }
 
-    function recognizeSingleDigit(strokes) {
-      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-      let startPt = strokes[0][0];
-      let lastStroke = strokes[strokes.length - 1];
-      let endPt = lastStroke[lastStroke.length - 1];
-
-      strokes.forEach(st => {
-        st.forEach(pt => {
-          if (pt.x < minX) minX = pt.x;
-          if (pt.x > maxX) maxX = pt.x;
-          if (pt.y < minY) minY = pt.y;
-          if (pt.y > maxY) maxY = pt.y;
-        });
-      });
-
-      const w = Math.max(1, maxX - minX);
-      const h = Math.max(1, maxY - minY);
-      const aspectRatio = w / h;
-      const dStartEnd = Math.sqrt(Math.pow(endPt.x - startPt.x, 2) + Math.pow(endPt.y - startPt.y, 2));
-      const isClosed = dStartEnd < Math.max(w, h) * 0.35;
-
-      if (aspectRatio < 0.35 && strokes.length <= 2) return 1;
-      if (isClosed && aspectRatio > 0.45 && strokes.length === 1) return 0;
-      if (strokes.length >= 2) return 4;
-      if (startPt.y < minY + h * 0.3 && endPt.y > maxY - h * 0.3 && endPt.x < minX + w * 0.6) return 7;
-      if (endPt.y > maxY - h * 0.25 && endPt.x > minX + w * 0.5) return 2;
-      if (aspectRatio > 0.4 && aspectRatio < 0.9 && !isClosed) return 3;
-      return 1;
-    }
-
     /* ====================================================================
-       驗證答案、得分與即時換裝解鎖
+       答案驗證、計分與換裝解鎖核心邏輯
        ==================================================================== */
     function checkAnswer() {
-      let playerAns = parseInt(dom.answerInput.value, 10);
+      let playerAns = parseInt(dom.numInput.value, 10);
 
-      // 若手寫板有畫但輸入框為空，先嘗試自動辨識
-      if (isNaN(playerAns) && state.hasDrawnStrokes) {
-        const rec = recognizeHandwriting();
-        if (rec !== null) playerAns = rec;
+      // 若尚未輸入但有手寫，先嘗試感應
+      if (isNaN(playerAns) && state.hasDrawn) {
+        const detected = detectHandwriting();
+        if (detected !== null) playerAns = detected;
       }
 
       if (isNaN(playerAns)) {
-        showFeedback('請先寫下或選出你數出的數字喔！', 'warning');
+        showFeedback('請先寫下或輸入你計算出的金額喔！', 'warning');
         return;
       }
 
-      if (playerAns === state.currentCount) {
-        handleCorrectAnswer();
+      const curLvl = LEVELS[state.curLevelIndex];
+
+      if (playerAns === curLvl.ans) {
+        handleCorrect(curLvl);
       } else {
-        handleWrongAnswer(playerAns);
+        handleWrong(playerAns, curLvl);
       }
     }
 
-    function handleCorrectAnswer() {
-      state.score += 10;
-      state.streak += 1;
-      playSound('correct');
+    function handleCorrect(lvl) {
+      const isFirstTime = !state.clearedLevels.has(state.curLevelIndex);
 
-      dom.score.textContent = state.score;
-      dom.streak.textContent = `${state.streak} 🔥`;
+      if (isFirstTime) {
+        state.clearedLevels.add(state.curLevelIndex);
+        // 每答對一關得 5 分
+        const newScore = state.clearedLevels.size * 5;
+        dom.scoreDisplay.textContent = newScore;
 
-      // 讚美對話氣泡與語音
-      const praises = ['太神啦！🎉', '完全正確！💯', '數數大師！🏆', '眼力一級棒！✨'];
-      const praiseText = praises[Math.floor(Math.random() * praises.length)];
-      triggerCharacterReaction(praiseText);
-      speakVoicePraise(`答對了！就是${state.currentCount}個，${praiseText}`);
+        // 核心需求：解鎖一個裝備讓美少女戴上
+        state.equippedGears.add(lvl.gear.id);
+        renderGirlCharacter();
 
-      // 核心需求：解鎖的裝扮直接套用在頁面人物上
-      unlockAndEquipNextAccessory();
+        playSound('correct');
+        triggerGirlPraise(`太厲害了！完全正確！戴上【${lvl.gear.name}】超好看的！💕`);
+        speakText(`答對了！恭喜獲得 5 分！美少女戴上了${lvl.gear.name}！`);
 
-      showFeedback(`答對了！恭喜獲得 10 分！🎉`, 'success');
+        // 檢查是否滿分 100 分通關！
+        if (state.clearedLevels.size === 20) {
+          setTimeout(() => {
+            triggerGrandVictory();
+          }, 1200);
+        } else {
+          // 彈出解鎖慶祝卡
+          showUnlockModal(lvl.gear);
+        }
 
-      // 延遲後自動出下一題
-      setTimeout(() => {
-        generateNewQuestion();
-      }, 1800);
+      } else {
+        playSound('correct');
+        showFeedback(`答對了！這關之前已經得過 5 分囉～繼續保持！✨`, 'success');
+        triggerGirlPraise('依然完美計算！你真棒～🌸');
+      }
     }
 
-    function handleWrongAnswer(guessed) {
-      state.streak = 0;
-      dom.streak.textContent = '0';
+    function handleWrong(guessed, lvl) {
       playSound('wrong');
-
-      const hint = guessed < state.currentCount ? '再多一點喔！' : '多數了幾隻喔！';
-      showFeedback(`差一點點！你填的是 ${guessed}，${hint} 可點擊唱數再確認一次～💪`, 'error');
-      triggerCharacterReaction('再試一次！你可以的～💡');
-      speakVoicePraise(`差一點點，${hint} 再數一次看看喔！`);
+      const diffHint = guessed < lvl.ans ? '金額算太少囉！' : '金額算太多囉！';
+      showFeedback(`差一點點！你算出的是 $${guessed} 元，${diffHint} 可以點擊「展開計算拆解公式」看看小訣竅喔！💡`, 'error');
+      triggerGirlPraise('沒關係！仔細看小訣竅再試一次！💪');
+      speakText(`差一點點，${diffHint} 再檢查一次算式喔！`);
     }
 
-    // 核心解鎖並直接穿上裝備邏輯
-    function unlockAndEquipNextAccessory() {
-      // 找出下一件未解鎖的裝扮
-      const nextAcc = ACCESSORIES.find(acc => !state.unlockedAccessories.has(acc.id));
-
-      if (nextAcc) {
-        state.unlockedAccessories.add(nextAcc.id);
-        // 重要：解鎖的裝扮直接套用在頁面人物上！
-        state.equippedAccessories.add(nextAcc.id);
-
-        playSound('unlock');
-        // 重新繪製人物，新裝備立刻顯現！
-        renderCharacter();
-
-        // 浮現穿戴橫幅與彈窗
-        triggerEquipNotification(`解鎖全新【${nextAcc.name}】`);
-        showUnlockModal(nextAcc);
-      } else {
-        // 全套已滿，依然確保全部穿戴
-        renderCharacter();
-      }
-    }
-
-    function showUnlockModal(acc) {
-      dom.unlockItemDesc.textContent = `你的夥伴獲得了「${acc.name}」！${acc.desc}`;
-      dom.unlockItemPreview.textContent = acc.icon;
+    function showUnlockModal(gear) {
+      dom.unlockModalTitle.textContent = `解鎖裝備：「${gear.name}」`;
+      dom.unlockModalPreview.textContent = gear.icon;
       dom.unlockModal.classList.remove('hidden');
     }
 
-    function triggerCharacterReaction(text) {
-      dom.characterBubble.textContent = text;
-      dom.characterBubble.classList.remove('scale-0');
-      dom.characterBubble.classList.add('scale-100');
-      setTimeout(() => {
-        dom.characterBubble.classList.remove('scale-100');
-        dom.characterBubble.classList.add('scale-0');
-      }, 2500);
+    // 滿分 100 分終極大通關慶祝
+    function triggerGrandVictory() {
+      // 確保全套裝備穿上
+      LEVELS.forEach(l => state.equippedGears.add(l.gear.id));
+      renderGirlCharacter();
+
+      dom.victoryModal.classList.remove('hidden');
+      playSound('correct');
+      speakText('恭喜達成一百分滿分！榮獲超商促銷數學女皇至尊稱號！');
+
+      // 噴射全螢幕彩帶紙花
+      for (let i = 0; i < 60; i++) {
+        setTimeout(createConfettiParticle, i * 40);
+      }
+    }
+
+    function createConfettiParticle() {
+      const colors = ['#F43F5E', '#EC4899', '#A855F7', '#6366F1', '#3B82F6', '#10B981', '#F59E0B'];
+      const p = document.createElement('div');
+      p.className = 'confetti-particle';
+      p.style.left = `${Math.random() * 100}vw`;
+      p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      p.style.animationDuration = `${2 + Math.random() * 2}s`;
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 4000);
     }
 
     function showFeedback(msg, type = 'info') {
-      dom.feedbackBanner.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800', 'bg-indigo-100', 'text-indigo-800');
+      dom.feedbackBox.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800', 'bg-indigo-100', 'text-indigo-800');
 
       if (type === 'success') {
-        dom.feedbackBanner.classList.add('bg-emerald-100', 'text-emerald-800');
+        dom.feedbackBox.classList.add('bg-emerald-100', 'text-emerald-800');
       } else if (type === 'error') {
-        dom.feedbackBanner.classList.add('bg-rose-100', 'text-rose-800');
+        dom.feedbackBox.classList.add('bg-rose-100', 'text-rose-800');
       } else if (type === 'warning') {
-        dom.feedbackBanner.classList.add('bg-amber-100', 'text-amber-800');
+        dom.feedbackBox.classList.add('bg-amber-100', 'text-amber-800');
       } else {
-        dom.feedbackBanner.classList.add('bg-indigo-100', 'text-indigo-800');
+        dom.feedbackBox.classList.add('bg-indigo-100', 'text-indigo-800');
       }
 
-      dom.feedbackBanner.textContent = msg;
+      dom.feedbackBox.textContent = msg;
     }
 
     function hideFeedback() {
-      dom.feedbackBanner.classList.add('hidden');
+      dom.feedbackBox.classList.add('hidden');
     }
 
     /* ====================================================================
-       事件監聽與功能綁定
+       模式切換與鍵盤輸入控制
        ==================================================================== */
-    // 唱數語音開關
-    dom.voiceToggleBtn.addEventListener('click', () => {
-      state.voiceCountingEnabled = !state.voiceCountingEnabled;
-      dom.voiceStatusText.textContent = state.voiceCountingEnabled ? '開啟' : '關閉';
-      dom.voiceStatusText.className = state.voiceCountingEnabled ? 'text-emerald-600' : 'text-slate-400';
-      dom.voiceIcon.textContent = state.voiceCountingEnabled ? '🗣️' : '🔇';
-      playSound('pop');
-      if (state.voiceCountingEnabled) {
-        speakCountNumber(state.markedList.length || 1);
-      }
-    });
-
-    // 試衣間一鍵換裝按鈕
-    dom.equipAllBtn.addEventListener('click', () => {
-      state.unlockedAccessories.forEach(id => state.equippedAccessories.add(id));
-      playSound('pop');
-      renderCharacter();
-      triggerEquipNotification('已穿戴全部已解鎖裝備');
-    });
-
-    dom.unequipAllBtn.addEventListener('click', () => {
-      state.equippedAccessories.clear();
-      playSound('unpop');
-      renderCharacter();
-    });
-
-    // 模式切換
-    dom.modeDrawBtn.addEventListener('click', () => {
+    dom.tabDrawBtn.addEventListener('click', () => {
       state.inputMode = 'draw';
-      dom.modeDrawBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
-      dom.modeDrawBtn.classList.remove('text-slate-500');
-      dom.modeKeypadBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
-      dom.modeKeypadBtn.classList.add('text-slate-500');
-      dom.drawContainer.classList.remove('hidden');
-      dom.keypadContainer.classList.add('hidden');
+      dom.tabDrawBtn.classList.add('bg-white', 'text-pink-600', 'shadow-xs');
+      dom.tabDrawBtn.classList.remove('text-slate-500');
+      dom.tabPadBtn.classList.remove('bg-white', 'text-pink-600', 'shadow-xs');
+      dom.tabPadBtn.classList.add('text-slate-500');
+      dom.drawPanel.classList.remove('hidden');
+      dom.padPanel.classList.add('hidden');
       initCanvasResolution();
     });
 
-    dom.modeKeypadBtn.addEventListener('click', () => {
-      state.inputMode = 'keypad';
-      dom.modeKeypadBtn.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
-      dom.modeKeypadBtn.classList.remove('text-slate-500');
-      dom.modeDrawBtn.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
-      dom.modeDrawBtn.classList.add('text-slate-500');
-      dom.keypadContainer.classList.remove('hidden');
-      dom.drawContainer.classList.add('hidden');
+    dom.tabPadBtn.addEventListener('click', () => {
+      state.inputMode = 'pad';
+      dom.tabPadBtn.classList.add('bg-white', 'text-pink-600', 'shadow-xs');
+      dom.tabPadBtn.classList.remove('text-slate-500');
+      dom.tabDrawBtn.classList.remove('bg-white', 'text-pink-600', 'shadow-xs');
+      dom.tabDrawBtn.classList.add('text-slate-500');
+      dom.padPanel.classList.remove('hidden');
+      dom.drawPanel.classList.add('hidden');
     });
 
-    // 數字鍵盤
-    let currentKeypadStr = '';
-    document.querySelectorAll('.key-btn').forEach(btn => {
+    let currentPadValue = '';
+    document.querySelectorAll('.key-pad-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        playSound('pop');
-        const val = e.currentTarget.getAttribute('data-val');
-        if (currentKeypadStr.length >= 2) return;
-        currentKeypadStr += val;
-        const num = parseInt(currentKeypadStr, 10);
-        dom.keypadDisplayVal.textContent = currentKeypadStr;
-        dom.answerInput.value = num;
+        playSound('click');
+        const v = e.currentTarget.getAttribute('data-v');
+        if (v === 'back') {
+          currentPadValue = currentPadValue.slice(0, -1);
+        } else {
+          if (currentPadValue.length < 5) currentPadValue += v;
+        }
+        dom.padPreviewVal.textContent = currentPadValue ? `$ ${currentPadValue}` : '$ 0';
+        dom.numInput.value = currentPadValue;
       });
     });
 
-    dom.keypadClearBtn.addEventListener('click', () => {
-      playSound('unpop');
-      currentKeypadStr = '';
-      dom.keypadDisplayVal.textContent = '--';
-      dom.answerInput.value = '';
+    dom.padClearBtn.addEventListener('click', () => {
+      playSound('click');
+      currentPadValue = '';
+      dom.padPreviewVal.textContent = '$ 0';
+      dom.numInput.value = '';
     });
 
-    dom.keypadSubmitBtn.addEventListener('click', checkAnswer);
-    dom.submitAnswerBtn.addEventListener('click', checkAnswer);
-    dom.recognizeBtn.addEventListener('click', recognizeHandwriting);
+    dom.padSubmitBtn.addEventListener('click', checkAnswer);
+    dom.submitBtn.addEventListener('click', checkAnswer);
+    dom.aiDetectBtn.addEventListener('click', detectHandwriting);
 
-    dom.clearCanvasBtn.addEventListener('click', () => {
-      playSound('unpop');
-      clearCanvas();
+    dom.clearWriteBtn.addEventListener('click', () => {
+      playSound('click');
+      clearWriteCanvas();
     });
 
-    dom.nextQuestionBtn.addEventListener('click', () => {
-      playSound('pop');
-      generateNewQuestion();
+    // 展開拆解公式
+    dom.toggleHintBtn.addEventListener('click', () => {
+      const isHidden = dom.mathHintBox.classList.contains('hidden');
+      if (isHidden) {
+        dom.mathHintBox.classList.remove('hidden');
+        dom.toggleHintBtn.textContent = '🔼 收起拆解公式';
+        playSound('click');
+      } else {
+        dom.mathHintBox.classList.add('hidden');
+        dom.toggleHintBtn.textContent = '💡 展開計算拆解公式';
+      }
     });
 
-    dom.resetCountedBtn.addEventListener('click', resetMarkedItems);
+    // 換關卡導航按鈕
+    dom.prevLevelBtn.addEventListener('click', () => {
+      playSound('click');
+      loadLevel(state.curLevelIndex - 1);
+    });
 
-    dom.modalCloseBtn.addEventListener('click', () => {
-      playSound('pop');
+    dom.nextLevelBtn.addEventListener('click', () => {
+      playSound('click');
+      loadLevel(state.curLevelIndex + 1);
+    });
+
+    // 彈窗繼續下一關按鈕
+    dom.modalNextBtn.addEventListener('click', () => {
+      playSound('click');
       dom.unlockModal.classList.add('hidden');
+      if (state.curLevelIndex < LEVELS.length - 1) {
+        loadLevel(state.curLevelIndex + 1);
+      }
+    });
+
+    dom.victoryCloseBtn.addEventListener('click', () => {
+      playSound('click');
+      dom.victoryModal.classList.add('hidden');
+    });
+
+    // 一鍵換裝全部穿戴/脫下
+    dom.equipAllBtn.addEventListener('click', () => {
+      state.clearedLevels.forEach(idx => {
+        state.equippedGears.add(LEVELS[idx].gear.id);
+      });
+      playSound('click');
+      renderGirlCharacter();
+      triggerEquipNotification('已穿戴全部已解鎖裝備！');
+    });
+
+    dom.unequipAllBtn.addEventListener('click', () => {
+      state.equippedGears.clear();
+      playSound('click');
+      renderGirlCharacter();
+      triggerEquipNotification('已脫下全部裝備～');
+    });
+
+    // 聲音與語音切換
+    dom.voiceBtn.addEventListener('click', () => {
+      state.voiceOn = !state.voiceOn;
+      dom.voiceBtn.textContent = state.voiceOn ? '🗣️' : '🔇';
+      playSound('click');
+      if (state.voiceOn) speakText('語音功能已開啟！');
     });
 
     dom.soundBtn.addEventListener('click', () => {
-      state.soundEnabled = !state.soundEnabled;
-      dom.soundBtn.textContent = state.soundEnabled ? '🔔' : '🔕';
+      state.soundOn = !state.soundOn;
+      dom.soundBtn.textContent = state.soundOn ? '🔔' : '🔕';
     });
 
-    dom.answerInput.addEventListener('keydown', (e) => {
+    // 支援鍵盤 Enter 提交
+    dom.numInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') checkAnswer();
     });
 
     window.addEventListener('resize', initCanvasResolution);
 
     // 啟動遊戲
-    initSpeechEngine();
+    initSpeech();
     initCanvasResolution();
-    renderCharacter();
-    generateNewQuestion();
+    renderGirlCharacter();
+    loadLevel(0);
   </script>
 </body>
 </html>

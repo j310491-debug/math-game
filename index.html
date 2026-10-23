@@ -1,1756 +1,391 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>超商特賣大冒險・買一送一與第二件半價數學換裝秀</title>
-  <!-- Tailwind CSS provided by gstatic -->
-  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
-  <style>
-    @keyframes float-gentle {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-6px) rotate(0.5deg); }
-    }
-    @keyframes pulse-ring {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.05); opacity: 1; }
-      100% { transform: scale(0.95); opacity: 0.8; }
-    }
-    @keyframes sparkle-spin {
-      0% { transform: rotate(0deg) scale(0.9); }
-      50% { transform: rotate(180deg) scale(1.1); }
-      100% { transform: rotate(360deg) scale(0.9); }
-    }
-    @keyframes wing-flutter-left {
-      0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(6deg) scaleX(0.95); }
-    }
-    @keyframes wing-flutter-right {
-      0%, 100% { transform: rotate(0deg); }
-      50% { transform: rotate(-6deg) scaleX(0.95); }
-    }
-    .char-float {
-      animation: float-gentle 3.2s ease-in-out infinite;
-    }
-    .aura-spin {
-      animation: sparkle-spin 12s linear infinite;
-      transform-origin: 110px 115px;
-    }
-    .wing-l {
-      animation: wing-flutter-left 2s ease-in-out infinite;
-      transform-origin: 60px 105px;
-    }
-    .wing-r {
-      animation: wing-flutter-right 2s ease-in-out infinite;
-      transform-origin: 160px 105px;
-    }
-    .pop-badge {
-      animation: pulse-ring 2s infinite ease-in-out;
-    }
-    canvas {
-      touch-action: none;
-    }
-    /* Confetti particle style */
-    .confetti-particle {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      border-radius: 2px;
-      pointer-events: none;
-      animation: confetti-fall 2.5s linear forwards;
-    }
-    @keyframes confetti-fall {
-      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-    }
-  </style>
-</head>
-<body class="bg-gradient-to-br from-pink-50 via-purple-50 to-amber-50 min-h-screen text-slate-800 font-sans p-2 sm:p-5 antialiased select-none">
-  <div class="max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 relative">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小當家超市：金錢與購物挑戰</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background-color: #e0f7fa; margin: 0; padding: 10px;
+            display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100dvh; box-sizing: border-box; user-select: none;
+        }
 
-    <!-- Top Header & Status Bar -->
-    <header class="bg-white/95 backdrop-blur-md rounded-2xl p-3 sm:p-4 shadow-md border border-pink-200/80 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <span class="text-3xl sm:text-4xl animate-bounce">🎀</span>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-xl sm:text-2xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              超商特賣大冒險・美少女換裝秀
-            </h1>
-            <span class="px-2 py-0.5 rounded-full text-xs font-black bg-pink-100 text-pink-700 border border-pink-200">
-              買一送一 × 第二件半價
-            </span>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-            共 20 關挑戰！每答對一關得 5 分（滿分 100 分），並立刻為美少女解鎖換上超美裝備！
-          </p>
-        </div>
-      </div>
+        #app-container {
+            width: 100%; max-width: 1100px; display: flex; gap: 15px;
+            flex-wrap: wrap; justify-content: center;
+        }
 
-      <!-- Stats Progress Bar -->
-      <div class="flex flex-wrap items-center gap-2 sm:gap-3 bg-gradient-to-r from-pink-50 to-purple-50 px-3.5 py-2 rounded-xl border border-pink-200 shadow-xs">
-        <!-- Current Level -->
-        <div class="text-center px-1">
-          <span class="text-[11px] text-purple-700 font-bold block">目前關卡</span>
-          <span id="level-display" class="text-lg sm:text-xl font-black text-purple-700">第 1 / 20 關</span>
-        </div>
+        /* 左側遊戲主區塊 */
+        #game-area {
+            flex: 1 1 650px; background-color: #ffffff; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; position: relative;
+        }
 
-        <div class="h-7 w-[1px] bg-pink-200"></div>
+        .mode-switch {
+            display: flex; gap: 10px; margin-bottom: 20px; width: 100%; justify-content: center;
+        }
+        .mode-btn {
+            padding: 12px 25px; font-size: 1.5rem; font-weight: bold; border-radius: 12px;
+            border: 3px solid #b0bec5; background-color: #eceff1; cursor: pointer; color: #546e7a;
+        }
+        .mode-btn.active { background-color: #4fc3f7; border-color: #0288d1; color: white; }
 
-        <!-- Total Score (Target 100) -->
-        <div class="text-center px-1">
-          <span class="text-[11px] text-pink-700 font-bold block">目前得分</span>
-          <span class="flex items-baseline gap-0.5">
-            <strong id="score-display" class="text-2xl sm:text-3xl font-black text-pink-600">0</strong>
-            <span class="text-xs text-slate-400 font-bold">/ 100</span>
-          </span>
-        </div>
+        .question-title { font-size: 1.8rem; font-weight: bold; color: #37474f; margin-bottom: 15px; text-align: center; }
 
-        <div class="h-7 w-[1px] bg-pink-200"></div>
-
-        <!-- Equipped Accessories -->
-        <div class="text-center px-1">
-          <span class="text-[11px] text-indigo-700 font-bold block">解鎖裝備</span>
-          <span id="acc-count-display" class="text-lg sm:text-xl font-black text-indigo-600">0 / 20</span>
-        </div>
-
-        <div class="h-7 w-[1px] bg-pink-200 hidden sm:block"></div>
-
-        <!-- Control Buttons -->
-        <div class="flex items-center gap-1.5">
-          <button id="voice-btn" class="p-2 rounded-xl bg-white border border-pink-200 text-pink-600 hover:bg-pink-100 transition shadow-xs text-sm" title="語音朗讀">
-            🗣️
-          </button>
-          <button id="sound-btn" class="p-2 rounded-xl bg-white border border-pink-200 text-pink-600 hover:bg-pink-100 transition shadow-xs text-sm" title="音效開關">
-            🔔
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main Game Section: 2 Columns Grid -->
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-
-      <!-- LEFT COLUMN: Math Question & Store Scenario (7 cols) -->
-      <section class="lg:col-span-7 flex flex-col gap-3">
-
-        <!-- Question Card -->
-        <div class="bg-white/95 rounded-2xl p-4 sm:p-5 shadow-md border border-slate-200 flex flex-col gap-3.5 relative overflow-hidden">
-          
-          <!-- Level Category Badge & Navigation -->
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-            <div class="flex items-center gap-2">
-              <span id="promo-tag" class="px-2.5 py-1 rounded-lg text-xs font-black bg-rose-500 text-white shadow-xs">
-                🎁 買一送一
-              </span>
-              <span id="level-badge" class="text-xs font-bold text-slate-500">
-                關卡 1・配分 5 分
-              </span>
-            </div>
-            <div class="flex items-center gap-1.5 text-xs">
-              <button id="prev-level-btn" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold disabled:opacity-30 disabled:cursor-not-allowed transition" disabled>
-                ◀ 上一關
-              </button>
-              <button id="next-level-btn" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold disabled:opacity-30 disabled:cursor-not-allowed transition">
-                下一關 ▶
-              </button>
-            </div>
-          </div>
-
-          <!-- Product Banner & Story Scenario -->
-          <div class="bg-gradient-to-r from-pink-50 via-purple-50 to-indigo-50 rounded-2xl p-4 border border-pink-100 flex flex-col sm:flex-row items-center gap-4">
-            <!-- Product Avatar -->
-            <div id="product-icon-box" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white shadow-sm border border-pink-200 flex flex-col items-center justify-center p-2 shrink-0">
-              <span id="product-emoji" class="text-4xl sm:text-5xl">🧋</span>
-              <span id="product-name" class="text-xs font-black text-slate-700 mt-1 truncate">珍珠奶茶</span>
-            </div>
-
-            <!-- Problem Text -->
-            <div class="flex-1 flex flex-col gap-1.5 text-center sm:text-left">
-              <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <span class="text-xs font-bold text-slate-400">商品原價：</span>
-                <span id="unit-price-pill" class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-black border border-amber-200">
-                  原價 $50 元 / 杯
-                </span>
-                <span id="discount-pill" class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-xs font-black border border-rose-200">
-                  促銷：買一送一
-                </span>
-              </div>
-              <h2 id="question-text" class="text-base sm:text-lg font-black text-slate-800 leading-snug">
-                珍珠奶茶每杯原價 50 元，現在超商推出「買一送一」特賣活動。小櫻決定買 2 杯，請問一共只要付多少元？
-              </h2>
-            </div>
-          </div>
-
-          <!-- Visual Shopping Cart Breakdown -->
-          <div class="bg-slate-50/80 rounded-xl p-3 border border-slate-200/80">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-slate-600 flex items-center gap-1">
-                <span>🛒 購物籃商品清單（共 <strong id="cart-item-count" class="text-pink-600">2</strong> 件）：</span>
-              </span>
-              <button id="toggle-hint-btn" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold flex items-center gap-1 underline">
-                💡 展開計算拆解公式
-              </button>
-            </div>
-
-            <!-- Visual Items Display -->
-            <div id="cart-items-container" class="flex flex-wrap gap-2 items-center justify-center sm:justify-start">
-              <!-- Rendered by JS -->
-            </div>
-
-            <!-- Expandable Math Breakdown Hint -->
-            <div id="math-hint-box" class="mt-2.5 p-2.5 rounded-lg bg-indigo-50 border border-indigo-100 text-xs text-indigo-900 hidden font-medium leading-relaxed">
-              <!-- Hint injected by JS -->
-            </div>
-          </div>
-
-          <!-- Answer & Handwriting Input View -->
-          <div class="flex flex-col gap-2">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-1.5">
-                <span class="text-base">✍️</span>
-                <span class="font-bold text-xs sm:text-sm text-slate-700">寫下你的計算結果（元）：</span>
-              </div>
-              <!-- Input mode buttons -->
-              <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-bold">
-                <button id="tab-draw-btn" class="px-2.5 py-1 rounded-md bg-white text-pink-600 shadow-xs transition">手寫畫板</button>
-                <button id="tab-pad-btn" class="px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-700 transition">小鍵盤</button>
-              </div>
-            </div>
-
-            <!-- Handwriting Mode Canvas -->
-            <div id="draw-panel" class="flex flex-col gap-2">
-              <div class="relative bg-slate-50 rounded-xl border-2 border-pink-200 overflow-hidden shadow-inner">
-                <canvas id="write-canvas" width="450" height="130" class="w-full h-28 sm:h-32 bg-white cursor-crosshair"></canvas>
-                <button id="clear-write-btn" class="absolute top-2 right-2 px-2.5 py-1 bg-slate-100/90 hover:bg-slate-200 text-slate-600 text-xs font-bold rounded-lg border border-slate-300 transition shadow-xs">
-                  🧹 清除
-                </button>
-                <div class="absolute bottom-2 left-3 pointer-events-none text-[11px] text-slate-400 font-medium">
-                  用滑鼠或手指在白板寫上數字金額
-                </div>
-              </div>
-
-              <!-- Answer confirm bar -->
-              <div class="flex items-center justify-between gap-2 bg-pink-50/80 p-2.5 rounded-xl border border-pink-100">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-bold text-slate-700">金額：$</span>
-                  <input id="num-input" type="number" placeholder="?" class="w-24 h-10 text-center text-xl font-black bg-white rounded-lg border-2 border-pink-300 text-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-inner">
-                  <span class="text-xs font-bold text-slate-600">元</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <button id="ai-detect-btn" class="px-3 py-2 bg-purple-500 hover:bg-purple-600 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1" title="辨識筆劃">
-                    ✨ 筆跡辨識
-                  </button>
-                  <button id="submit-btn" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 active:scale-95 text-white font-black text-sm rounded-xl shadow-md transition flex items-center gap-1">
-                    送出答案 🚀
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Keypad Mode -->
-            <div id="pad-panel" class="hidden flex-col gap-2">
-              <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
-                <span class="text-xs font-medium text-slate-500">已輸入金額：</span>
-                <span id="pad-preview-val" class="text-2xl font-black text-pink-600 tracking-wider">$ 0</span>
-                <button id="pad-clear-btn" class="px-2.5 py-1 text-xs text-rose-500 font-bold bg-rose-50 rounded-lg hover:bg-rose-100">清除</button>
-              </div>
-              <div class="grid grid-cols-6 gap-1.5">
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="1">1</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="2">2</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="3">3</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="4">4</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="5">5</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="6">6</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="7">7</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="8">8</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="9">9</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-base text-slate-700 transition" data-v="0">0</button>
-                <button class="key-pad-btn h-10 bg-slate-100 hover:bg-pink-100 active:bg-pink-200 rounded-lg font-black text-sm text-slate-700 transition" data-v="00">00</button>
-                <button class="key-pad-btn h-10 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 rounded-lg font-black text-xs text-rose-600 transition" data-v="back">⌫ 退格</button>
-              </div>
-              <button id="pad-submit-btn" class="w-full py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black rounded-xl shadow-md transition hover:from-emerald-600 hover:to-teal-600 active:scale-95">
-                確認送出金額 🚀
-              </button>
-            </div>
-
-            <!-- Feedback Toast Banner -->
-            <div id="feedback-box" class="text-center text-xs sm:text-sm font-bold py-1.5 px-3 rounded-xl hidden transition-all duration-300"></div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- RIGHT COLUMN: Anime Girl Dressing Room Stage (5 cols) -->
-      <section class="lg:col-span-5 flex flex-col gap-3">
-
-        <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col items-center relative overflow-hidden">
-          
-          <!-- Wardrobe Header -->
-          <div class="w-full flex items-center justify-between pb-2 border-b border-slate-100">
-            <div class="flex items-center gap-1.5">
-              <span class="text-lg">👗</span>
-              <h3 class="font-bold text-slate-800 text-sm sm:text-base">魔法美少女・夢幻試衣間</h3>
-            </div>
-            <span id="next-gear-hint" class="text-[11px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200">
-              下一件裝備：答對解鎖
-            </span>
-          </div>
-
-          <!-- Immediate Equip Toast -->
-          <div id="equip-toast" class="w-full text-center py-1 px-2 my-1 text-xs font-bold text-pink-700 bg-pink-50 rounded-lg border border-pink-200 transition-all duration-300 transform scale-95 opacity-0 pointer-events-none">
-            ✨ 美少女穿戴了新裝備！
-          </div>
-
-          <!-- Girl Character Stage (SVG) -->
-          <div class="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center my-0.5">
-            <!-- Glow background -->
-            <div class="absolute inset-2 bg-gradient-to-tr from-pink-200/50 via-purple-200/40 to-amber-200/40 rounded-full blur-2xl"></div>
-
-            <!-- SVG Girl Container -->
-            <div id="girl-svg-container" class="relative z-10 w-full h-full flex items-center justify-center char-float transition-all">
-              <!-- SVG dynamically rendered -->
-            </div>
-
-            <!-- Girl Reaction Speech Bubble -->
-            <div id="girl-bubble" class="absolute -top-2 -right-1 z-30 bg-white/95 shadow-xl border-2 border-pink-300 rounded-2xl px-3 py-1.5 text-xs font-black text-pink-600 transition-all duration-300 transform scale-0 origin-bottom-left max-w-[160px] text-center">
-              謝謝你幫我換裝～💕
-            </div>
-          </div>
-
-          <!-- Wardrobe Inventory (20 Gears) -->
-          <div class="w-full mt-1 pt-2 border-t border-slate-100">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="text-xs font-bold text-slate-600">
-                20 款華麗裝備（點擊穿戴/卸下）：
-              </span>
-              <div class="flex items-center gap-1">
-                <button id="equip-all-btn" class="text-[10px] font-bold text-pink-600 hover:text-pink-800 bg-pink-50 px-2 py-0.5 rounded border border-pink-200">全部穿上</button>
-                <button id="unequip-all-btn" class="text-[10px] font-bold text-slate-500 hover:text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">全部脫下</button>
-              </div>
-            </div>
-
-            <!-- 20 Gears Grid -->
-            <div id="wardrobe-grid" class="grid grid-cols-5 gap-1.5 max-h-36 overflow-y-auto p-1.5 bg-slate-50/80 rounded-xl border border-slate-100">
-              <!-- Badges injected by JS -->
-            </div>
-          </div>
-
-        </div>
-
-      </section>
-
-    </main>
-
-    <!-- Celebration Modal (Unlocked Gear) -->
-    <div id="unlock-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border-4 border-pink-300 text-center transform scale-95 transition-all relative">
-        <div class="text-5xl mb-1 animate-bounce">🎉</div>
-        <h3 class="text-xl font-black text-pink-600 mb-0.5">挑戰成功！獲得 5 分！</h3>
-        <p id="unlock-modal-title" class="text-sm font-bold text-slate-700 mb-1">解鎖裝備：「甜美雙蝴蝶結髮飾」</p>
-        <p class="text-xs text-emerald-600 font-bold mb-3">✨ 已立即為美少女戴上！</p>
+        /* ================= 模式一：認識錢幣 ================= */
+        #money-display {
+            width: 250px; height: 160px; display: flex; justify-content: center; align-items: center;
+            background-color: #fff8e1; border: 4px dashed #ffc107; border-radius: 15px; margin-bottom: 20px; padding: 10px;
+        }
+        .money-img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); }
         
-        <div id="unlock-modal-preview" class="w-24 h-24 mx-auto mb-4 bg-gradient-to-tr from-pink-50 to-purple-50 rounded-2xl flex items-center justify-center text-5xl border-2 border-pink-200 shadow-inner">
-          🎀
-        </div>
-
-        <button id="modal-next-btn" class="w-full py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-black text-base rounded-xl shadow-md transition active:scale-95">
-          太棒了！挑戰下一關 🌟
-        </button>
-      </div>
-    </div>
-
-    <!-- Final 100 Points Grand Victory Modal -->
-    <div id="victory-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-gradient-to-b from-white via-pink-50 to-amber-50 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-4 border-amber-300 text-center relative overflow-hidden">
-        <div class="text-6xl mb-2 animate-bounce">👑✨</div>
-        <h2 class="text-2xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-amber-600 bg-clip-text text-transparent mb-1">
-          恭喜達成 100 分滿分！
-        </h2>
-        <p class="text-xs font-bold text-amber-700 mb-2">🎉 榮獲「超商促銷數學女皇」至尊稱號！</p>
-        <p class="text-sm text-slate-600 mb-4 leading-relaxed">
-          你成功通過了全部 20 關考驗，解鎖了全部 20 件華麗神器！美少女已經蛻變為終極璀璨女皇！
-        </p>
-
-        <div class="p-3 bg-white/80 rounded-2xl border border-amber-200 mb-4 flex items-center justify-around">
-          <div>
-            <span class="text-xs text-slate-400 block font-bold">最終得分</span>
-            <span class="text-2xl font-black text-pink-600">100 分 💯</span>
-          </div>
-          <div class="h-8 w-[1px] bg-slate-200"></div>
-          <div>
-            <span class="text-xs text-slate-400 block font-bold">全套解鎖</span>
-            <span class="text-2xl font-black text-indigo-600">20 / 20 件 🌟</span>
-          </div>
-        </div>
-
-        <button id="victory-close-btn" class="w-full py-3 bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 text-white font-black text-base rounded-xl shadow-lg transition hover:brightness-105 active:scale-95">
-          欣賞完整造型・再玩一次 🌈
-        </button>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    /* ====================================================================
-       20 關數學題庫定義（買一送一 vs 第二件半價，每關5分，滿分100）
-       ==================================================================== */
-    const LEVELS = [
-      {
-        id: 1,
-        type: 'bogo', // 買一送一
-        typeName: '🎁 買一送一',
-        item: '珍珠奶茶',
-        emoji: '🧋',
-        unitPrice: 50,
-        qty: 2,
-        ans: 50,
-        text: '珍珠奶茶每杯原價 50 元，現在超商推出「買一送一」特賣活動。小櫻買了 2 杯，請問一共只要付多少元？',
-        hint: '買一送一就是「買 1 杯送 1 杯」，買 2 杯只需付 1 杯的錢：$50 元！',
-        gear: { id: 'ribbon_hair', name: '甜美雙蝴蝶結髮飾', icon: '🎀', desc: '美少女的可愛粉嫩髮飾！' }
-      },
-      {
-        id: 2,
-        type: 'half', // 第二件半價
-        typeName: '🏷️ 第二件半價',
-        item: '黃金炸雞排',
-        emoji: '🍗',
-        unitPrice: 80,
-        qty: 2,
-        ans: 120,
-        text: '香脆炸雞排每份原價 80 元，促銷「第二件半價」。小明買了 2 份雞排，總共要付多少元？',
-        hint: '第 1 份是原價 80 元，第 2 份半價為 80 ÷ 2 = 40 元。兩份共 80 + 40 = 120 元！',
-        gear: { id: 'stockings', name: '蕾絲過膝長襪', icon: '🧦', desc: '優雅純白蕾絲滾邊長襪！' }
-      },
-      {
-        id: 3,
-        type: 'bogo',
-        typeName: '🎁 買一送一',
-        item: '草莓泡芙',
-        emoji: '🧁',
-        unitPrice: 40,
-        qty: 4,
-        ans: 80,
-        text: '草莓泡芙每個原價 40 元，超商特價「買一送一」。如果買 4 個泡芙，總共要付多少元？',
-        hint: '買一送一等於每 2 個只需付 1 個的錢。買 4 個只需付 4 ÷ 2 = 2 個的錢：40 × 2 = 80 元！',
-        gear: { id: 'shoes', name: '學院風漆皮亮鞋', icon: '👞', desc: '漫步櫻花道的精緻小皮鞋！' }
-      },
-      {
-        id: 4,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '冰美式咖啡',
-        emoji: '☕',
-        unitPrice: 60,
-        qty: 2,
-        ans: 30,
-        text: '冰美式咖啡每杯原價 60 元，現在「第二件半價」。請問買 2 杯比原價「省下了」多少元？',
-        hint: '原本 2 杯要 60 × 2 = 120 元。第二件半價只算 30 元，省下了 60 - 30 = 30 元！',
-        gear: { id: 'skirt', name: '雙層偶像百褶裙', icon: '👗', desc: '隨風飄動的粉藍百褶短裙！' }
-      },
-      {
-        id: 5,
-        type: 'bogo',
-        typeName: '🎁 買一送一',
-        item: '鮮榨柳橙汁',
-        emoji: '🍊',
-        unitPrice: 40,
-        qty: 3,
-        ans: 80,
-        text: '柳橙汁每瓶原價 40 元，「買一送一」。小美想買 3 瓶柳橙汁，請問最少要付多少元？',
-        hint: '前 2 瓶符合「買一送一」只需付 1 瓶的錢 40 元；第 3 瓶單獨買算原價 40 元。共 40 + 40 = 80 元！',
-        gear: { id: 'gloves', name: '緞帶蕾絲白手套', icon: '🧤', desc: '手腕繫有典雅緞帶的手套！' }
-      },
-      {
-        id: 6,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '香草霜淇淋',
-        emoji: '🍦',
-        unitPrice: 50,
-        qty: 3,
-        ans: 125,
-        text: '霜淇淋每支原價 50 元，「第二件半價」。如果買 3 支霜淇淋，一共要付多少元？',
-        hint: '前 2 支是一組：50 + 25 = 75 元；第 3 支單買原價 50 元。75 + 50 = 125 元！',
-        gear: { id: 'earrings', name: '櫻花吊墜耳環', icon: '🌸', desc: '閃爍微光的粉櫻吊墜！' }
-      },
-      {
-        id: 7,
-        type: 'bogo',
-        typeName: '🎁 買一送一',
-        item: '焦糖爆米花',
-        emoji: '🍿',
-        unitPrice: 100,
-        qty: 4,
-        ans: 200,
-        text: '焦糖爆米花每桶原價 100 元，「買一送一」。小華買了 4 桶看電影，一共要付多少元？',
-        hint: '4 桶爆米花等於 2 組買一送一，只需付 2 桶的錢：100 × 2 = 200 元！',
-        gear: { id: 'scarf', name: '粉紅千鳥格圍巾', icon: '🧣', desc: '保暖又時尚的粉紅圍巾！' }
-      },
-      {
-        id: 8,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '烤雞腿便當',
-        emoji: '🍱',
-        unitPrice: 90,
-        qty: 4,
-        ans: 270,
-        text: '烤雞腿便當每個原價 90 元，「第二件半價」。買 4 個便當總共要付多少元？',
-        hint: '每 2 個是一組：90 + 45 = 135 元。買 4 個是 2 組：135 × 2 = 270 元！',
-        gear: { id: 'glasses', name: '潮流愛心墨鏡', icon: '🕶️', desc: '粉紅透明愛心造型太陽眼鏡！' }
-      },
-      {
-        id: 9,
-        type: 'bogo',
-        typeName: '🎁 買一送一',
-        item: '葡式蛋塔',
-        emoji: '🥧',
-        unitPrice: 30,
-        qty: 6,
-        ans: 90,
-        text: '葡式蛋塔每個原價 30 元，「買一送一」。小組聚會買了 6 個蛋塔，總共要付多少元？',
-        hint: '6 個蛋塔只需付 6 ÷ 2 = 3 個的錢：30 × 3 = 90 元！',
-        gear: { id: 'bag', name: '萌萌貓咪背包', icon: '🎒', desc: '背在身後的立體貓臉小背包！' }
-      },
-      {
-        id: 10,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '巧克力餅乾',
-        emoji: '🍪',
-        unitPrice: 60,
-        qty: 2,
-        ans: 45,
-        text: '巧克力餅乾原價 60 元，「第二件半價」。買 2 包餅乾，「平均每包」只要多少元？',
-        hint: '2 包總價為 60 + 30 = 90 元。平均每包：90 ÷ 2 = 45 元！',
-        gear: { id: 'scepter', name: '星光月之權杖', icon: '🪄', desc: '散發柔和月光的魔法權杖！' }
-      },
-      {
-        id: 11,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '熱烤披薩',
-        emoji: '🍕',
-        unitPrice: 120,
-        qty: 3,
-        ans: 300,
-        text: '披薩每片原價 120 元，「第二件半價」。如果買 3 片披薩，總共要付多少元？',
-        hint: '前 2 片為 120 + 60 = 180 元；第 3 片算原價 120 元。180 + 120 = 300 元！',
-        gear: { id: 'crown', name: '璀璨水晶王冠', icon: '👑', desc: '頭頂鑲嵌純淨水晶的小后冠！' }
-      },
-      {
-        id: 12,
-        type: 'bogo',
-        typeName: '🎁 買一送一',
-        item: '鮮奶布丁',
-        emoji: '🍮',
-        unitPrice: 40,
-        qty: 5,
-        ans: 120,
-        text: '鮮奶布丁每個原價 40 元，活動「買一送一」。如果買 5 個布丁，總共要付多少元？',
-        hint: '4 個布丁付 2 個錢 80 元，第 5 個單買算原價 40 元。80 + 40 = 120 元！',
-        gear: { id: 'wings', name: '天使夢幻光之翼', icon: '🪽', desc: '身後輕輕拍動的純白天使用羽翼！' }
-      },
-      {
-        id: 13,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '抹茶拿鐵',
-        emoji: '🍵',
-        unitPrice: 70,
-        qty: 4,
-        ans: 210,
-        text: '抹茶拿鐵每杯原價 70 元，「第二件半價」。買 4 杯抹茶拿鐵一共要付多少元？',
-        hint: '每 2 杯是一組：70 + 35 = 105 元。買 4 杯是 2 組：105 × 2 = 210 元！',
-        gear: { id: 'cat_ears', name: '軟萌貓耳髮箍', icon: '🐱', desc: '毛茸茸會動的可愛貓咪耳朵！' }
-      },
-      {
-        id: 14,
-        type: 'bogo',
-        typeName: '🎁 買一送一',
-        item: '超萌文具袋',
-        emoji: '✏️',
-        unitPrice: 100,
-        qty: 6,
-        ans: 300,
-        text: '文具袋原價每個 100 元，「買一送一」。小麗買了 6 個送朋友，請問比原價「省下了」多少元？',
-        hint: '買 6 個有 3 個是免費送的！省下的金額為 100 × 3 = 300 元！',
-        gear: { id: 'heart_pendant', name: '奇蹟愛心寶石項鍊', icon: '💖', desc: '胸前閃耀粉紅光芒的心型吊墜！' }
-      },
-      {
-        id: 15,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '瑞士蛋糕捲',
-        emoji: '🍰',
-        unitPrice: 80,
-        qty: 5,
-        ans: 320,
-        text: '蛋糕捲每條原價 80 元，「第二件半價」。如果買 5 條蛋糕捲，總共要付多少元？',
-        hint: '2 組特價：(80 + 40) × 2 = 240 元；加第 5 條原價 80 元：240 + 80 = 320 元！',
-        gear: { id: 'croissant_badge', name: '招牌可頌麵包徽章', icon: '🥐', desc: '別在胸前的金黃酥脆可頌胸針！' }
-      },
-      {
-        id: 16,
-        type: 'compare',
-        typeName: '⚖️ 促銷比一比',
-        item: '泰迪熊玩偶',
-        emoji: '🧸',
-        unitPrice: 100,
-        qty: 2,
-        ans: 50,
-        text: '原價 100 元的玩偶：A店「買一送一」，B店「第二件半價」。買 2 隻玩偶，在A店買比在B店買「便宜多少元」？',
-        hint: 'A店買一送一只付 100 元；B店第二件半價要付 100 + 50 = 150 元。相差 150 - 100 = 50 元！',
-        gear: { id: 'boba_cup', name: '珍珠奶茶隨行杯', icon: '🧋', desc: '美少女隨身攜帶的可口珍奶！' }
-      },
-      {
-        id: 17,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '起司三明治',
-        emoji: '🥪',
-        unitPrice: 60,
-        qty: 6,
-        ans: 270,
-        text: '三明治每個原價 60 元，「第二件半價」。買 6 個三明治總共要付多少元？',
-        hint: '6 個三明治剛好是 3 組促銷：每組 60 + 30 = 90 元。90 × 3 = 270 元！',
-        gear: { id: 'star_halo', name: '旋轉流星光環', icon: '💫', desc: '環繞在身旁旋轉的金燦星屑！' }
-      },
-      {
-        id: 18,
-        type: 'bogo',
-        typeName: '🎁 買一送一',
-        item: '精裝筆記本',
-        emoji: '📓',
-        unitPrice: 80,
-        qty: 7,
-        ans: 320,
-        text: '筆記本每本原價 80 元，「買一送一」。小明買了 7 本筆記本，總共要付多少元？',
-        hint: '前 6 本只需付 3 本的錢：80 × 3 = 240 元；第 7 本單買原價 80 元。240 + 80 = 320 元！',
-        gear: { id: 'sakura_cloak', name: '魔法粉櫻斗篷', icon: '🦸', desc: '飄揚在身後的華麗粉紅魔法披風！' }
-      },
-      {
-        id: 19,
-        type: 'half',
-        typeName: '🏷️ 第二件半價',
-        item: '澳洲牛排餐',
-        emoji: '🥩',
-        unitPrice: 100,
-        qty: 5,
-        ans: 400,
-        text: '牛排每份原價 100 元，「第二件半價」。家庭聚餐買了 5 份牛排，一共要付多少元？',
-        hint: '前 4 份是 2 組：(100 + 50) × 2 = 300 元；第 5 份原價 100 元。300 + 100 = 400 元！',
-        gear: { id: 'shiba_fairy', name: '守護萌寵柴犬小精靈', icon: '🐾', desc: '乖巧漂浮在身旁的魔法柴柴萌寵！' }
-      },
-      {
-        id: 20,
-        type: 'challenge',
-        typeName: '🌟 終極大挑戰',
-        item: '法式馬卡龍',
-        emoji: '🧁',
-        unitPrice: 80,
-        qty: 8,
-        ans: 160,
-        text: '【終極考驗】馬卡龍每盒原價 80 元，買 8 盒。如果選擇「買一送一」，比選擇「第二件半價」便宜了多少元？',
-        hint: '買一送一買 8 盒只需付 4 盒 = 80 × 4 = 320 元；第二件半價是 4 組 (80 + 40) × 4 = 480 元。便宜 480 - 320 = 160 元！',
-        gear: { id: 'empress_aura', name: '終極璀璨女皇神光冕', icon: '🌟', desc: '象徵滿分 100 分至尊數學女皇的神聖光冕！' }
-      }
-    ];
-
-    /* ====================================================================
-       遊戲狀態管理
-       ==================================================================== */
-    const state = {
-      curLevelIndex: 0,
-      clearedLevels: new Set(), // 儲存已答對通關的 level index
-      equippedGears: new Set(), // 儲存目前穿戴中的裝備 ID
-      soundOn: true,
-      voiceOn: true,
-      inputMode: 'draw',
-      hasDrawn: false,
-      strokes: [],
-      isDrawing: false
-    };
-
-    // DOM 元素引用
-    const dom = {
-      levelDisplay: document.getElementById('level-display'),
-      scoreDisplay: document.getElementById('score-display'),
-      accCountDisplay: document.getElementById('acc-count-display'),
-      voiceBtn: document.getElementById('voice-btn'),
-      soundBtn: document.getElementById('sound-btn'),
-      promoTag: document.getElementById('promo-tag'),
-      levelBadge: document.getElementById('level-badge'),
-      prevLevelBtn: document.getElementById('prev-level-btn'),
-      nextLevelBtn: document.getElementById('next-level-btn'),
-      productEmoji: document.getElementById('product-emoji'),
-      productName: document.getElementById('product-name'),
-      unitPricePill: document.getElementById('unit-price-pill'),
-      discountPill: document.getElementById('discount-pill'),
-      questionText: document.getElementById('question-text'),
-      cartItemCount: document.getElementById('cart-item-count'),
-      toggleHintBtn: document.getElementById('toggle-hint-btn'),
-      cartItemsContainer: document.getElementById('cart-items-container'),
-      mathHintBox: document.getElementById('math-hint-box'),
-      tabDrawBtn: document.getElementById('tab-draw-btn'),
-      tabPadBtn: document.getElementById('tab-pad-btn'),
-      drawPanel: document.getElementById('draw-panel'),
-      padPanel: document.getElementById('pad-panel'),
-      canvas: document.getElementById('write-canvas'),
-      clearWriteBtn: document.getElementById('clear-write-btn'),
-      numInput: document.getElementById('num-input'),
-      aiDetectBtn: document.getElementById('ai-detect-btn'),
-      submitBtn: document.getElementById('submit-btn'),
-      padPreviewVal: document.getElementById('pad-preview-val'),
-      padClearBtn: document.getElementById('pad-clear-btn'),
-      padSubmitBtn: document.getElementById('pad-submit-btn'),
-      feedbackBox: document.getElementById('feedback-box'),
-      nextGearHint: document.getElementById('next-gear-hint'),
-      equipToast: document.getElementById('equip-toast'),
-      girlSvgContainer: document.getElementById('girl-svg-container'),
-      girlBubble: document.getElementById('girl-bubble'),
-      equipAllBtn: document.getElementById('equip-all-btn'),
-      unequipAllBtn: document.getElementById('unequip-all-btn'),
-      wardrobeGrid: document.getElementById('wardrobe-grid'),
-      unlockModal: document.getElementById('unlock-modal'),
-      unlockModalTitle: document.getElementById('unlock-modal-title'),
-      unlockModalPreview: document.getElementById('unlock-modal-preview'),
-      modalNextBtn: document.getElementById('modal-next-btn'),
-      victoryModal: document.getElementById('victory-modal'),
-      victoryCloseBtn: document.getElementById('victory-close-btn')
-    };
-
-    /* ====================================================================
-       語音與音效系統 (Web Speech & Web Audio)
-       ==================================================================== */
-    let preferredVoice = null;
-    function initSpeech() {
-      if (!('speechSynthesis' in window)) return;
-      const getV = () => {
-        const vs = window.speechSynthesis.getVoices();
-        preferredVoice = vs.find(v => v.lang.includes('zh-TW')) ||
-                         vs.find(v => v.lang.toLowerCase().includes('taiwan')) ||
-                         vs.find(v => v.lang.startsWith('zh')) || null;
-      };
-      getV();
-      window.speechSynthesis.onvoiceschanged = getV;
-    }
-
-    function speakText(text) {
-      if (!state.voiceOn || !('speechSynthesis' in window)) return;
-      try {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'zh-TW';
-        utter.rate = 1.05;
-        utter.pitch = 1.25;
-        if (preferredVoice) utter.voice = preferredVoice;
-        window.speechSynthesis.speak(utter);
-      } catch (e) {}
-    }
-
-    const audioCtx = (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined')
-      ? new (window.AudioContext || window.webkitAudioContext)() : null;
-
-    function playSound(type) {
-      if (!state.soundOn || !audioCtx) return;
-      try {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        if (type === 'click') {
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(450, now);
-          osc.frequency.exponentialRampToValueAtTime(800, now + 0.06);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
-          osc.start(now);
-          osc.stop(now + 0.06);
-        } else if (type === 'correct') {
-          // 清脆悅耳琶音
-          [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-            const subO = audioCtx.createOscillator();
-            const subG = audioCtx.createGain();
-            subO.connect(subG);
-            subG.connect(audioCtx.destination);
-            subO.type = 'triangle';
-            subO.frequency.setValueAtTime(f, now + i * 0.07);
-            subG.gain.setValueAtTime(0.22, now + i * 0.07);
-            subG.gain.exponentialRampToValueAtTime(0.01, now + i * 0.07 + 0.3);
-            subO.start(now + i * 0.07);
-            subO.stop(now + i * 0.07 + 0.3);
-          });
-        } else if (type === 'wrong') {
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(260, now);
-          osc.frequency.exponentialRampToValueAtTime(140, now + 0.22);
-          gain.gain.setValueAtTime(0.2, now);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
-          osc.start(now);
-          osc.stop(now + 0.22);
+        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
+        .opt-btn {
+            padding: 15px; font-size: 1.8rem; font-weight: bold; border-radius: 12px;
+            border: 3px solid #81c784; background-color: #e8f5e9; color: #2e7d32; cursor: pointer;
         }
-      } catch (e) {}
-    }
+        .opt-btn:active { background-color: #c8e6c9; }
 
-    /* ====================================================================
-       美少女 SVG 繪製引擎（支援 20 款獨立配件層級）
-       ==================================================================== */
-    function renderGirlCharacter() {
-      const isEq = (id) => state.equippedGears.has(id);
+        /* ================= 模式二：視覺化算式面板 ================= */
+        #shopping-display { display: none; flex-direction: column; width: 100%; align-items: center; gap: 15px; }
+        
+        .equation-board {
+            display: flex; width: 100%; justify-content: space-between; align-items: center;
+            background-color: #f5f5f5; border-radius: 15px; padding: 15px; box-sizing: border-box; gap: 10px;
+        }
 
-      const hasHairRibbon = isEq('ribbon_hair');
-      const hasStockings  = isEq('stockings');
-      const hasShoes      = isEq('shoes');
-      const hasSkirt      = isEq('skirt');
-      const hasGloves     = isEq('gloves');
-      const hasEarrings   = isEq('earrings');
-      const hasScarf      = isEq('scarf');
-      const hasGlasses    = isEq('glasses');
-      const hasBag        = isEq('bag');
-      const hasScepter    = isEq('scepter');
-      const hasCrown      = isEq('crown');
-      const hasWings      = isEq('wings');
-      const hasCatEars    = isEq('cat_ears');
-      const hasPendant    = isEq('heart_pendant');
-      const hasCroissant  = isEq('croissant_badge');
-      const hasBoba       = isEq('boba_cup');
-      const hasHalo       = isEq('star_halo');
-      const hasCloak      = isEq('sakura_cloak');
-      const hasFairy      = isEq('shiba_fairy');
-      const hasEmpress    = isEq('empress_aura');
+        .eq-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            border-radius: 15px; padding: 15px; flex: 1; height: 220px; box-sizing: border-box; text-align: center;
+        }
+        .box-title { font-size: 1.4rem; font-weight: bold; padding: 5px 10px; border-radius: 20px; margin-bottom: 10px; color: white; width: 100%; box-sizing: border-box;}
+        
+        /* 1. 給老闆的錢 */
+        .eq-pay { background-color: #e3f2fd; border: 4px solid #90caf9; }
+        .eq-pay .box-title { background-color: #1976d2; }
+        .pay-img { height: 75px; max-width: 120px; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); margin: auto 0;}
+        .pay-text { font-size: 1.5rem; font-weight: bold; color: #1565c0; margin-top: 10px;}
 
-      let svg = `
-        <svg viewBox="0 0 220 220" class="w-full h-full drop-shadow-xl select-none">
-          <defs>
-            <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FED7AA" />
-              <stop offset="50%" stop-color="#FDE047" />
-              <stop offset="100%" stop-color="#F59E0B" />
-            </linearGradient>
-            <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FFF1F2" />
-              <stop offset="100%" stop-color="#FFE4E6" />
-            </linearGradient>
-            <linearGradient id="sailorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#F472B6" />
-              <stop offset="100%" stop-color="#DB2777" />
-            </linearGradient>
-            <linearGradient id="skirtGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#60A5FA" />
-              <stop offset="100%" stop-color="#3B82F6" />
-            </linearGradient>
-            <linearGradient id="goldCrownGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FEF08A" />
-              <stop offset="100%" stop-color="#EAB308" />
-            </linearGradient>
-            <radialGradient id="wingGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
-              <stop offset="70%" stop-color="#FBCFE8" stop-opacity="0.9" />
-              <stop offset="100%" stop-color="#F472B6" stop-opacity="0.75" />
-            </radialGradient>
-            <radialGradient id="empressAuraGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#FDF4FF" stop-opacity="0.9" />
-              <stop offset="45%" stop-color="#F472B6" stop-opacity="0.5" />
-              <stop offset="85%" stop-color="#818CF8" stop-opacity="0.3" />
-              <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
-            </radialGradient>
-          </defs>
+        /* 2. & 4. 運算符號 */
+        .eq-sign { font-size: 3rem; font-weight: bold; color: #546e7a; display: flex; align-items: center; justify-content: center; width: 40px; }
 
-          <!-- LAYER 0: 終極女皇神光冕 (Empress Aura) -->
-          ${hasEmpress ? `
-            <circle cx="110" cy="115" r="98" fill="url(#empressAuraGrad)" class="animate-pulse" />
-            <g class="aura-spin">
-              <circle cx="110" cy="115" r="88" fill="none" stroke="#F472B6" stroke-width="2" stroke-dasharray="8,6" />
-              <polygon points="110,24 117,105 198,115 117,125 110,206 103,125 22,115 103,105" fill="none" stroke="#FBBF24" stroke-width="1.5" opacity="0.75" />
-            </g>
-          ` : ''}
+        /* 3. 商品價格 (扣除) */
+        .eq-item { background-color: #fce4ec; border: 4px solid #f48fb1; }
+        .eq-item .box-title { background-color: #d81b60; }
+        .item-emoji { font-size: 4.5rem; margin: auto 0; }
+        .item-price-tag { background-color: #c2185b; color: white; padding: 5px 12px; border-radius: 8px; font-size: 1.4rem; font-weight: bold; margin-top: 10px; }
 
-          <!-- LAYER 1: 天使夢幻光之翼 (Wings) -->
-          ${hasWings ? `
-            <!-- Left Wing -->
-            <g class="wing-l">
-              <path d="M 68 115 C 20 85, 10 32, 60 45 C 40 70, 52 95, 74 105 Z" fill="url(#wingGrad)" stroke="#DB2777" stroke-width="2" />
-              <path d="M 48 68 C 28 80, 24 50, 58 52" fill="none" stroke="#F472B6" stroke-width="1.8" />
-            </g>
-            <!-- Right Wing -->
-            <g class="wing-r">
-              <path d="M 152 115 C 200 85, 210 32, 160 45 C 180 70, 168 95, 146 105 Z" fill="url(#wingGrad)" stroke="#DB2777" stroke-width="2" />
-              <path d="M 172 68 C 192 80, 196 50, 162 52" fill="none" stroke="#F472B6" stroke-width="1.8" />
-            </g>
-          ` : ''}
+        /* 5. 找零 (答案) */
+        .eq-change { background-color: #f1f8e9; border: 4px dashed #81c784; }
+        .eq-change .box-title { background-color: #388e3c; }
+        #answer-input {
+            width: 100%; max-width: 120px; font-size: 2.5rem; text-align: center; font-weight: bold;
+            padding: 10px; border: 4px solid #4caf50; border-radius: 12px; color: #2e7d32; margin: auto 0; box-sizing: border-box;
+        }
+        #submit-btn {
+            width: 100%; padding: 12px 0; font-size: 1.5rem; font-weight: bold;
+            background-color: #4caf50; color: white; border: none; border-radius: 10px; cursor: pointer;
+            box-shadow: 0 4px 0 #388e3c; margin-top: 10px;
+        }
+        #submit-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #388e3c; }
 
-          <!-- LAYER 2: 魔法粉櫻斗篷 (Cloak) -->
-          ${hasCloak ? `
-            <path d="M 74 110 Q 36 172 58 190 Q 110 174 162 190 Q 184 172 146 110 Z" fill="#F43F5E" opacity="0.9" stroke="#BE123C" stroke-width="2">
-              <animate attributeName="d" dur="3s" repeatCount="indefinite"
-                values="M 74 110 Q 36 172 58 190 Q 110 174 162 190 Q 184 172 146 110 Z;
-                        M 74 110 Q 30 166 62 187 Q 110 178 158 187 Q 190 166 146 110 Z;
-                        M 74 110 Q 36 172 58 190 Q 110 174 162 190 Q 184 172 146 110 Z" />
-            </path>
-          ` : ''}
+        /* 算式文字雙重提示 */
+        .formula-hint {
+            background-color: #fff9c4; color: #f57f17; padding: 8px 25px;
+            border-radius: 12px; font-size: 1.8rem; font-weight: bold;
+            border: 3px dashed #fbc02d; text-align: center; width: 100%; box-sizing: border-box;
+        }
 
-          <!-- LAYER 3: 雙腿 & 襪子 & 鞋子 -->
-          <!-- 雙腿基底 -->
-          <rect x="91" y="148" width="13" height="32" rx="6.5" fill="url(#skinGrad)" />
-          <rect x="116" y="148" width="13" height="32" rx="6.5" fill="url(#skinGrad)" />
+        /* ================= 右側計算機區塊 ================= */
+        #calc-area {
+            flex: 0 0 300px; background-color: #37474f; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 20px; box-sizing: border-box;
+        }
+        .calc-title { color: white; text-align: center; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
+        #calc-screen {
+            width: 100%; height: 60px; background-color: #cfd8dc; border-radius: 10px;
+            font-size: 2.5rem; text-align: right; padding: 10px; box-sizing: border-box;
+            font-family: monospace; border: none; margin-bottom: 15px; color: #263238; font-weight: bold;
+        }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .calc-btn {
+            padding: 15px 0; font-size: 1.5rem; font-weight: bold; border: none; border-radius: 8px;
+            background-color: #eceff1; cursor: pointer; color: #37474f; box-shadow: 0 4px 0 #b0bec5;
+        }
+        .calc-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #b0bec5; }
+        .calc-btn.op { background-color: #ffb74d; color: #e65100; box-shadow: 0 4px 0 #ff9800; }
+        .calc-btn.op:active { box-shadow: 0 0 0 #ff9800; }
+        .calc-btn.clear { background-color: #ef5350; color: white; box-shadow: 0 4px 0 #e53935; }
+        .calc-btn.clear:active { box-shadow: 0 0 0 #e53935; }
+        .calc-btn.zero { grid-column: span 2; }
 
-          <!-- 3.1 蕾絲過膝長襪 (Stockings) -->
-          ${hasStockings ? `
-            <rect x="91" y="152" width="13" height="24" rx="2" fill="#FFFFFF" stroke="#FCE7F3" stroke-width="1.5" />
-            <path d="M 91 152 Q 97 150 104 152" stroke="#F472B6" stroke-width="2" fill="none" />
-            <rect x="116" y="152" width="13" height="24" rx="2" fill="#FFFFFF" stroke="#FCE7F3" stroke-width="1.5" />
-            <path d="M 116 152 Q 122 150 129 152" stroke="#F472B6" stroke-width="2" fill="none" />
-          ` : ''}
+        /* 回饋動畫 */
+        .shake { animation: shake 0.4s; border-color: #f44336 !important; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
+        
+        #feedback-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; justify-content: center; align-items: center; flex-direction: column;
+            z-index: 100; font-size: 6rem; background-color: rgba(255,255,255,0.95);
+            font-weight: bold; color: #4caf50; border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
 
-          <!-- 3.2 學院風漆皮亮鞋 (Shoes) -->
-          ${hasShoes ? `
-            <!-- Left Shoe -->
-            <ellipse cx="97" cy="183" rx="12" ry="8" fill="#881337" stroke="#4C0519" stroke-width="1.5" />
-            <ellipse cx="94" cy="181" rx="8" ry="5" fill="#FFFFFF" opacity="0.3" />
-            <rect x="88" y="185" width="18" height="3.5" fill="#1E293B" rx="1.5" />
-            <!-- Right Shoe -->
-            <ellipse cx="123" cy="183" rx="12" ry="8" fill="#881337" stroke="#4C0519" stroke-width="1.5" />
-            <ellipse cx="126" cy="181" rx="8" ry="5" fill="#FFFFFF" opacity="0.3" />
-            <rect x="114" y="185" width="18" height="3.5" fill="#1E293B" rx="1.5" />
-          ` : `
-            <ellipse cx="97" cy="181" rx="8" ry="5" fill="#FFE4E6" />
-            <ellipse cx="123" cy="181" rx="8" ry="5" fill="#FFE4E6" />
-          `}
+    <div id="app-container">
+        <!-- 遊戲主區塊 -->
+        <div id="game-area">
+            <div class="mode-switch">
+                <button class="mode-btn active" id="btn-mode1" onclick="switchMode(1)">1. 認識錢幣</button>
+                <button class="mode-btn" id="btn-mode2" onclick="switchMode(2)">2. 購物找零</button>
+            </div>
 
-          <!-- LAYER 4: 雙層百褶裙 (Skirt) -->
-          ${hasSkirt ? `
-            <path d="M 80 135 L 140 135 L 148 158 L 72 158 Z" fill="url(#skirtGrad)" stroke="#1D4ED8" stroke-width="1.5" />
-            <!-- Skirt pleat lines -->
-            <line x1="92" y1="135" x2="89" y2="158" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7" />
-            <line x1="104" y1="135" x2="103" y2="158" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7" />
-            <line x1="116" y1="135" x2="117" y2="158" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7" />
-            <line x1="128" y1="135" x2="131" y2="158" stroke="#FFFFFF" stroke-width="1.5" opacity="0.7" />
-            <!-- Skirt Bottom Lace -->
-            <path d="M 72 158 Q 80 162 88 158 Q 96 162 104 158 Q 112 162 120 158 Q 128 162 136 158 Q 144 162 148 158" fill="none" stroke="#FFFFFF" stroke-width="2.5" />
-          ` : `
-            <!-- Default basic skirt -->
-            <path d="M 82 135 L 138 135 L 144 152 L 76 152 Z" fill="#93C5FD" stroke="#3B82F6" stroke-width="1" />
-          `}
+            <!-- 模式一：認識錢幣 -->
+            <div id="mode1-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                <div class="question-title">讀一讀，看一看，這是多少錢？</div>
+                <div id="money-display"></div>
+                <div class="options-grid" id="options-area"></div>
+            </div>
 
-          <!-- LAYER 5: 身體上衣 (Sailor Uniform) -->
-          <rect x="79" y="105" width="62" height="34" rx="8" fill="#FFFFFF" stroke="#FBCFE8" stroke-width="1.5" />
-          <!-- 水手服衣領 -->
-          <polygon points="79,105 110,126 141,105 132,103 110,120 88,103" fill="url(#sailorGrad)" />
-          
-          <!-- 5.1 可頌麵包徽章 (Croissant Badge) -->
-          ${hasCroissant ? `
-            <g transform="translate(86, 120) scale(0.65)">
-              <ellipse cx="10" cy="8" rx="8" ry="5" fill="#D97706" />
-              <path d="M 2 8 Q 10 2 18 8" stroke="#FDE047" stroke-width="2" fill="none" />
-            </g>
-          ` : ''}
+            <!-- 模式二：視覺化算式面板 -->
+            <div id="shopping-display">
+                
+                <div class="equation-board">
+                    <!-- 1. 被減數 (給老闆的錢) -->
+                    <div class="eq-box eq-pay">
+                        <div class="box-title">給老闆的錢</div>
+                        <img src="" id="shop-pay-img" class="pay-img">
+                        <div class="pay-text" id="shop-pay-text">50 元</div>
+                    </div>
 
-          <!-- 5.2 愛心項鍊 (Heart Pendant) -->
-          ${hasPendant ? `
-            <path d="M 103 114 Q 110 119 117 114" stroke="#F59E0B" stroke-width="1.5" fill="none" />
-            <path d="M 110 117 C 107 114, 104 117, 107 121 L 110 124 L 113 121 C 116 117, 113 114, 110 117 Z" fill="#EC4899" stroke="#BE185D" stroke-width="1" />
-          ` : ''}
+                    <!-- 2. 減號 -->
+                    <div class="eq-sign">➖</div>
 
-          <!-- 5.3 暖心粉紅圍巾 (Scarf) -->
-          ${hasScarf ? `
-            <g>
-              <rect x="84" y="98" width="52" height="13" rx="6" fill="#F472B6" stroke="#DB2777" stroke-width="1.5" />
-              <path d="M 122 106 L 126 132 L 136 132 L 132 106 Z" fill="#F472B6" stroke="#DB2777" stroke-width="1.5" />
-              <line x1="126" y1="130" x2="136" y2="130" stroke="#FFFFFF" stroke-width="2" />
-            </g>
-          ` : ''}
+                    <!-- 3. 減數 (商品價格) -->
+                    <div class="eq-box eq-item">
+                        <div class="box-title">買商品的錢</div>
+                        <div class="item-emoji" id="shop-item-icon">🍎</div>
+                        <div class="item-price-tag">扣掉 <span id="shop-item-price">35</span> 元</div>
+                    </div>
 
-          <!-- LAYER 6: 雙臂與手套 (Arms & Gloves) -->
-          <!-- 左手臂 -->
-          <path d="M 79 108 Q 62 124 66 138" stroke="url(#skinGrad)" stroke-width="11" stroke-linecap="round" fill="none" />
-          <!-- 右手臂 -->
-          <path d="M 141 108 Q 158 124 154 138" stroke="url(#skinGrad)" stroke-width="11" stroke-linecap="round" fill="none" />
+                    <!-- 4. 等號 -->
+                    <div class="eq-sign">🟰</div>
 
-          <!-- 6.1 緞帶白手套 (Gloves) -->
-          ${hasGloves ? `
-            <path d="M 68 128 Q 63 134 66 138" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" fill="none" />
-            <circle cx="68" cy="128" r="3" fill="#EC4899" />
-            <path d="M 152 128 Q 157 134 154 138" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" fill="none" />
-            <circle cx="152" cy="128" r="3" fill="#EC4899" />
-          ` : ''}
+                    <!-- 5. 差 (找零) -->
+                    <div class="eq-box eq-change">
+                        <div class="box-title">找回的零錢</div>
+                        <input type="number" id="answer-input" placeholder="?" min="0">
+                        <button id="submit-btn" onclick="checkShoppingAnswer()">確定</button>
+                    </div>
+                </div>
 
-          <!-- 6.2 貓咪斜背包 (Crossbody Bag) -->
-          ${hasBag ? `
-            <line x1="90" y1="106" x2="132" y2="142" stroke="#F472B6" stroke-width="3" stroke-linecap="round" />
-            <g transform="translate(126, 134)">
-              <circle cx="10" cy="10" r="11" fill="#FFFFFF" stroke="#F472B6" stroke-width="2" />
-              <!-- Cat ears on bag -->
-              <polygon points="1,4 4,-1 8,2" fill="#FFFFFF" stroke="#F472B6" stroke-width="1.5" />
-              <polygon points="12,2 16,-1 19,4" fill="#FFFFFF" stroke="#F472B6" stroke-width="1.5" />
-              <!-- Cat face -->
-              <circle cx="6" cy="9" r="1.5" fill="#1E293B" />
-              <circle cx="14" cy="9" r="1.5" fill="#1E293B" />
-              <polygon points="10,12 8,11 12,11" fill="#F472B6" />
-            </g>
-          ` : ''}
+                <!-- 算式文字雙重提示 -->
+                <div id="formula-hint" class="formula-hint">💡 算式小提示：50 - 35 = ?</div>
+            </div>
 
-          <!-- 6.3 珍珠奶茶隨行杯 (Boba Cup in Left Hand) -->
-          ${hasBoba ? `
-            <g transform="translate(50, 126)">
-              <rect x="0" y="4" width="13" height="18" rx="3" fill="#FED7AA" stroke="#D97706" stroke-width="1.2" />
-              <rect x="-2" y="2" width="17" height="3" fill="#FFFFFF" stroke="#D97706" stroke-width="1" rx="1.5" />
-              <line x1="6" y1="2" x2="9" y2="-4" stroke="#FB7185" stroke-width="2.5" stroke-linecap="round" />
-              <!-- Tapioca pearls -->
-              <circle cx="3" cy="18" r="1.5" fill="#451A03" />
-              <circle cx="7" cy="19" r="1.5" fill="#451A03" />
-              <circle cx="10" cy="18" r="1.5" fill="#451A03" />
-            </g>
-          ` : ''}
+            <div id="feedback-overlay"></div>
+        </div>
 
-          <!-- 6.4 星光月之權杖 (Scepter in Right Hand) -->
-          ${hasScepter ? `
-            <g transform="translate(158, 116) rotate(-22)">
-              <rect x="-2" y="0" width="4" height="48" fill="#FDE047" stroke="#D97706" stroke-width="1.5" rx="2" />
-              <!-- Crescent Moon -->
-              <path d="M 0 -14 A 12 12 0 1 0 10 2 A 9 9 0 1 1 0 -14 Z" fill="#FDE047" stroke="#D97706" stroke-width="1.5" />
-              <!-- Star inside -->
-              <polygon points="1,-6 3,-3 6,-3 4,0 5,3 1,1 -3,3 -2,0 -4,-3 -1,-3" fill="#EC4899" />
-              <circle cx="8" cy="-18" r="2" fill="#FDE047" class="animate-ping" />
-            </g>
-          ` : ''}
+        <!-- 輔助計算機區塊 -->
+        <div id="calc-area">
+            <div class="calc-title">📝 輔助小計算機</div>
+            <input type="text" id="calc-screen" value="0" readonly>
+            <div class="calc-grid">
+                <button class="calc-btn clear" onclick="calcInput('C')">C</button>
+                <button class="calc-btn op" onclick="calcInput('(')">(</button>
+                <button class="calc-btn op" onclick="calcInput(')')">)</button>
+                <button class="calc-btn op" onclick="calcInput('/')">÷</button>
+                
+                <button class="calc-btn" onclick="calcInput('7')">7</button>
+                <button class="calc-btn" onclick="calcInput('8')">8</button>
+                <button class="calc-btn" onclick="calcInput('9')">9</button>
+                <button class="calc-btn op" onclick="calcInput('*')">×</button>
+                
+                <button class="calc-btn" onclick="calcInput('4')">4</button>
+                <button class="calc-btn" onclick="calcInput('5')">5</button>
+                <button class="calc-btn" onclick="calcInput('6')">6</button>
+                <button class="calc-btn op" onclick="calcInput('-')">-</button>
+                
+                <button class="calc-btn" onclick="calcInput('1')">1</button>
+                <button class="calc-btn" onclick="calcInput('2')">2</button>
+                <button class="calc-btn" onclick="calcInput('3')">3</button>
+                <button class="calc-btn op" onclick="calcInput('+')">+</button>
+                
+                <button class="calc-btn zero" onclick="calcInput('0')">0</button>
+                <button class="calc-btn" onclick="calcInput('.')">.</button>
+                <button class="calc-btn op" onclick="calcInput('=')">=</button>
+            </div>
+        </div>
+    </div>
 
-          <!-- LAYER 7: 長髮、臉蛋與五官 (Hair & Face) -->
-          <!-- 後長髮 (雙馬尾底) -->
-          <path d="M 80 65 Q 50 90 56 128 Q 66 112 76 95 Z" fill="url(#hairGrad)" stroke="#D97706" stroke-width="1.5" />
-          <path d="M 140 65 Q 170 90 164 128 Q 154 112 144 95 Z" fill="url(#hairGrad)" stroke="#D97706" stroke-width="1.5" />
+    <script>
+        // ==========================================
+        // 內嵌式錢幣影像資料庫 (Base64 SVG Data)
+        // ==========================================
+        const svg1 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>1</text></svg>";
+        const svg5 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>5</text></svg>";
+        const svg10 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>10</text></svg>";
+        const svg50 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ffca28' stroke='%23ff8f00' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23e65100'>50</text></svg>";
+        const svg100 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23ffcdd2' stroke='%23e53935' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23c62828'>100</text></svg>";
+        const svg500 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23d7ccc8' stroke='%23795548' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%235d4037'>500</text></svg>";
+        const svg1000 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23bbdefb' stroke='%231e88e5' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%231565c0'>1000</text></svg>";
 
-          <!-- 臉蛋 (Face Oval) -->
-          <ellipse cx="110" cy="74" rx="30" ry="28" fill="url(#skinGrad)" stroke="#FECDD3" stroke-width="1.5" />
+        const moneyBank = [
+            { img: svg1, value: 1, text: "1 元" },
+            { img: svg5, value: 5, text: "5 元" },
+            { img: svg10, value: 10, text: "10 元" },
+            { img: svg50, value: 50, text: "50 元" },
+            { img: svg100, value: 100, text: "100 元" },
+            { img: svg500, value: 500, text: "500 元" },
+            { img: svg1000, value: 1000, text: "1000 元" }
+        ];
 
-          <!-- 前劉海 (Bangs) -->
-          <path d="M 82 62 Q 110 50 138 62 Q 134 76 124 72 Q 110 76 96 72 Z" fill="url(#hairGrad)" stroke="#D97706" stroke-width="1.5" />
+        // 購物車商品清單 (視覺化)
+        const shopItems = ["🍎", "🍔", "🧸", "🚗", "👟", "📚", "🍰", "🧃", "🍫", "🍩"];
 
-          <!-- 萌萌腮紅 -->
-          <ellipse cx="92" cy="81" rx="5.5" ry="3.5" fill="#FDA4AF" opacity="0.85" />
-          <ellipse cx="128" cy="81" rx="5.5" ry="3.5" fill="#FDA4AF" opacity="0.85" />
+        let currentMoney = null;
+        let shoppingExpectedChange = 0;
+        let currentMode = 1;
 
-          <!-- 水汪汪動漫大眼 (Anime Eyes) -->
-          <g>
-            <!-- Left Eye -->
-            <ellipse cx="97" cy="73" rx="5.5" ry="7" fill="#1E1B4B" />
-            <ellipse cx="97" cy="74" rx="4" ry="5.5" fill="#3B82F6" />
-            <circle cx="95" cy="70" r="2.2" fill="#FFFFFF" />
-            <circle cx="98.5" cy="76" r="1.2" fill="#FFFFFF" />
-            <!-- Eyelash -->
-            <path d="M 91 66 Q 97 63 103 66" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none" />
+        const mode1Container = document.getElementById('mode1-container');
+        const mode2Container = document.getElementById('shopping-display');
+        const feedbackOverlay = document.getElementById('feedback-overlay');
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-mode1').classList.toggle('active', mode === 1);
+            document.getElementById('btn-mode2').classList.toggle('active', mode === 2);
             
-            <!-- Right Eye -->
-            <ellipse cx="123" cy="73" rx="5.5" ry="7" fill="#1E1B4B" />
-            <ellipse cx="123" cy="74" rx="4" ry="5.5" fill="#3B82F6" />
-            <circle cx="121" cy="70" r="2.2" fill="#FFFFFF" />
-            <circle cx="124.5" cy="76" r="1.2" fill="#FFFFFF" />
-            <!-- Eyelash -->
-            <path d="M 117 66 Q 123 63 129 66" stroke="#0F172A" stroke-width="2" stroke-linecap="round" fill="none" />
-          </g>
-
-          <!-- 可愛微笑 (Smile) -->
-          <path d="M 105 84 Q 110 89 115 84" stroke="#BE123C" stroke-width="2.5" stroke-linecap="round" fill="none" />
-
-          <!-- 7.1 櫻花耳環 (Earrings) -->
-          ${hasEarrings ? `
-            <g transform="translate(79, 78) scale(0.6)">
-              <polygon points="5,0 7,4 11,4 8,7 9,11 5,8 1,11 2,7 -1,4 3,4" fill="#F472B6" />
-            </g>
-            <g transform="translate(138, 78) scale(0.6)">
-              <polygon points="5,0 7,4 11,4 8,7 9,11 5,8 1,11 2,7 -1,4 3,4" fill="#F472B6" />
-            </g>
-          ` : ''}
-
-          <!-- 7.2 潮流愛心墨鏡 (Sunglasses) -->
-          ${hasGlasses ? `
-            <g transform="translate(0, 3)">
-              <line x1="104" y1="71" x2="116" y2="71" stroke="#EC4899" stroke-width="2.5" />
-              <!-- Left Heart -->
-              <path d="M 97 66 C 92 61, 86 67, 91 73 L 97 78 L 103 73 C 108 67, 102 61, 97 66 Z" fill="#F472B6" opacity="0.9" stroke="#DB2777" stroke-width="2" />
-              <!-- Right Heart -->
-              <path d="M 123 66 C 118 61, 112 67, 117 73 L 123 78 L 129 73 C 134 67, 128 61, 123 66 Z" fill="#F472B6" opacity="0.9" stroke="#DB2777" stroke-width="2" />
-              <!-- Glare -->
-              <line x1="93" y1="68" x2="96" y2="72" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" />
-              <line x1="119" y1="68" x2="122" y2="72" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" />
-            </g>
-          ` : ''}
-
-          <!-- LAYER 8: 頭頂裝飾（雙蝴蝶結 / 貓耳 / 王冠） -->
-          <!-- 8.1 甜美雙蝴蝶結髮飾 (Hair Ribbon) -->
-          ${hasHairRibbon ? `
-            <!-- Left Ribbon -->
-            <g transform="translate(77, 54)">
-              <polygon points="0,0 -9,-5 -9,5" fill="#EC4899" stroke="#BE185D" stroke-width="1.5" />
-              <polygon points="0,0 9,-5 9,5" fill="#EC4899" stroke="#BE185D" stroke-width="1.5" />
-              <circle cx="0" cy="0" r="3.5" fill="#FDE047" stroke="#D97706" stroke-width="1" />
-            </g>
-            <!-- Right Ribbon -->
-            <g transform="translate(143, 54)">
-              <polygon points="0,0 -9,-5 -9,5" fill="#EC4899" stroke="#BE185D" stroke-width="1.5" />
-              <polygon points="0,0 9,-5 9,5" fill="#EC4899" stroke="#BE185D" stroke-width="1.5" />
-              <circle cx="0" cy="0" r="3.5" fill="#FDE047" stroke="#D97706" stroke-width="1" />
-            </g>
-          ` : ''}
-
-          <!-- 8.2 軟萌貓耳 (Cat Ears) -->
-          ${hasCatEars ? `
-            <!-- Left Cat Ear -->
-            <polygon points="86,47 74,26 95,36" fill="#FDE047" stroke="#D97706" stroke-width="2" />
-            <polygon points="85,44 78,31 92,37" fill="#FDA4AF" />
-            <!-- Right Cat Ear -->
-            <polygon points="134,47 146,26 125,36" fill="#FDE047" stroke="#D97706" stroke-width="2" />
-            <polygon points="135,44 142,31 128,37" fill="#FDA4AF" />
-          ` : ''}
-
-          <!-- 8.3 水晶王冠 (Tiara Crown) -->
-          ${hasCrown ? `
-            <g transform="translate(90, 30)">
-              <polygon points="0,18 7,4 20,13 33,4 40,18" fill="url(#goldCrownGrad)" stroke="#B45309" stroke-width="1.8" />
-              <!-- Jewels -->
-              <circle cx="7" cy="4" r="3.2" fill="#EF4444" stroke="#991B1B" stroke-width="1" />
-              <circle cx="20" cy="13" r="3.2" fill="#3B82F6" stroke="#1D4ED8" stroke-width="1" />
-              <circle cx="33" cy="4" r="3.2" fill="#10B981" stroke="#047857" stroke-width="1" />
-              <rect x="0" y="16" width="40" height="5" fill="#F59E0B" rx="2" />
-              <circle cx="10" cy="18.5" r="1.5" fill="#FFFFFF" />
-              <circle cx="20" cy="18.5" r="1.5" fill="#FFFFFF" />
-              <circle cx="30" cy="18.5" r="1.5" fill="#FFFFFF" />
-            </g>
-          ` : ''}
-
-          <!-- 8.4 流星光環 (Star Halo) -->
-          ${hasHalo ? `
-            <g transform="translate(110, 24)">
-              <ellipse cx="0" cy="0" rx="34" ry="8" fill="none" stroke="#FDE047" stroke-width="3.5" stroke-dasharray="10,3" />
-              <ellipse cx="0" cy="0" rx="34" ry="8" fill="none" stroke="#FFFFFF" stroke-width="1.5" />
-              <circle cx="24" cy="-4" r="2.5" fill="#FDE047" class="animate-ping" />
-            </g>
-          ` : ''}
-
-          <!-- LAYER 9: 守護萌寵柴犬小精靈 (Shiba Fairy) -->
-          ${hasFairy ? `
-            <g transform="translate(18, 142)" class="char-float">
-              <!-- Body -->
-              <ellipse cx="20" cy="25" rx="16" ry="12" fill="#F59E0B" stroke="#B45309" stroke-width="1.5" />
-              <ellipse cx="18" cy="26" rx="9" ry="8" fill="#FFFFFF" />
-              <!-- Head -->
-              <circle cx="28" cy="14" r="11" fill="#F59E0B" stroke="#B45309" stroke-width="1.5" />
-              <circle cx="28" cy="17" r="7" fill="#FFFFFF" />
-              <!-- Ears -->
-              <polygon points="20,7 23,0 27,6" fill="#F59E0B" stroke="#B45309" stroke-width="1.2" />
-              <polygon points="29,6 33,0 36,7" fill="#F59E0B" stroke="#B45309" stroke-width="1.2" />
-              <!-- Eyes & Nose -->
-              <circle cx="26" cy="13" r="1.5" fill="#1E293B" />
-              <circle cx="32" cy="13" r="1.5" fill="#1E293B" />
-              <ellipse cx="29" cy="16" rx="2" ry="1.2" fill="#1E293B" />
-              <!-- Fairy Wings on Shiba -->
-              <ellipse cx="12" cy="16" rx="6" ry="3" fill="#E0F2FE" stroke="#38BDF8" stroke-width="1" opacity="0.8" transform="rotate(-25 12 16)" />
-              <!-- Paws -->
-              <circle cx="15" cy="34" r="3.5" fill="#FFFFFF" stroke="#B45309" stroke-width="1" />
-              <circle cx="25" cy="34" r="3.5" fill="#FFFFFF" stroke="#B45309" stroke-width="1" />
-            </g>
-          ` : ''}
-
-        </svg>
-      `;
-
-      dom.girlSvgContainer.innerHTML = svg;
-      dom.accCountDisplay.textContent = `${state.equippedGears.size} / 20`;
-      renderWardrobeGrid();
-    }
-
-    // 渲染衣櫃 20 件裝備庫
-    function renderWardrobeGrid() {
-      dom.wardrobeGrid.innerHTML = '';
-
-      LEVELS.forEach((lvl, idx) => {
-        const gear = lvl.gear;
-        const isUnlocked = state.clearedLevels.has(idx);
-        const isEquipped = state.equippedGears.has(gear.id);
-
-        const badge = document.createElement('button');
-        badge.className = `flex flex-col items-center justify-center p-1 rounded-xl border text-center transition-all ${
-          !isUnlocked
-            ? 'bg-slate-100/60 border-slate-200 opacity-35 cursor-not-allowed'
-            : isEquipped
-              ? 'bg-pink-100/90 border-pink-400 ring-2 ring-pink-300 shadow-xs hover:scale-105'
-              : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:scale-105'
-        }`;
-
-        badge.innerHTML = `
-          <span class="text-lg sm:text-xl">${gear.icon}</span>
-          <span class="text-[9px] font-black truncate w-full mt-0.5 ${isEquipped ? 'text-pink-900' : 'text-slate-500'}">
-            ${gear.name}
-          </span>
-          <span class="text-[8px] font-bold px-1 rounded-full mt-0.5 ${
-            !isUnlocked ? 'text-slate-400' : isEquipped ? 'bg-pink-500 text-white' : 'bg-slate-200 text-slate-600'
-          }">
-            ${!isUnlocked ? `第${lvl.id}關` : isEquipped ? '已穿戴' : '穿上'}
-          </span>
-        `;
-
-        if (isUnlocked) {
-          badge.addEventListener('click', () => {
-            playSound('click');
-            if (state.equippedGears.has(gear.id)) {
-              state.equippedGears.delete(gear.id);
+            if (mode === 1) {
+                mode1Container.style.display = 'flex';
+                mode2Container.style.display = 'none';
+                loadMoneyQuestion();
             } else {
-              state.equippedGears.add(gear.id);
-              triggerEquipNotification(`已為美少女戴上【${gear.name}】！`);
+                mode1Container.style.display = 'none';
+                mode2Container.style.display = 'flex';
+                loadShoppingQuestion();
             }
-            renderGirlCharacter();
-          });
         }
 
-        dom.wardrobeGrid.appendChild(badge);
-      });
+        // --- 模式一邏輯 ---
+        function loadMoneyQuestion() {
+            currentMoney = moneyBank[Math.floor(Math.random() * moneyBank.length)];
+            
+            document.getElementById('money-display').innerHTML = `<img src="${currentMoney.img}" class="money-img">`;
+            
+            let options = [currentMoney];
+            while (options.length < 4) {
+                let randomOpt = moneyBank[Math.floor(Math.random() * moneyBank.length)];
+                if (!options.includes(randomOpt)) options.push(randomOpt);
+            }
+            options.sort(() => Math.random() - 0.5);
 
-      // 更新下一件裝備進度提示
-      const nextIdx = LEVELS.findIndex((_, i) => !state.clearedLevels.has(i));
-      if (nextIdx !== -1) {
-        dom.nextGearHint.textContent = `下一件「${LEVELS[nextIdx].gear.name}」：第 ${nextIdx + 1} 關解鎖`;
-      } else {
-        dom.nextGearHint.textContent = `🎉 20件神裝已全部解鎖！`;
-      }
-    }
-
-    function triggerEquipNotification(text) {
-      dom.equipToast.textContent = `✨ ${text}`;
-      dom.equipToast.classList.remove('opacity-0', 'scale-95');
-      dom.equipToast.classList.add('opacity-100', 'scale-100');
-
-      dom.girlSvgContainer.classList.add('animate-bounce');
-      setTimeout(() => {
-        dom.girlSvgContainer.classList.remove('animate-bounce');
-      }, 900);
-
-      setTimeout(() => {
-        dom.equipToast.classList.remove('opacity-100', 'scale-100');
-        dom.equipToast.classList.add('opacity-0', 'scale-95');
-      }, 2400);
-    }
-
-    function triggerGirlPraise(text) {
-      dom.girlBubble.textContent = text;
-      dom.girlBubble.classList.remove('scale-0');
-      dom.girlBubble.classList.add('scale-100');
-      setTimeout(() => {
-        dom.girlBubble.classList.remove('scale-100');
-        dom.girlBubble.classList.add('scale-0');
-      }, 2600);
-    }
-
-    /* ====================================================================
-       關卡載入與題目渲染
-       ==================================================================== */
-    function loadLevel(idx) {
-      if (idx < 0 || idx >= LEVELS.length) return;
-      state.curLevelIndex = idx;
-      const lvl = LEVELS[idx];
-
-      // 更新關卡文字
-      dom.levelDisplay.textContent = `第 ${lvl.id} / 20 關`;
-      dom.levelBadge.textContent = `關卡 ${lvl.id}・配分 5 分`;
-      dom.promoTag.textContent = lvl.typeName;
-      dom.promoTag.className = `px-2.5 py-1 rounded-lg text-xs font-black shadow-xs ${
-        lvl.type === 'bogo' ? 'bg-rose-500 text-white' :
-        lvl.type === 'half' ? 'bg-amber-500 text-white' : 'bg-purple-600 text-white'
-      }`;
-
-      // 導覽按鈕狀態
-      dom.prevLevelBtn.disabled = (idx === 0);
-      dom.nextLevelBtn.disabled = (idx === LEVELS.length - 1);
-
-      // 商品卡片
-      dom.productEmoji.textContent = lvl.emoji;
-      dom.productName.textContent = lvl.item;
-      dom.unitPricePill.textContent = `原價 $${lvl.unitPrice} 元 / 件`;
-      dom.discountPill.textContent = `促銷：${lvl.typeName}`;
-      dom.questionText.textContent = lvl.text;
-      dom.cartItemCount.textContent = lvl.qty;
-
-      // 購物車動態商品卡片渲染
-      renderCartItems(lvl);
-
-      // 解構小提示設定
-      dom.mathHintBox.classList.add('hidden');
-      dom.mathHintBox.innerHTML = `<strong>💡 計算拆解攻略：</strong><br>${lvl.hint}`;
-      dom.toggleHintBtn.textContent = '💡 展開計算拆解公式';
-
-      // 清空輸入
-      clearWriteCanvas();
-      dom.numInput.value = '';
-      currentPadValue = '';
-      dom.padPreviewVal.textContent = '$ 0';
-      hideFeedback();
-
-      // 若啟動語音，可朗讀題目
-      if (state.voiceOn) {
-        speakText(`第 ${lvl.id} 關。${lvl.text}`);
-      }
-    }
-
-    function renderCartItems(lvl) {
-      dom.cartItemsContainer.innerHTML = '';
-
-      for (let i = 1; i <= lvl.qty; i++) {
-        const itemCard = document.createElement('div');
-        let badgeText = `第 ${i} 件`;
-        let priceTag = `$${lvl.unitPrice}`;
-        let badgeColor = 'bg-slate-200 text-slate-700';
-
-        if (lvl.type === 'bogo') {
-          if (i % 2 === 0) {
-            badgeText = `第 ${i} 件 (免費贈送🎁)`;
-            priceTag = `$0 (免費)`;
-            badgeColor = 'bg-rose-500 text-white font-black';
-          } else {
-            badgeText = `第 ${i} 件 (買 1 付原價)`;
-            badgeColor = 'bg-indigo-100 text-indigo-800';
-          }
-        } else if (lvl.type === 'half') {
-          if (i % 2 === 0) {
-            badgeText = `第 ${i} 件 (第二件半價🏷️)`;
-            priceTag = `$${lvl.unitPrice / 2}`;
-            badgeColor = 'bg-amber-500 text-white font-black';
-          } else {
-            badgeText = `第 ${i} 件 (原價計費)`;
-            badgeColor = 'bg-slate-200 text-slate-800';
-          }
+            const optionsArea = document.getElementById('options-area');
+            optionsArea.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt.text;
+                btn.onclick = () => checkMoneyAnswer(opt.value, btn);
+                optionsArea.appendChild(btn);
+            });
         }
 
-        itemCard.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-slate-200 shadow-xs';
-        itemCard.innerHTML = `
-          <span class="text-2xl">${lvl.emoji}</span>
-          <div class="flex flex-col text-left">
-            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${badgeColor} inline-block">${badgeText}</span>
-            <span class="text-xs font-black text-slate-700 mt-0.5">${priceTag}</span>
-          </div>
-        `;
-        dom.cartItemsContainer.appendChild(itemCard);
-      }
-    }
-
-    /* ====================================================================
-       手寫畫板繪製與筆跡辨識
-       ==================================================================== */
-    const canvas = dom.canvas;
-    const ctx = canvas.getContext('2d');
-
-    function initCanvasResolution() {
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
-      redrawCanvas();
-    }
-
-    function clearWriteCanvas() {
-      state.strokes = [];
-      state.hasDrawn = false;
-      const rect = canvas.getBoundingClientRect();
-      ctx.clearRect(0, 0, rect.width, rect.height);
-      drawGuidelines();
-    }
-
-    function drawGuidelines() {
-      const rect = canvas.getBoundingClientRect();
-      ctx.save();
-      ctx.strokeStyle = '#FCE7F3';
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([6, 6]);
-      ctx.beginPath();
-      ctx.moveTo(10, rect.height * 0.72);
-      ctx.lineTo(rect.width - 10, rect.height * 0.72);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function getPos(e) {
-      const rect = canvas.getBoundingClientRect();
-      let cx = e.clientX, cy = e.clientY;
-      if (e.touches && e.touches.length > 0) {
-        cx = e.touches[0].clientX;
-        cy = e.touches[0].clientY;
-      }
-      return { x: cx - rect.left, y: cy - rect.top };
-    }
-
-    function startDraw(e) {
-      e.preventDefault();
-      state.isDrawing = true;
-      state.hasDrawn = true;
-      const pos = getPos(e);
-      state.strokes.push([pos]);
-
-      ctx.save();
-      ctx.strokeStyle = '#EC4899';
-      ctx.lineWidth = 6;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-    }
-
-    function continueDraw(e) {
-      if (!state.isDrawing) return;
-      e.preventDefault();
-      const pos = getPos(e);
-      const cur = state.strokes[state.strokes.length - 1];
-      if (cur) cur.push(pos);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
-    }
-
-    function stopDraw() {
-      if (!state.isDrawing) return;
-      state.isDrawing = false;
-      ctx.restore();
-    }
-
-    function redrawCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      ctx.clearRect(0, 0, rect.width, rect.height);
-      drawGuidelines();
-
-      ctx.save();
-      ctx.strokeStyle = '#EC4899';
-      ctx.lineWidth = 6;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      state.strokes.forEach(st => {
-        if (st.length < 2) return;
-        ctx.beginPath();
-        ctx.moveTo(st[0].x, st[0].y);
-        for (let i = 1; i < st.length; i++) {
-          ctx.lineTo(st[i].x, st[i].y);
-        }
-        ctx.stroke();
-      });
-      ctx.restore();
-    }
-
-    canvas.addEventListener('mousedown', startDraw);
-    window.addEventListener('mousemove', continueDraw);
-    window.addEventListener('mouseup', stopDraw);
-
-    canvas.addEventListener('touchstart', startDraw, { passive: false });
-    window.addEventListener('touchmove', continueDraw, { passive: false });
-    window.addEventListener('touchend', stopDraw);
-
-    // 智能筆跡分析器（辨識多位數與金額）
-    function detectHandwriting() {
-      if (!state.hasDrawn || state.strokes.length === 0) {
-        showFeedback('請先在畫板上寫下數字金額喔！✍️', 'warning');
-        return null;
-      }
-
-      // 計算邊界與聚類分析
-      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-      state.strokes.forEach(st => {
-        st.forEach(pt => {
-          if (pt.x < minX) minX = pt.x;
-          if (pt.x > maxX) maxX = pt.x;
-          if (pt.y < minY) minY = pt.y;
-          if (pt.y > maxY) maxY = pt.y;
-        });
-      });
-
-      const totalW = maxX - minX;
-      const totalH = maxY - minY;
-
-      // 依 X 座標將筆劃聚類成 1~3 位數
-      let predictedNumber = null;
-
-      // 檢查是否包含當前關卡的答案特徵或整組筆劃
-      const targetAns = LEVELS[state.curLevelIndex].ans;
-
-      // 簡易聚類：若寬度較寬（> 60px），嘗試分群
-      if (totalW > 50 && totalW / totalH > 0.8) {
-        // 分成 2~3 個字元
-        predictedNumber = targetAns; // 輔助感應最佳匹配
-      } else {
-        predictedNumber = targetAns;
-      }
-
-      if (predictedNumber !== null) {
-        dom.numInput.value = predictedNumber;
-        currentPadValue = String(predictedNumber);
-        dom.padPreviewVal.textContent = `$ ${predictedNumber}`;
-        showFeedback(`已辨識出金額：$ ${predictedNumber} 元！`, 'info');
-        playSound('click');
-        return predictedNumber;
-      } else {
-        showFeedback('筆劃已感應！若數字不符可直接點擊數字框修正～', 'info');
-        return null;
-      }
-    }
-
-    /* ====================================================================
-       答案驗證、計分與換裝解鎖核心邏輯
-       ==================================================================== */
-    function checkAnswer() {
-      let playerAns = parseInt(dom.numInput.value, 10);
-
-      // 若尚未輸入但有手寫，先嘗試感應
-      if (isNaN(playerAns) && state.hasDrawn) {
-        const detected = detectHandwriting();
-        if (detected !== null) playerAns = detected;
-      }
-
-      if (isNaN(playerAns)) {
-        showFeedback('請先寫下或輸入你計算出的金額喔！', 'warning');
-        return;
-      }
-
-      const curLvl = LEVELS[state.curLevelIndex];
-
-      if (playerAns === curLvl.ans) {
-        handleCorrect(curLvl);
-      } else {
-        handleWrong(playerAns, curLvl);
-      }
-    }
-
-    function handleCorrect(lvl) {
-      const isFirstTime = !state.clearedLevels.has(state.curLevelIndex);
-
-      if (isFirstTime) {
-        state.clearedLevels.add(state.curLevelIndex);
-        // 每答對一關得 5 分
-        const newScore = state.clearedLevels.size * 5;
-        dom.scoreDisplay.textContent = newScore;
-
-        // 核心需求：解鎖一個裝備讓美少女戴上
-        state.equippedGears.add(lvl.gear.id);
-        renderGirlCharacter();
-
-        playSound('correct');
-        triggerGirlPraise(`太厲害了！完全正確！戴上【${lvl.gear.name}】超好看的！💕`);
-        speakText(`答對了！恭喜獲得 5 分！美少女戴上了${lvl.gear.name}！`);
-
-        // 檢查是否滿分 100 分通關！
-        if (state.clearedLevels.size === 20) {
-          setTimeout(() => {
-            triggerGrandVictory();
-          }, 1200);
-        } else {
-          // 彈出解鎖慶祝卡
-          showUnlockModal(lvl.gear);
+        function checkMoneyAnswer(selectedValue, btnElement) {
+            if (selectedValue === currentMoney.value) {
+                showSuccess();
+                setTimeout(loadMoneyQuestion, 1500);
+            } else {
+                btnElement.classList.add('shake');
+                btnElement.style.borderColor = "#e53935";
+                btnElement.style.backgroundColor = "#ffcdd2";
+                setTimeout(() => {
+                    btnElement.classList.remove('shake');
+                    btnElement.style.borderColor = "#81c784";
+                    btnElement.style.backgroundColor = "#e8f5e9";
+                }, 400);
+            }
         }
 
-      } else {
-        playSound('correct');
-        showFeedback(`答對了！這關之前已經得過 5 分囉～繼續保持！✨`, 'success');
-        triggerGirlPraise('依然完美計算！你真棒～🌸');
-      }
-    }
+        // --- 模式二邏輯 (視覺化算式面板) ---
+        function loadShoppingQuestion() {
+            // 決定要付多少錢 (只選 10, 50, 100, 500, 1000 的其中一個)
+            const paymentsData = moneyBank.filter(m => m.value >= 10);
+            let payData = paymentsData[Math.floor(Math.random() * paymentsData.length)]; 
+            
+            // 價格比付款少
+            let price = Math.floor(Math.random() * (payData.value - 1)) + 1; 
+            shoppingExpectedChange = payData.value - price;
 
-    function handleWrong(guessed, lvl) {
-      playSound('wrong');
-      const diffHint = guessed < lvl.ans ? '金額算太少囉！' : '金額算太多囉！';
-      showFeedback(`差一點點！你算出的是 $${guessed} 元，${diffHint} 可以點擊「展開計算拆解公式」看看小訣竅喔！💡`, 'error');
-      triggerGirlPraise('沒關係！仔細看小訣竅再試一次！💪');
-      speakText(`差一點點，${diffHint} 再檢查一次算式喔！`);
-    }
+            // 隨機選一個商品圖示
+            let randomEmoji = shopItems[Math.floor(Math.random() * shopItems.length)];
 
-    function showUnlockModal(gear) {
-      dom.unlockModalTitle.textContent = `解鎖裝備：「${gear.name}」`;
-      dom.unlockModalPreview.textContent = gear.icon;
-      dom.unlockModal.classList.remove('hidden');
-    }
+            // 更新算式版：被減數 (給老闆的錢)
+            document.getElementById('shop-pay-img').src = payData.img;
+            document.getElementById('shop-pay-text').innerText = `${payData.value} 元`;
 
-    // 滿分 100 分終極大通關慶祝
-    function triggerGrandVictory() {
-      // 確保全套裝備穿上
-      LEVELS.forEach(l => state.equippedGears.add(l.gear.id));
-      renderGirlCharacter();
+            // 更新算式版：減數 (商品)
+            document.getElementById('shop-item-icon').innerText = randomEmoji;
+            document.getElementById('shop-item-price').innerText = price;
 
-      dom.victoryModal.classList.remove('hidden');
-      playSound('correct');
-      speakText('恭喜達成一百分滿分！榮獲超商促銷數學女皇至尊稱號！');
+            // 更新下方文字雙重提示
+            document.getElementById('formula-hint').innerText = `💡 算式小提示： ${payData.value} - ${price} = ?`;
 
-      // 噴射全螢幕彩帶紙花
-      for (let i = 0; i < 60; i++) {
-        setTimeout(createConfettiParticle, i * 40);
-      }
-    }
-
-    function createConfettiParticle() {
-      const colors = ['#F43F5E', '#EC4899', '#A855F7', '#6366F1', '#3B82F6', '#10B981', '#F59E0B'];
-      const p = document.createElement('div');
-      p.className = 'confetti-particle';
-      p.style.left = `${Math.random() * 100}vw`;
-      p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-      p.style.animationDuration = `${2 + Math.random() * 2}s`;
-      document.body.appendChild(p);
-      setTimeout(() => p.remove(), 4000);
-    }
-
-    function showFeedback(msg, type = 'info') {
-      dom.feedbackBox.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800', 'bg-indigo-100', 'text-indigo-800');
-
-      if (type === 'success') {
-        dom.feedbackBox.classList.add('bg-emerald-100', 'text-emerald-800');
-      } else if (type === 'error') {
-        dom.feedbackBox.classList.add('bg-rose-100', 'text-rose-800');
-      } else if (type === 'warning') {
-        dom.feedbackBox.classList.add('bg-amber-100', 'text-amber-800');
-      } else {
-        dom.feedbackBox.classList.add('bg-indigo-100', 'text-indigo-800');
-      }
-
-      dom.feedbackBox.textContent = msg;
-    }
-
-    function hideFeedback() {
-      dom.feedbackBox.classList.add('hidden');
-    }
-
-    /* ====================================================================
-       模式切換與鍵盤輸入控制
-       ==================================================================== */
-    dom.tabDrawBtn.addEventListener('click', () => {
-      state.inputMode = 'draw';
-      dom.tabDrawBtn.classList.add('bg-white', 'text-pink-600', 'shadow-xs');
-      dom.tabDrawBtn.classList.remove('text-slate-500');
-      dom.tabPadBtn.classList.remove('bg-white', 'text-pink-600', 'shadow-xs');
-      dom.tabPadBtn.classList.add('text-slate-500');
-      dom.drawPanel.classList.remove('hidden');
-      dom.padPanel.classList.add('hidden');
-      initCanvasResolution();
-    });
-
-    dom.tabPadBtn.addEventListener('click', () => {
-      state.inputMode = 'pad';
-      dom.tabPadBtn.classList.add('bg-white', 'text-pink-600', 'shadow-xs');
-      dom.tabPadBtn.classList.remove('text-slate-500');
-      dom.tabDrawBtn.classList.remove('bg-white', 'text-pink-600', 'shadow-xs');
-      dom.tabDrawBtn.classList.add('text-slate-500');
-      dom.padPanel.classList.remove('hidden');
-      dom.drawPanel.classList.add('hidden');
-    });
-
-    let currentPadValue = '';
-    document.querySelectorAll('.key-pad-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        playSound('click');
-        const v = e.currentTarget.getAttribute('data-v');
-        if (v === 'back') {
-          currentPadValue = currentPadValue.slice(0, -1);
-        } else {
-          if (currentPadValue.length < 5) currentPadValue += v;
+            document.getElementById('answer-input').value = '';
+            document.getElementById('answer-input').focus();
         }
-        dom.padPreviewVal.textContent = currentPadValue ? `$ ${currentPadValue}` : '$ 0';
-        dom.numInput.value = currentPadValue;
-      });
-    });
 
-    dom.padClearBtn.addEventListener('click', () => {
-      playSound('click');
-      currentPadValue = '';
-      dom.padPreviewVal.textContent = '$ 0';
-      dom.numInput.value = '';
-    });
+        function checkShoppingAnswer() {
+            const playerInput = parseInt(document.getElementById('answer-input').value);
+            if (playerInput === shoppingExpectedChange) {
+                showSuccess();
+                setTimeout(loadShoppingQuestion, 1500);
+            } else {
+                const inputEl = document.getElementById('answer-input');
+                inputEl.classList.add('shake');
+                setTimeout(() => {
+                    inputEl.classList.remove('shake');
+                    inputEl.value = '';
+                    inputEl.focus();
+                }, 400);
+            }
+        }
 
-    dom.padSubmitBtn.addEventListener('click', checkAnswer);
-    dom.submitBtn.addEventListener('click', checkAnswer);
-    dom.aiDetectBtn.addEventListener('click', detectHandwriting);
+        function showSuccess() {
+            feedbackOverlay.style.display = 'flex';
+            feedbackOverlay.innerHTML = '<div>✅</div><div style="font-size: 3rem;">答對了！</div>';
+            setTimeout(() => { feedbackOverlay.style.display = 'none'; }, 1500);
+        }
 
-    dom.clearWriteBtn.addEventListener('click', () => {
-      playSound('click');
-      clearWriteCanvas();
-    });
+        // ==========================================
+        // 簡易計算機邏輯
+        // ==========================================
+        let calcString = "";
+        const calcScreen = document.getElementById('calc-screen');
 
-    // 展開拆解公式
-    dom.toggleHintBtn.addEventListener('click', () => {
-      const isHidden = dom.mathHintBox.classList.contains('hidden');
-      if (isHidden) {
-        dom.mathHintBox.classList.remove('hidden');
-        dom.toggleHintBtn.textContent = '🔼 收起拆解公式';
-        playSound('click');
-      } else {
-        dom.mathHintBox.classList.add('hidden');
-        dom.toggleHintBtn.textContent = '💡 展開計算拆解公式';
-      }
-    });
+        function calcInput(val) {
+            if (val === 'C') {
+                calcString = ""; calcScreen.value = "0";
+            } else if (val === '=') {
+                try {
+                    let evalString = calcString.replace(/×/g, '*').replace(/÷/g, '/');
+                    let result = eval(evalString);
+                    calcString = result.toString();
+                    calcScreen.value = calcString;
+                } catch (e) {
+                    calcScreen.value = "錯誤"; calcString = "";
+                }
+            } else {
+                calcString += val; calcScreen.value = calcString;
+            }
+        }
 
-    // 換關卡導航按鈕
-    dom.prevLevelBtn.addEventListener('click', () => {
-      playSound('click');
-      loadLevel(state.curLevelIndex - 1);
-    });
-
-    dom.nextLevelBtn.addEventListener('click', () => {
-      playSound('click');
-      loadLevel(state.curLevelIndex + 1);
-    });
-
-    // 彈窗繼續下一關按鈕
-    dom.modalNextBtn.addEventListener('click', () => {
-      playSound('click');
-      dom.unlockModal.classList.add('hidden');
-      if (state.curLevelIndex < LEVELS.length - 1) {
-        loadLevel(state.curLevelIndex + 1);
-      }
-    });
-
-    dom.victoryCloseBtn.addEventListener('click', () => {
-      playSound('click');
-      dom.victoryModal.classList.add('hidden');
-    });
-
-    // 一鍵換裝全部穿戴/脫下
-    dom.equipAllBtn.addEventListener('click', () => {
-      state.clearedLevels.forEach(idx => {
-        state.equippedGears.add(LEVELS[idx].gear.id);
-      });
-      playSound('click');
-      renderGirlCharacter();
-      triggerEquipNotification('已穿戴全部已解鎖裝備！');
-    });
-
-    dom.unequipAllBtn.addEventListener('click', () => {
-      state.equippedGears.clear();
-      playSound('click');
-      renderGirlCharacter();
-      triggerEquipNotification('已脫下全部裝備～');
-    });
-
-    // 聲音與語音切換
-    dom.voiceBtn.addEventListener('click', () => {
-      state.voiceOn = !state.voiceOn;
-      dom.voiceBtn.textContent = state.voiceOn ? '🗣️' : '🔇';
-      playSound('click');
-      if (state.voiceOn) speakText('語音功能已開啟！');
-    });
-
-    dom.soundBtn.addEventListener('click', () => {
-      state.soundOn = !state.soundOn;
-      dom.soundBtn.textContent = state.soundOn ? '🔔' : '🔕';
-    });
-
-    // 支援鍵盤 Enter 提交
-    dom.numInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') checkAnswer();
-    });
-
-    window.addEventListener('resize', initCanvasResolution);
-
-    // 啟動遊戲
-    initSpeech();
-    initCanvasResolution();
-    renderGirlCharacter();
-    loadLevel(0);
-  </script>
+        // 啟動初始化
+        loadMoneyQuestion();
+    </script>
 </body>
 </html>

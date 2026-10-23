@@ -9,7 +9,7 @@
             font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
             background-color: #e0f7fa; margin: 0; padding: 10px;
             display: flex; justify-content: center; align-items: flex-start;
-            min-height: 100dvh; box-sizing: border-box; user-select: none;
+            min-height: 100vh; box-sizing: border-box; user-select: none;
         }
 
         #app-container {
@@ -17,92 +17,174 @@
             flex-wrap: wrap; justify-content: center;
         }
 
-        /* 左側遊戲主區塊 */
+        /* 首頁區塊 */
+        #home-screen {
+            width: 100%; background-color: #ffffff; border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 40px; box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 60vh;
+        }
+        .home-title { font-size: 3rem; color: #00838f; margin-bottom: 10px; text-align: center; }
+        .home-subtitle { font-size: 1.5rem; color: #546e7a; margin-bottom: 40px; text-align: center; }
+        
+        .menu-btn {
+            width: 80%; max-width: 400px; padding: 20px; font-size: 2rem; font-weight: bold;
+            border-radius: 15px; border: none; margin-bottom: 20px; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+        }
+        .btn-count { background-color: #ffca28; color: #f57f17; box-shadow: 0 6px 0 #f57f17; }
+        .btn-count:active { transform: translateY(6px); box-shadow: 0 0 0 #f57f17; }
+        .btn-shop { background-color: #4fc3f7; color: #0277bd; box-shadow: 0 6px 0 #0277bd; }
+        .btn-shop:active { transform: translateY(6px); box-shadow: 0 0 0 #0277bd; }
+
+        /* 遊戲主區塊 */
         #game-area {
             flex: 1 1 650px; background-color: #ffffff; border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 20px; box-sizing: border-box;
-            display: flex; flex-direction: column; align-items: center; position: relative;
+            display: none; flex-direction: column; align-items: center; position: relative;
         }
 
-        .mode-switch {
-            display: flex; gap: 10px; margin-bottom: 20px; width: 100%; justify-content: center;
+        /* 頂部導覽列 */
+        .top-nav {
+            width: 100%; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; border-bottom: 3px solid #eeeeee; padding-bottom: 10px;
         }
-        .mode-btn {
-            padding: 12px 25px; font-size: 1.5rem; font-weight: bold; border-radius: 12px;
-            border: 3px solid #b0bec5; background-color: #eceff1; cursor: pointer; color: #546e7a;
+        .btn-home {
+            background-color: #eceff1; border: 3px solid #b0bec5; padding: 8px 15px;
+            border-radius: 10px; font-size: 1.2rem; font-weight: bold; color: #546e7a; cursor: pointer;
         }
-        .mode-btn.active { background-color: #4fc3f7; border-color: #0288d1; color: white; }
+        .btn-home:active { background-color: #cfd8dc; }
+        .progress-text { font-size: 1.5rem; font-weight: bold; color: #ff9800; }
 
         .question-title { font-size: 1.8rem; font-weight: bold; color: #37474f; margin-bottom: 15px; text-align: center; }
 
-        /* ================= 模式一：認識錢幣 ================= */
-        #money-display {
-            width: 250px; height: 160px; display: flex; justify-content: center; align-items: center;
-            background-color: #fff8e1; border: 4px dashed #ffc107; border-radius: 15px; margin-bottom: 20px; padding: 10px;
-        }
-        .money-img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); }
+        /* ================= 模式一：錢幣數數 ================= */
+        #counting-display { display: none; flex-direction: column; width: 100%; align-items: center; margin-bottom: 15px; }
         
-        .options-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; }
-        .opt-btn {
-            padding: 15px; font-size: 1.8rem; font-weight: bold; border-radius: 12px;
-            border: 3px solid #81c784; background-color: #e8f5e9; color: #2e7d32; cursor: pointer;
+        #coins-container {
+            width: 100%; min-height: 200px; background-color: #fff8e1; border: 4px dashed #ffc107;
+            border-radius: 15px; padding: 20px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; box-sizing: border-box;
         }
-        .opt-btn:active { background-color: #c8e6c9; }
+        .money-item { filter: drop-shadow(2px 4px 4px rgba(0,0,0,0.2)); }
+        .money-item.bill { height: 70px; }
+        .money-item.coin { height: 60px; }
+        .coin-plus { font-size: 2.5rem; font-weight: bold; color: #78909c; display: flex; align-items: center; justify-content: center; }
 
-        /* ================= 模式二：視覺化算式面板 ================= */
-        #shopping-display { display: none; flex-direction: column; width: 100%; align-items: center; gap: 15px; }
+        .answer-area {
+            background-color: #e3f2fd; border: 4px solid #90caf9; border-radius: 15px;
+            padding: 15px 30px; display: flex; align-items: center; gap: 15px; width: 100%; box-sizing: border-box; justify-content: center;
+        }
+
+        /* ================= 模式二：飲料店 (情境互動) ================= */
+        #shopping-display { display: none; flex-direction: column; width: 100%; align-items: center; gap: 15px; margin-bottom: 15px; }
         
+        /* 語文溝通區塊：老闆對話 */
+        .boss-dialog-area {
+            display: flex; align-items: flex-end; gap: 15px; width: 100%; margin-bottom: 10px;
+        }
+        .boss-avatar {
+            font-size: 3.5rem; background-color: #f1f8e9; border: 3px solid #81c784;
+            border-radius: 50%; padding: 10px; position: relative;
+        }
+        .boss-label {
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            background: #388e3c; color: white; font-size: 0.9rem; font-weight: bold; padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+        }
+        .speech-bubble {
+            position: relative; background: #e3f2fd; border-radius: 15px; padding: 15px 20px;
+            font-size: 1.5rem; font-weight: bold; color: #1565c0; border: 3px solid #90caf9; flex: 1;
+        }
+        .speech-bubble::before {
+            content: ''; position: absolute; left: -15px; bottom: 20px;
+            border-width: 10px 15px 10px 0; border-style: solid; border-color: transparent #90caf9 transparent transparent;
+        }
+        .speech-bubble::after {
+            content: ''; position: absolute; left: -10px; bottom: 23px;
+            border-width: 7px 11px 7px 0; border-style: solid; border-color: transparent #e3f2fd transparent transparent;
+        }
+
+        /* 飲料菜單區塊 */
+        .drink-menu { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; width: 100%; }
+        .drink-item {
+            background: #fff; border: 3px solid #ffb74d; border-radius: 10px; padding: 10px;
+            text-align: center; cursor: pointer; width: 85px; transition: 0.1s;
+        }
+        .drink-item:active { background: #ffe0b2; transform: scale(0.95); }
+        .drink-emoji { font-size: 3.5rem; line-height: 1; }
+        .drink-name { font-size: 1rem; font-weight: bold; color: #e65100; margin-top: 5px; }
+        .drink-price { font-size: 1.1rem; font-weight: bold; color: #d81b60; background: #fce4ec; border-radius: 5px; margin-top: 5px; }
+
+        /* 托盤與計算區塊 */
+        .tray-container { width: 100%; position: relative; margin-bottom: 5px; }
+        .tray-title { font-weight: bold; color: #546e7a; margin-bottom: 5px; font-size: 1.2rem; }
+        .tray-area {
+            background: #efebe9; border: 4px dashed #bcaaa4; border-radius: 15px; min-height: 110px;
+            display: flex; gap: 15px; justify-content: center; align-items: center; padding: 15px; flex-wrap: wrap;
+        }
+        .btn-clear-tray {
+            position: absolute; top: 0; right: 0; background: #cfd8dc; border: 2px solid #90a4ae;
+            padding: 5px 10px; border-radius: 8px; font-weight: bold; color: #455a64; cursor: pointer;
+        }
+        .tray-item { font-size: 3.5rem; position: relative; }
+        .tray-price {
+            position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%);
+            background: #d81b60; color: #fff; font-size: 1rem; padding: 2px 6px; border-radius: 5px; font-weight: bold; white-space: nowrap;
+        }
+        .tray-math-sign { font-size: 2.5rem; font-weight: bold; color: #78909c; }
+
+        .calc-action-area {
+            background-color: #fff9c4; border: 4px solid #fbc02d; border-radius: 15px;
+            padding: 15px; display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%; box-sizing: border-box;
+        }
+        .action-title { font-size: 1.5rem; font-weight: bold; color: #f57f17; }
+
+        /* 付款與找零算式面板 */
         .equation-board {
             display: flex; width: 100%; justify-content: space-between; align-items: center;
             background-color: #f5f5f5; border-radius: 15px; padding: 15px; box-sizing: border-box; gap: 10px;
         }
-
         .eq-box {
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
             border-radius: 15px; padding: 15px; flex: 1; height: 220px; box-sizing: border-box; text-align: center;
         }
         .box-title { font-size: 1.4rem; font-weight: bold; padding: 5px 10px; border-radius: 20px; margin-bottom: 10px; color: white; width: 100%; box-sizing: border-box;}
         
-        /* 1. 給老闆的錢 */
         .eq-pay { background-color: #e3f2fd; border: 4px solid #90caf9; }
         .eq-pay .box-title { background-color: #1976d2; }
         .pay-img { height: 75px; max-width: 120px; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); margin: auto 0;}
         .pay-text { font-size: 1.5rem; font-weight: bold; color: #1565c0; margin-top: 10px;}
 
-        /* 2. & 4. 運算符號 */
         .eq-sign { font-size: 3rem; font-weight: bold; color: #546e7a; display: flex; align-items: center; justify-content: center; width: 40px; }
 
-        /* 3. 商品價格 (扣除) */
         .eq-item { background-color: #fce4ec; border: 4px solid #f48fb1; }
         .eq-item .box-title { background-color: #d81b60; }
-        .item-emoji { font-size: 4.5rem; margin: auto 0; }
-        .item-price-tag { background-color: #c2185b; color: white; padding: 5px 12px; border-radius: 8px; font-size: 1.4rem; font-weight: bold; margin-top: 10px; }
-
-        /* 5. 找零 (答案) */
+        
         .eq-change { background-color: #f1f8e9; border: 4px dashed #81c784; }
         .eq-change .box-title { background-color: #388e3c; }
-        #answer-input {
+        
+        /* 共用輸入與按鈕 */
+        .game-input {
             width: 100%; max-width: 120px; font-size: 2.5rem; text-align: center; font-weight: bold;
             padding: 10px; border: 4px solid #4caf50; border-radius: 12px; color: #2e7d32; margin: auto 0; box-sizing: border-box;
         }
-        #submit-btn {
-            width: 100%; padding: 12px 0; font-size: 1.5rem; font-weight: bold;
+        .submit-btn {
+            width: auto; padding: 12px 25px; font-size: 1.5rem; font-weight: bold;
             background-color: #4caf50; color: white; border: none; border-radius: 10px; cursor: pointer;
-            box-shadow: 0 4px 0 #388e3c; margin-top: 10px;
+            box-shadow: 0 4px 0 #388e3c;
         }
-        #submit-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #388e3c; }
+        .submit-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #388e3c; }
 
-        /* 算式文字雙重提示 */
         .formula-hint {
             background-color: #fff9c4; color: #f57f17; padding: 8px 25px;
             border-radius: 12px; font-size: 1.8rem; font-weight: bold;
-            border: 3px dashed #fbc02d; text-align: center; width: 100%; box-sizing: border-box;
+            border: 3px dashed #fbc02d; text-align: center; width: 100%; box-sizing: border-box; margin-top: 10px;
         }
 
         /* ================= 右側計算機區塊 ================= */
         #calc-area {
             flex: 0 0 300px; background-color: #37474f; border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 20px; box-sizing: border-box;
+            display: none;
         }
         .calc-title { color: white; text-align: center; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
         #calc-screen {
@@ -137,54 +219,84 @@
 <body>
 
     <div id="app-container">
+        <!-- 首頁區塊 -->
+        <div id="home-screen">
+            <h1 class="home-title">🏪 小當家生活商店</h1>
+            <div class="home-subtitle">請選擇今天要練習的遊戲</div>
+            <button class="menu-btn btn-count" onclick="startGame(1)">🪙 1. 錢幣數一數 (加法)</button>
+            <button class="menu-btn btn-shop" onclick="startGame(2)">🥤 2. 買飲料練習 (買賣溝通)</button>
+        </div>
+
         <!-- 遊戲主區塊 -->
         <div id="game-area">
-            <div class="mode-switch">
-                <button class="mode-btn active" id="btn-mode1" onclick="switchMode(1)">1. 認識錢幣</button>
-                <button class="mode-btn" id="btn-mode2" onclick="switchMode(2)">2. 購物找零</button>
+            <div class="top-nav">
+                <button class="btn-home" onclick="goHome()">🏠 回主頁</button>
+                <div class="progress-text" id="progress-indicator"></div>
             </div>
 
-            <!-- 模式一：認識錢幣 -->
-            <div id="mode1-container" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
-                <div class="question-title">讀一讀，看一看，這是多少錢？</div>
-                <div id="money-display"></div>
-                <div class="options-grid" id="options-area"></div>
+            <!-- 模式一：錢幣數數 -->
+            <div id="counting-display">
+                <div class="question-title">加一加，這裡總共有多少錢？</div>
+                <div id="coins-container"></div>
+                <div id="count-formula-hint" class="formula-hint">💡 算式小提示：</div>
+                <div class="answer-area" style="margin-top: 15px;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #1565c0;">總共：</span>
+                    <input type="number" id="count-input" class="game-input" placeholder="?" min="0" style="max-width: 150px;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #1565c0;">元</span>
+                    <button class="submit-btn" style="margin-left: 20px;" onclick="checkCountingAnswer()">確定</button>
+                </div>
             </div>
 
-            <!-- 模式二：視覺化算式面板 -->
+            <!-- 模式二：飲料店 (情境互動) -->
             <div id="shopping-display">
-                
-                <div class="equation-board">
-                    <!-- 1. 被減數 (給老闆的錢) -->
-                    <div class="eq-box eq-pay">
-                        <div class="box-title">給老闆的錢</div>
-                        <img src="" id="shop-pay-img" class="pay-img">
-                        <div class="pay-text" id="shop-pay-text">50 元</div>
+                <!-- 語文溝通區塊 -->
+                <div class="boss-dialog-area">
+                    <div class="boss-avatar">👨‍💼<div class="boss-label">老闆</div></div>
+                    <div class="speech-bubble" id="boss-speech">歡迎光臨，請問你要買什麼飲料？</div>
+                </div>
+
+                <!-- 階段一：選飲料與結算 -->
+                <div id="drink-phase-1" style="width: 100%;">
+                    <div class="drink-menu" id="drink-menu"></div>
+                    <div class="tray-container">
+                        <div class="tray-title">👉 你點的飲料 (最多3杯)：</div>
+                        <button onclick="clearDrinks()" class="btn-clear-tray">🗑️ 清除重選</button>
+                        <div class="tray-area" id="drink-tray"></div>
                     </div>
+                    
+                    <div id="phase1-formula-hint" class="formula-hint" style="margin-bottom: 15px; display: none;">💡 算式小提示：</div>
 
-                    <!-- 2. 減號 -->
-                    <div class="eq-sign">➖</div>
-
-                    <!-- 3. 減數 (商品價格) -->
-                    <div class="eq-box eq-item">
-                        <div class="box-title">買商品的錢</div>
-                        <div class="item-emoji" id="shop-item-icon">🍎</div>
-                        <div class="item-price-tag">扣掉 <span id="shop-item-price">35</span> 元</div>
-                    </div>
-
-                    <!-- 4. 等號 -->
-                    <div class="eq-sign">🟰</div>
-
-                    <!-- 5. 差 (找零) -->
-                    <div class="eq-box eq-change">
-                        <div class="box-title">找回的零錢</div>
-                        <input type="number" id="answer-input" placeholder="?" min="0">
-                        <button id="submit-btn" onclick="checkShoppingAnswer()">確定</button>
+                    <div class="calc-action-area">
+                        <div class="action-title">飲料總共多少錢？</div>
+                        <input type="number" id="drink-total-input" class="game-input" placeholder="?" style="width: 120px;">
+                        <span style="font-size: 1.5rem; font-weight: bold; color: #f57f17;">元</span>
+                        <button class="submit-btn" onclick="checkDrinkTotal()">老闆，算好了！</button>
                     </div>
                 </div>
 
-                <!-- 算式文字雙重提示 -->
-                <div id="formula-hint" class="formula-hint">💡 算式小提示：50 - 35 = ?</div>
+                <!-- 階段二：付款與找零 -->
+                <div id="drink-phase-2" style="width: 100%; display: none;">
+                    <div class="equation-board">
+                        <div class="eq-box eq-pay">
+                            <div class="box-title">給老闆的錢</div>
+                            <img src="" id="drink-pay-img" class="pay-img">
+                            <div class="pay-text" id="display-drink-paid-text">100 元</div>
+                        </div>
+                        <div class="eq-sign">➖</div>
+                        <div class="eq-box eq-item">
+                            <div class="box-title">飲料總金額</div>
+                            <div style="font-size:4rem; margin:auto 0;">🥤</div>
+                            <div class="pay-text" id="display-drink-total-text" style="color:#d81b60; margin-top:0;">65 元</div>
+                        </div>
+                        <div class="eq-sign">🟰</div>
+                        <div class="eq-box eq-change">
+                            <div class="box-title">找回的零錢</div>
+                            <input type="number" id="drink-change-input" class="game-input" placeholder="?" style="margin-bottom: 10px; width: 100%;">
+                            <button class="submit-btn" style="width: 100%; padding: 10px;" onclick="checkDrinkChange()">確認</button>
+                        </div>
+                    </div>
+                    <div id="drink-formula-hint" class="formula-hint" style="margin-top: 15px;">💡 算式小提示：</div>
+                </div>
             </div>
 
             <div id="feedback-overlay"></div>
@@ -199,22 +311,18 @@
                 <button class="calc-btn op" onclick="calcInput('(')">(</button>
                 <button class="calc-btn op" onclick="calcInput(')')">)</button>
                 <button class="calc-btn op" onclick="calcInput('/')">÷</button>
-                
                 <button class="calc-btn" onclick="calcInput('7')">7</button>
                 <button class="calc-btn" onclick="calcInput('8')">8</button>
                 <button class="calc-btn" onclick="calcInput('9')">9</button>
                 <button class="calc-btn op" onclick="calcInput('*')">×</button>
-                
                 <button class="calc-btn" onclick="calcInput('4')">4</button>
                 <button class="calc-btn" onclick="calcInput('5')">5</button>
                 <button class="calc-btn" onclick="calcInput('6')">6</button>
                 <button class="calc-btn op" onclick="calcInput('-')">-</button>
-                
                 <button class="calc-btn" onclick="calcInput('1')">1</button>
                 <button class="calc-btn" onclick="calcInput('2')">2</button>
                 <button class="calc-btn" onclick="calcInput('3')">3</button>
                 <button class="calc-btn op" onclick="calcInput('+')">+</button>
-                
                 <button class="calc-btn zero" onclick="calcInput('0')">0</button>
                 <button class="calc-btn" onclick="calcInput('.')">.</button>
                 <button class="calc-btn op" onclick="calcInput('=')">=</button>
@@ -222,158 +330,362 @@
         </div>
     </div>
 
+    <!-- 為了提高舊設備相容性，這裡已全面轉換為傳統 ES5 語法 -->
     <script>
-        // ==========================================
-        // 內嵌式錢幣影像資料庫 (Base64 SVG Data)
-        // ==========================================
-        const svg1 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>1</text></svg>";
-        const svg5 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>5</text></svg>";
-        const svg10 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>10</text></svg>";
-        const svg50 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ffca28' stroke='%23ff8f00' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23e65100'>50</text></svg>";
-        const svg100 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23ffcdd2' stroke='%23e53935' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23c62828'>100</text></svg>";
-        const svg500 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23d7ccc8' stroke='%23795548' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%235d4037'>500</text></svg>";
-        const svg1000 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23bbdefb' stroke='%231e88e5' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%231565c0'>1000</text></svg>";
+        var svg1 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>1</text></svg>";
+        var svg5 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>5</text></svg>";
+        var svg10 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>10</text></svg>";
+        var svg50 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23ffca28' stroke='%23ff8f00' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23e65100'>50</text></svg>";
+        var svg100 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23ffcdd2' stroke='%23e53935' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23c62828'>100</text></svg>";
+        var svg200 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23c8e6c9' stroke='%23388e3c' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%232e7d32'>200</text></svg>";
+        var svg500 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23d7ccc8' stroke='%23795548' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%235d4037'>500</text></svg>";
+        var svg1000 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><rect x='5' y='5' width='190' height='90' rx='10' fill='%23bbdefb' stroke='%231e88e5' stroke-width='4'/><text x='100' y='65' font-size='45' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%231565c0'>1000</text></svg>";
 
-        const moneyBank = [
-            { img: svg1, value: 1, text: "1 元" },
-            { img: svg5, value: 5, text: "5 元" },
-            { img: svg10, value: 10, text: "10 元" },
-            { img: svg50, value: 50, text: "50 元" },
-            { img: svg100, value: 100, text: "100 元" },
-            { img: svg500, value: 500, text: "500 元" },
-            { img: svg1000, value: 1000, text: "1000 元" }
+        var moneyBank = [
+            { img: svg1, value: 1, type: 'coin' },
+            { img: svg5, value: 5, type: 'coin' },
+            { img: svg10, value: 10, type: 'coin' },
+            { img: svg50, value: 50, type: 'coin' },
+            { img: svg100, value: 100, type: 'bill' },
+            { img: svg200, value: 200, type: 'bill' },
+            { img: svg500, value: 500, type: 'bill' },
+            { img: svg1000, value: 1000, type: 'bill' }
         ];
 
-        // 購物車商品清單 (視覺化)
-        const shopItems = ["🍎", "🍔", "🧸", "🚗", "👟", "📚", "🍰", "🧃", "🍫", "🍩"];
+        var allDrinks = [
+            { name: "珍珠奶茶", emoji: "🧋", price: 50 },
+            { name: "紅茶", emoji: "🫖", price: 30 },
+            { name: "綠茶", emoji: "🍵", price: 30 },
+            { name: "果汁", emoji: "🧃", price: 40 },
+            { name: "牛奶", emoji: "🥛", price: 35 },
+            { name: "可樂", emoji: "🥤", price: 25 },
+            { name: "咖啡", emoji: "☕", price: 60 },
+            { name: "檸檬茶", emoji: "🍋", price: 45 },
+            { name: "冰沙", emoji: "🍧", price: 55 },
+            { name: "礦泉水", emoji: "💧", price: 20 },
+            { name: "熱可可", emoji: "☕", price: 55 },
+            { name: "葡萄汁", emoji: "🍇", price: 45 }
+        ];
 
-        let currentMoney = null;
-        let shoppingExpectedChange = 0;
-        let currentMode = 1;
+        var currentMode = 0;
+        var gameProgress = 0;
+        var MAX_ROUNDS = 30;
+        
+        var countingExpectedSum = 0;
+        var currentMenu = [];
+        var chosenDrinks = [];
+        var drinkTotalAmount = 0;
+        var currentPaid = 0;
+        var expectedChange = 0;
 
-        const mode1Container = document.getElementById('mode1-container');
-        const mode2Container = document.getElementById('shopping-display');
-        const feedbackOverlay = document.getElementById('feedback-overlay');
+        var ttsUtterance = null;
 
-        function switchMode(mode) {
+        function speakText(text, callback) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                ttsUtterance = new SpeechSynthesisUtterance(text);
+                ttsUtterance.lang = 'zh-TW';
+                ttsUtterance.rate = 0.8;
+                if(callback) { ttsUtterance.onend = callback; }
+                window.speechSynthesis.speak(ttsUtterance);
+            } else {
+                if(callback) callback();
+            }
+        }
+
+        function setBossDialogue(text, useTTS, callback) {
+            document.getElementById('boss-speech').innerText = text;
+            if(useTTS) {
+                speakText(text, callback);
+            } else {
+                if(callback) callback();
+            }
+        }
+
+        function goHome() {
+            currentMode = 0;
+            document.getElementById('home-screen').style.display = 'flex';
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('calc-area').style.display = 'none';
+            try {
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+            } catch(e) {}
+        }
+
+        function startGame(mode) {
             currentMode = mode;
-            document.getElementById('btn-mode1').classList.toggle('active', mode === 1);
-            document.getElementById('btn-mode2').classList.toggle('active', mode === 2);
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('game-area').style.display = 'flex';
+            document.getElementById('calc-area').style.display = 'block';
+            gameProgress = 1;
             
             if (mode === 1) {
-                mode1Container.style.display = 'flex';
-                mode2Container.style.display = 'none';
-                loadMoneyQuestion();
+                document.getElementById('counting-display').style.display = 'flex';
+                document.getElementById('shopping-display').style.display = 'none';
+                loadCountingQuestion();
             } else {
-                mode1Container.style.display = 'none';
-                mode2Container.style.display = 'flex';
-                loadShoppingQuestion();
+                document.getElementById('counting-display').style.display = 'none';
+                document.getElementById('shopping-display').style.display = 'flex';
+                startDrinkShopRound();
             }
+            calcInput('C');
+            
+            try {
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+                }
+            } catch(e) {}
         }
 
-        // --- 模式一邏輯 ---
-        function loadMoneyQuestion() {
-            currentMoney = moneyBank[Math.floor(Math.random() * moneyBank.length)];
-            
-            document.getElementById('money-display').innerHTML = `<img src="${currentMoney.img}" class="money-img">`;
-            
-            let options = [currentMoney];
-            while (options.length < 4) {
-                let randomOpt = moneyBank[Math.floor(Math.random() * moneyBank.length)];
-                if (!options.includes(randomOpt)) options.push(randomOpt);
-            }
-            options.sort(() => Math.random() - 0.5);
-
-            const optionsArea = document.getElementById('options-area');
-            optionsArea.innerHTML = '';
-            options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'opt-btn';
-                btn.innerText = opt.text;
-                btn.onclick = () => checkMoneyAnswer(opt.value, btn);
-                optionsArea.appendChild(btn);
-            });
+        function showSuccess(msg) {
+            var overlay = document.getElementById('feedback-overlay');
+            overlay.style.display = 'flex';
+            overlay.innerHTML = '<div>✅</div><div style="font-size: 3rem; text-align: center;">' + msg + '</div>';
+            setTimeout(function() { overlay.style.display = 'none'; }, 1500);
         }
 
-        function checkMoneyAnswer(selectedValue, btnElement) {
-            if (selectedValue === currentMoney.value) {
-                showSuccess();
-                setTimeout(loadMoneyQuestion, 1500);
+        function triggerShake(elementId) {
+            var el = document.getElementById(elementId);
+            el.classList.add('shake');
+            setTimeout(function() {
+                el.classList.remove('shake');
+                el.value = '';
+                el.focus();
+            }, 400);
+        }
+
+        function loadCountingQuestion() {
+            if (gameProgress > MAX_ROUNDS) {
+                alert("🎉 太棒了！30題全部完成了！");
+                goHome(); 
+                return;
+            }
+            document.getElementById('progress-indicator').innerText = "目前進度: " + gameProgress + " / " + MAX_ROUNDS + " 題";
+            document.getElementById('count-input').value = '';
+            
+            countingExpectedSum = Math.floor(Math.random() * 200) + 1;
+            
+            var remaining = countingExpectedSum;
+            var coinMix = [];
+            var denoms = [100, 50, 10, 5, 1];
+            
+            for (var d_i = 0; d_i < denoms.length; d_i++) {
+                var d = denoms[d_i];
+                var count = Math.floor(remaining / d);
+                if (count > 0) {
+                    for (var i = 0; i < count; i++) {
+                        for (var k = 0; k < moneyBank.length; k++) {
+                            if (moneyBank[k].value === d) {
+                                coinMix.push(moneyBank[k]);
+                                break;
+                            }
+                        }
+                    }
+                    remaining -= count * d;
+                }
+            }
+            
+            coinMix.sort(function() { return Math.random() - 0.5; });
+
+            var container = document.getElementById('coins-container');
+            container.innerHTML = '';
+            var formulaValues = [];
+
+            for (var j = 0; j < coinMix.length; j++) {
+                var item = coinMix[j];
+                var img = document.createElement('img');
+                img.src = item.img;
+                img.className = "money-item " + item.type;
+                container.appendChild(img);
+                formulaValues.push(item.value);
+
+                if (j < coinMix.length - 1) {
+                    var plusSign = document.createElement('div');
+                    plusSign.className = 'coin-plus'; 
+                    plusSign.innerText = '+';
+                    container.appendChild(plusSign);
+                }
+            }
+            document.getElementById('count-formula-hint').innerText = "💡 算式小提示：" + formulaValues.join(' + ') + " = ?";
+        }
+
+        function checkCountingAnswer() {
+            if (parseInt(document.getElementById('count-input').value) === countingExpectedSum) {
+                showSuccess("算對了！");
+                gameProgress++;
+                setTimeout(loadCountingQuestion, 1500);
             } else {
-                btnElement.classList.add('shake');
-                btnElement.style.borderColor = "#e53935";
-                btnElement.style.backgroundColor = "#ffcdd2";
-                setTimeout(() => {
-                    btnElement.classList.remove('shake');
-                    btnElement.style.borderColor = "#81c784";
-                    btnElement.style.backgroundColor = "#e8f5e9";
-                }, 400);
+                triggerShake('count-input');
             }
         }
 
-        // --- 模式二邏輯 (視覺化算式面板) ---
-        function loadShoppingQuestion() {
-            // 決定要付多少錢 (只選 10, 50, 100, 500, 1000 的其中一個)
-            const paymentsData = moneyBank.filter(m => m.value >= 10);
-            let payData = paymentsData[Math.floor(Math.random() * paymentsData.length)]; 
+        function startDrinkShopRound() {
+            if (gameProgress > MAX_ROUNDS) {
+                setBossDialogue("太棒了，30次練習都完成了！下班囉！", true, goHome);
+                return;
+            }
+            document.getElementById('progress-indicator').innerText = "買飲料進度: " + gameProgress + " / " + MAX_ROUNDS + " 次";
             
-            // 價格比付款少
-            let price = Math.floor(Math.random() * (payData.value - 1)) + 1; 
-            shoppingExpectedChange = payData.value - price;
-
-            // 隨機選一個商品圖示
-            let randomEmoji = shopItems[Math.floor(Math.random() * shopItems.length)];
-
-            // 更新算式版：被減數 (給老闆的錢)
-            document.getElementById('shop-pay-img').src = payData.img;
-            document.getElementById('shop-pay-text').innerText = `${payData.value} 元`;
-
-            // 更新算式版：減數 (商品)
-            document.getElementById('shop-item-icon').innerText = randomEmoji;
-            document.getElementById('shop-item-price').innerText = price;
-
-            // 更新下方文字雙重提示
-            document.getElementById('formula-hint').innerText = `💡 算式小提示： ${payData.value} - ${price} = ?`;
-
-            document.getElementById('answer-input').value = '';
-            document.getElementById('answer-input').focus();
+            chosenDrinks = [];
+            drinkTotalAmount = 0;
+            document.getElementById('drink-total-input').value = '';
+            document.getElementById('drink-change-input').value = '';
+            document.getElementById('drink-phase-1').style.display = 'block';
+            document.getElementById('drink-phase-2').style.display = 'none';
+            
+            var shuffled = allDrinks.slice().sort(function() { return Math.random() - 0.5; });
+            currentMenu = shuffled.slice(0, 5);
+            
+            var menuArea = document.getElementById('drink-menu');
+            menuArea.innerHTML = '';
+            
+            for (var i = 0; i < currentMenu.length; i++) {
+                (function(index) {
+                    var drink = currentMenu[index];
+                    var btn = document.createElement('div');
+                    btn.className = 'drink-item';
+                    btn.innerHTML = '<div class="drink-emoji">' + drink.emoji + '</div>' +
+                                    '<div class="drink-name">' + drink.name + '</div>' +
+                                    '<div class="drink-price">' + drink.price + ' 元</div>';
+                    btn.onclick = function() { selectDrink(index); };
+                    menuArea.appendChild(btn);
+                })(i);
+            }
+            
+            renderTray();
+            setBossDialogue("歡迎光臨，請問你要買什麼飲料？", true);
         }
 
-        function checkShoppingAnswer() {
-            const playerInput = parseInt(document.getElementById('answer-input').value);
-            if (playerInput === shoppingExpectedChange) {
-                showSuccess();
-                setTimeout(loadShoppingQuestion, 1500);
+        function selectDrink(index) {
+            if (chosenDrinks.length >= 3) {
+                setBossDialogue("最多只能選三杯喔！", true);
+                return;
+            }
+            var drink = currentMenu[index];
+            chosenDrinks.push(drink);
+            drinkTotalAmount += drink.price;
+            
+            speakText(drink.name);
+            renderTray();
+        }
+
+        function clearDrinks() {
+            chosenDrinks = [];
+            drinkTotalAmount = 0;
+            renderTray();
+            setBossDialogue("重新為您點餐，請問需要什麼？", true);
+        }
+
+        function renderTray() {
+            var tray = document.getElementById('drink-tray');
+            var hint = document.getElementById('phase1-formula-hint');
+            tray.innerHTML = '';
+            
+            if (chosenDrinks.length === 0) {
+                tray.innerHTML = '<span style="color: #90a4ae; font-weight: bold; font-size: 1.2rem;">(請點擊上方的飲料)</span>';
+                hint.style.display = 'none';
+                return;
+            }
+
+            hint.style.display = 'block';
+            var formulaValues = [];
+
+            for (var i = 0; i < chosenDrinks.length; i++) {
+                var drink = chosenDrinks[i];
+                var div = document.createElement('div');
+                div.className = 'tray-item';
+                div.innerHTML = drink.emoji + '<div class="tray-price">' + drink.price + '</div>';
+                tray.appendChild(div);
+                
+                formulaValues.push(drink.price);
+
+                if (i < chosenDrinks.length - 1) {
+                    var plusSign = document.createElement('div');
+                    plusSign.className = 'tray-math-sign';
+                    plusSign.innerText = '➕';
+                    tray.appendChild(plusSign);
+                }
+            }
+            
+            var eqSign = document.createElement('div');
+            eqSign.className = 'tray-math-sign';
+            eqSign.innerText = '🟰';
+            tray.appendChild(eqSign);
+
+            hint.innerText = "💡 算式小提示：" + formulaValues.join(' + ') + " = ?";
+        }
+
+        function checkDrinkTotal() {
+            if (chosenDrinks.length === 0) {
+                setBossDialogue("你還沒有點飲料喔！", true);
+                return;
+            }
+            var input = parseInt(document.getElementById('drink-total-input').value);
+            if (input === drinkTotalAmount) {
+                setBossDialogue("好的，飲料總共是 " + drinkTotalAmount + " 元。", true, function() {
+                    setTimeout(startPaymentPhase, 500); 
+                });
             } else {
-                const inputEl = document.getElementById('answer-input');
-                inputEl.classList.add('shake');
-                setTimeout(() => {
-                    inputEl.classList.remove('shake');
-                    inputEl.value = '';
-                    inputEl.focus();
-                }, 400);
+                setBossDialogue("算錯了，請再加加看喔！", true);
+                triggerShake('drink-total-input');
             }
         }
 
-        function showSuccess() {
-            feedbackOverlay.style.display = 'flex';
-            feedbackOverlay.innerHTML = '<div>✅</div><div style="font-size: 3rem;">答對了！</div>';
-            setTimeout(() => { feedbackOverlay.style.display = 'none'; }, 1500);
+        function startPaymentPhase() {
+            document.getElementById('drink-phase-1').style.display = 'none';
+            document.getElementById('drink-phase-2').style.display = 'block';
+            
+            var bills = [
+                { v: 100, img: svg100 },
+                { v: 200, img: svg200 },
+                { v: 500, img: svg500 }
+            ];
+            
+            var validBills = [];
+            for (var i = 0; i < bills.length; i++) {
+                if (bills[i].v >= drinkTotalAmount) {
+                    validBills.push(bills[i]);
+                }
+            }
+            
+            var chosenBill = validBills[Math.floor(Math.random() * validBills.length)];
+            
+            currentPaid = chosenBill.v;
+            expectedChange = currentPaid - drinkTotalAmount;
+            
+            document.getElementById('drink-pay-img').src = chosenBill.img;
+            document.getElementById('display-drink-paid-text').innerText = currentPaid + " 元";
+            document.getElementById('display-drink-total-text').innerText = drinkTotalAmount + " 元";
+            document.getElementById('drink-formula-hint').innerText = "💡 算式小提示：" + currentPaid + " - " + drinkTotalAmount + " = ?";
+            document.getElementById('drink-change-input').value = '';
+            
+            setBossDialogue("系統指定付 " + currentPaid + " 元，請問老闆要找多少錢？", true);
         }
 
-        // ==========================================
-        // 簡易計算機邏輯
-        // ==========================================
-        let calcString = "";
-        const calcScreen = document.getElementById('calc-screen');
+        function checkDrinkChange() {
+            var input = parseInt(document.getElementById('drink-change-input').value);
+            if (input === expectedChange) {
+                showSuccess("找對錢了！");
+                setBossDialogue("總共找您 " + expectedChange + " 元，謝謝光臨。", true, function() {
+                    gameProgress++;
+                    setTimeout(startDrinkShopRound, 1500);
+                });
+            } else {
+                setBossDialogue("找錯錢囉，再用計算機減減看！", true);
+                triggerShake('drink-change-input');
+            }
+        }
+
+        var calcString = "";
+        var calcScreen = document.getElementById('calc-screen');
 
         function calcInput(val) {
             if (val === 'C') {
                 calcString = ""; calcScreen.value = "0";
             } else if (val === '=') {
                 try {
-                    let evalString = calcString.replace(/×/g, '*').replace(/÷/g, '/');
-                    let result = eval(evalString);
+                    var evalString = calcString.replace(/×/g, '*').replace(/÷/g, '/');
+                    var result = eval(evalString);
                     calcString = result.toString();
                     calcScreen.value = calcString;
                 } catch (e) {
@@ -383,9 +695,6 @@
                 calcString += val; calcScreen.value = calcString;
             }
         }
-
-        // 啟動初始化
-        loadMoneyQuestion();
     </script>
 </body>
 </html>

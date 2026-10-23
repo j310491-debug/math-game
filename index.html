@@ -162,10 +162,11 @@
         .eq-change { background-color: #f1f8e9; border: 4px dashed #81c784; }
         .eq-change .box-title { background-color: #388e3c; }
         
-        /* 共用輸入與按鈕 */
+        /* 共用輸入與按鈕：已加入防點擊閃動的外觀 */
         .game-input {
             width: 100%; max-width: 120px; font-size: 2.5rem; text-align: center; font-weight: bold;
             padding: 10px; border: 4px solid #4caf50; border-radius: 12px; color: #2e7d32; margin: auto 0; box-sizing: border-box;
+            background-color: #ffffff; cursor: default;
         }
         .submit-btn {
             width: auto; padding: 12px 25px; font-size: 1.5rem; font-weight: bold;
@@ -241,7 +242,8 @@
                 <div id="count-formula-hint" class="formula-hint">💡 算式小提示：</div>
                 <div class="answer-area" style="margin-top: 15px;">
                     <span style="font-size: 1.5rem; font-weight: bold; color: #1565c0;">總共：</span>
-                    <input type="number" id="count-input" class="game-input" placeholder="?" min="0" style="max-width: 150px;">
+                    <!-- 加上 readonly 屬性，防阻虛擬鍵盤彈出 -->
+                    <input type="text" id="count-input" class="game-input" placeholder="?" style="max-width: 150px;" readonly>
                     <span style="font-size: 1.5rem; font-weight: bold; color: #1565c0;">元</span>
                     <button class="submit-btn" style="margin-left: 20px;" onclick="checkCountingAnswer()">確定</button>
                 </div>
@@ -268,7 +270,8 @@
 
                     <div class="calc-action-area">
                         <div class="action-title">飲料總共多少錢？</div>
-                        <input type="number" id="drink-total-input" class="game-input" placeholder="?" style="width: 120px;">
+                        <!-- 加上 readonly 屬性 -->
+                        <input type="text" id="drink-total-input" class="game-input" placeholder="?" style="width: 120px;" readonly>
                         <span style="font-size: 1.5rem; font-weight: bold; color: #f57f17;">元</span>
                         <button class="submit-btn" onclick="checkDrinkTotal()">老闆，算好了！</button>
                     </div>
@@ -291,7 +294,8 @@
                         <div class="eq-sign">🟰</div>
                         <div class="eq-box eq-change">
                             <div class="box-title">找回的零錢</div>
-                            <input type="number" id="drink-change-input" class="game-input" placeholder="?" style="margin-bottom: 10px; width: 100%;">
+                            <!-- 加上 readonly 屬性 -->
+                            <input type="text" id="drink-change-input" class="game-input" placeholder="?" style="margin-bottom: 10px; width: 100%;" readonly>
                             <button class="submit-btn" style="width: 100%; padding: 10px;" onclick="checkDrinkChange()">確認</button>
                         </div>
                     </div>
@@ -330,7 +334,7 @@
         </div>
     </div>
 
-    <!-- 為了提高舊設備相容性，這裡已全面轉換為傳統 ES5 語法 -->
+    <!-- 腳本區域 (已完整保留高相容性 ES5 寫法) -->
     <script>
         var svg1 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>1</text></svg>";
         var svg5 = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23e0e0e0' stroke='%239e9e9e' stroke-width='4'/><text x='50' y='65' font-size='40' font-family='sans-serif' font-weight='bold' text-anchor='middle' fill='%23424242'>5</text></svg>";
@@ -634,6 +638,7 @@
         function startPaymentPhase() {
             document.getElementById('drink-phase-1').style.display = 'none';
             document.getElementById('drink-phase-2').style.display = 'block';
+            calcInput('C'); // 進入下一階段時清空計算機
             
             var bills = [
                 { v: 100, img: svg100 },
@@ -676,23 +681,45 @@
             }
         }
 
+        /* ================= 核心更新：計算機連動輸入框 ================= */
         var calcString = "";
         var calcScreen = document.getElementById('calc-screen');
 
+        // 將計算機的值自動對應到畫面上正在操作的輸入框
+        function autoFillInputBox(valueStr) {
+            if (currentMode === 1) {
+                document.getElementById('count-input').value = valueStr;
+            } else if (currentMode === 2) {
+                if (document.getElementById('drink-phase-1').style.display === 'block') {
+                    document.getElementById('drink-total-input').value = valueStr;
+                } else if (document.getElementById('drink-phase-2').style.display === 'block') {
+                    document.getElementById('drink-change-input').value = valueStr;
+                }
+            }
+        }
+
         function calcInput(val) {
             if (val === 'C') {
-                calcString = ""; calcScreen.value = "0";
+                calcString = ""; 
+                calcScreen.value = "0";
+                autoFillInputBox(""); // 按C時連同輸入框一起清空
             } else if (val === '=') {
                 try {
                     var evalString = calcString.replace(/×/g, '*').replace(/÷/g, '/');
                     var result = eval(evalString);
                     calcString = result.toString();
                     calcScreen.value = calcString;
+                    
+                    // 當按下等號算出結果，自動把答案送到遊戲的輸入框中
+                    autoFillInputBox(calcString);
+                    
                 } catch (e) {
-                    calcScreen.value = "錯誤"; calcString = "";
+                    calcScreen.value = "錯誤"; 
+                    calcString = "";
                 }
             } else {
-                calcString += val; calcScreen.value = calcString;
+                calcString += val; 
+                calcScreen.value = calcString;
             }
         }
     </script>

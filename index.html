@@ -50,7 +50,6 @@
 <body class="bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 min-h-screen text-slate-800 font-sans p-2 sm:p-5 antialiased select-none">
   <div class="max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 relative">
 
-    <!-- Top Header -->
     <header class="bg-white/95 backdrop-blur-md rounded-2xl p-3.5 sm:p-4 shadow-md border border-indigo-100 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 to-sky-500 flex items-center justify-center text-2xl sm:text-3xl shadow-sm text-white">
@@ -71,7 +70,6 @@
         </div>
       </div>
 
-      <!-- Controls & Level Selector Bar -->
       <div class="flex items-center gap-2">
         <button id="guide-modal-btn" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition border border-indigo-200 shadow-xs">
           <span>📖</span>
@@ -86,9 +84,7 @@
       </div>
     </header>
 
-    <!-- Stage Chapters & Level Selector -->
     <nav class="bg-white/90 backdrop-blur rounded-2xl p-2.5 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-2">
-      <!-- Chapter Pills -->
       <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto custom-scrollbar pb-1 sm:pb-0">
         <button class="chap-tab-btn px-3 py-1.5 rounded-xl font-bold text-xs transition shrink-0 bg-indigo-600 text-white shadow-xs" data-chap="1">
           第一章：等量加減 (一階)
@@ -107,7 +103,6 @@
         </button>
       </div>
 
-      <!-- Quick Level Progress -->
       <div class="flex items-center gap-2 text-xs font-bold text-slate-600">
         <span>關卡進度：</span>
         <span id="level-indicator-badge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black">
@@ -116,16 +111,11 @@
       </div>
     </nav>
 
-    <!-- Main Game Grid: 12 Cols -->
     <main class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-      <!-- LEFT COLUMN: The Interactive Balance Scale & Equation Board (7 cols) -->
       <section class="lg:col-span-7 flex flex-col gap-3">
-
-        <!-- Balance Scale Display Card -->
         <div class="bg-white/95 rounded-2xl p-4 sm:p-5 shadow-md border border-slate-200 flex flex-col gap-3 relative overflow-hidden">
           
-          <!-- Current Equation Title -->
           <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div class="flex items-center gap-2">
               <span id="chap-tag" class="px-2.5 py-0.5 rounded-lg text-xs font-black bg-indigo-600 text-white">
@@ -144,7 +134,6 @@
             </div>
           </div>
 
-          <!-- Giant Current Equation Formula Display -->
           <div class="bg-gradient-to-r from-indigo-50/70 via-sky-50/50 to-emerald-50/70 rounded-2xl p-3 sm:p-4 border border-indigo-100 text-center flex flex-col items-center justify-center">
             <span class="text-xs font-bold text-slate-400 tracking-wider">方程式平衡狀態</span>
             <div id="current-equation-text" class="text-2xl sm:text-3xl font-black text-indigo-900 tracking-wide mt-1">
@@ -152,57 +141,43 @@
             </div>
           </div>
 
-          <!-- Dynamic SVG Balance Scale Stage -->
           <div class="relative w-full h-56 sm:h-64 bg-slate-50/80 rounded-2xl border border-slate-200/80 flex items-center justify-center overflow-hidden">
-            <!-- Balance Scale SVG -->
             <svg id="scale-svg" viewBox="0 0 300 220" class="w-full h-full drop-shadow-sm select-none">
-              <!-- Scale Base Pillar -->
               <polygon points="135,210 165,210 155,75 145,75" fill="#475569" />
               <rect x="110" y="205" width="80" height="12" rx="4" fill="#334155" />
               <circle cx="150" cy="72" r="7" fill="#F59E0B" stroke="#D97706" stroke-width="2" />
 
-              <!-- Beam (Rotates based on balance) -->
               <g id="scale-beam-group" class="transition-transform duration-500 ease-out">
-                <!-- Main Beam -->
                 <rect x="30" y="68" width="240" height="8" rx="4" fill="#F59E0B" stroke="#D97706" stroke-width="1.5" />
                 <circle cx="150" cy="72" r="3" fill="#FFFFFF" />
 
-                <!-- Left Suspension Ropes & Pan -->
                 <g id="left-pan-group">
                   <line x1="55" y1="72" x2="35" y2="135" stroke="#94A3B8" stroke-width="2" />
                   <line x1="55" y1="72" x2="75" y2="135" stroke="#94A3B8" stroke-width="2" />
-                  <!-- Left Pan Plate -->
                   <path d="M 25 135 Q 55 148 85 135 Z" fill="#64748B" stroke="#334155" stroke-width="1.5" />
-                  <!-- Container for Left Items (Injected by JS) -->
                   <g id="left-items-svg-container"></g>
                 </g>
 
-                <!-- Right Suspension Ropes & Pan -->
                 <g id="right-pan-group">
                   <line x1="245" y1="72" x2="225" y2="135" stroke="#94A3B8" stroke-width="2" />
                   <line x1="245" y1="72" x2="265" y2="135" stroke="#94A3B8" stroke-width="2" />
-                  <!-- Right Pan Plate -->
                   <path d="M 215 135 Q 245 148 275 135 Z" fill="#64748B" stroke="#334155" stroke-width="1.5" />
-                  <!-- Container for Right Items (Injected by JS) -->
                   <g id="right-items-svg-container"></g>
                 </g>
               </g>
 
-              <!-- Balanced Status Indicator Center Light -->
               <g id="balance-center-light">
                 <circle cx="150" cy="40" r="12" fill="#10B981" class="balanced-glow" />
                 <text x="150" y="44" font-size="10" font-weight="900" fill="#FFFFFF" text-anchor="middle">平衡</text>
               </g>
             </svg>
 
-            <!-- Solved Overlay Ribbon -->
             <div id="solved-badge" class="absolute top-3 right-3 px-3 py-1 rounded-xl bg-emerald-500 text-white font-black text-xs shadow-md border-2 border-white flex items-center gap-1.5 hidden pop-anim">
               <span>🎉</span>
               <span id="solved-badge-text">成功求出 x = 7！</span>
             </div>
           </div>
 
-          <!-- Step History Breadcrumb Trace -->
           <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 flex flex-col gap-1.5">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-slate-500 flex items-center gap-1">
@@ -213,19 +188,15 @@
                 ↺ 重設回最初題目
               </button>
             </div>
-            <div id="steps-history-list" class="flex flex-col gap-1 text-xs font-mono text-slate-700 max-h-24 overflow-y-auto custom-scrollbar">
-              <!-- Dynamically appended step traces -->
-            </div>
+            <div id="steps-history-list" class="flex flex-col gap-1 text-xs font-mono text-slate-700 max-h-24 overflow-y-auto custom-scrollbar"></div>
           </div>
 
         </div>
 
       </section>
 
-      <!-- RIGHT COLUMN: Axiom Operation Action Panel & Input Modes (5 cols) -->
       <section class="lg:col-span-5 flex flex-col gap-3">
 
-        <!-- Axiom Action Panel -->
         <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col gap-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center gap-1.5">
@@ -238,12 +209,8 @@
             </button>
           </div>
 
-          <!-- Mentor Suggestion Box -->
-          <div id="mentor-box" class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 leading-relaxed font-medium hidden">
-            <!-- Injected by JS -->
-          </div>
+          <div id="mentor-box" class="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 leading-relaxed font-medium hidden"></div>
 
-          <!-- Operation 1: Choose Property (Add, Subtract, Multiply, Divide) -->
           <div class="flex flex-col gap-1.5">
             <span class="text-xs font-bold text-slate-600">步驟 1：選擇要在天平兩邊同時執行的等量動作</span>
             <div class="grid grid-cols-4 gap-1.5">
@@ -266,7 +233,6 @@
             </div>
           </div>
 
-          <!-- Operation 2: Input Value / Terms -->
           <div class="flex flex-col gap-1.5">
             <span class="text-xs font-bold text-slate-600">步驟 2：輸入要同時加減乘除的數字或代數 (如 5 或 x)</span>
             <div class="flex items-center gap-2">
@@ -280,13 +246,9 @@
               </button>
             </div>
             
-            <!-- Quick Suggestion Buttons based on current equation -->
-            <div id="quick-terms-container" class="flex flex-wrap items-center gap-1.5 mt-1">
-              <!-- Quick pills injected by JS -->
-            </div>
+            <div id="quick-terms-container" class="flex flex-wrap items-center gap-1.5 mt-1"></div>
           </div>
 
-          <!-- Direct Input or Handwriting Canvas Mode Switch -->
           <div class="border-t border-slate-100 pt-2 flex flex-col gap-2">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-slate-600 flex items-center gap-1">
@@ -299,7 +261,6 @@
               </div>
             </div>
 
-            <!-- Direct Number Input Form -->
             <div id="direct-input-form" class="flex items-center gap-2">
               <div class="flex-1 flex items-center gap-1 bg-slate-50 rounded-xl border border-slate-300 px-3 py-1.5">
                 <span class="font-black text-indigo-600 text-sm">x =</span>
@@ -310,7 +271,6 @@
               </button>
             </div>
 
-            <!-- Handwriting Mode Canvas (Hidden by default) -->
             <div id="handwriting-panel" class="hidden flex-col gap-1.5">
               <div class="relative bg-slate-50 rounded-xl border-2 border-indigo-200 overflow-hidden shadow-inner">
                 <canvas id="handwriting-canvas" width="400" height="110" class="w-full h-24 bg-white cursor-crosshair"></canvas>
@@ -326,14 +286,12 @@
               </div>
             </div>
 
-            <!-- Feedback Alert Banner -->
             <div id="feedback-alert" class="text-center text-xs font-bold py-1.5 px-3 rounded-xl hidden transition-all duration-300"></div>
 
           </div>
 
         </div>
 
-        <!-- 18 Levels Grid Matrix Card -->
         <div class="bg-white/95 rounded-2xl p-4 shadow-md border border-slate-200 flex flex-col gap-2">
           <div class="flex items-center justify-between">
             <h4 class="font-bold text-xs sm:text-sm text-slate-700 flex items-center gap-1.5">
@@ -343,17 +301,13 @@
             <span id="cleared-count-text" class="text-xs font-black text-indigo-600">已過關：0 / 18</span>
           </div>
 
-          <!-- Levels Matrix -->
-          <div id="levels-matrix" class="grid grid-cols-6 gap-1.5">
-            <!-- Injected by JS -->
-          </div>
+          <div id="levels-matrix" class="grid grid-cols-6 gap-1.5"></div>
         </div>
 
       </section>
 
     </main>
 
-    <!-- Modal: Equation Rules Guide Reference -->
     <div id="guide-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
       <div class="bg-white rounded-3xl p-5 sm:p-6 max-w-lg w-full shadow-2xl border-2 border-slate-200 flex flex-col gap-3 relative max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -400,7 +354,6 @@
       </div>
     </div>
 
-    <!-- Celebration Modal: Level Complete -->
     <div id="celebrate-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border-4 border-emerald-300 text-center flex flex-col gap-2.5">
         <div class="text-5xl animate-bounce">🏆</div>
@@ -416,61 +369,48 @@
   </div>
 
   <script>
-    /* ====================================================================
-       18 關解一元一次方程式關卡資料庫
-       ==================================================================== */
     const LEVELS = [
-      // 第一章：等量加減法 (一步解)
       { id: 1, chap: 1, chapName: '第一章：等量加減', original: 'x + 5 = 12', ans: 7, leftText: 'x + 5', rightText: '12', xCoeffL: 1, constL: 5, xCoeffR: 0, constR: 12, hint: '左邊有多餘的 + 5，請在天平兩邊同時【－ 5】喔！', targetOp: 'sub', targetVal: '5' },
       { id: 2, chap: 1, chapName: '第一章：等量加減', original: 'x - 7 = 18', ans: 25, leftText: 'x - 7', rightText: '18', xCoeffL: 1, constL: -7, xCoeffR: 0, constR: 18, hint: '左邊有 - 7，請在天平兩邊同時【＋ 7】讓它抵消！', targetOp: 'add', targetVal: '7' },
       { id: 3, chap: 1, chapName: '第一章：等量加減', original: '14 + x = 32', ans: 18, leftText: 'x + 14', rightText: '32', xCoeffL: 1, constL: 14, xCoeffR: 0, constR: 32, hint: '左邊有 + 14，請在兩邊同時【－ 14】！', targetOp: 'sub', targetVal: '14' },
       { id: 4, chap: 1, chapName: '第一章：等量加減', original: 'x - 15 = 45', ans: 60, leftText: 'x - 15', rightText: '45', xCoeffL: 1, constL: -15, xCoeffR: 0, constR: 45, hint: '左邊有 - 15，請在兩邊同時【＋ 15】！', targetOp: 'add', targetVal: '15' },
 
-      // 第二章：等量乘除法 (一步解)
       { id: 5, chap: 2, chapName: '第二章：等量乘除', original: '3x = 24', ans: 8, leftText: '3x', rightText: '24', xCoeffL: 3, constL: 0, xCoeffR: 0, constR: 24, hint: '左邊是 3 個 x (3 乘以 x)，請在兩邊同時【÷ 3】！', targetOp: 'div', targetVal: '3' },
       { id: 6, chap: 2, chapName: '第二章：等量乘除', original: 'x / 4 = 6', ans: 24, leftText: 'x ÷ 4', rightText: '6', xCoeffL: 0.25, constL: 0, xCoeffR: 0, constR: 6, hint: '左邊是 x 除以 4，請在兩邊同時【× 4】恢復原狀！', targetOp: 'mul', targetVal: '4' },
       { id: 7, chap: 2, chapName: '第二章：等量乘除', original: '7x = 56', ans: 8, leftText: '7x', rightText: '56', xCoeffL: 7, constL: 0, xCoeffR: 0, constR: 56, hint: '左邊是 7 個 x，請在兩邊同時【÷ 7】！', targetOp: 'div', targetVal: '7' },
       { id: 8, chap: 2, chapName: '第二章：等量乘除', original: 'x / 5 = 9', ans: 45, leftText: 'x ÷ 5', rightText: '9', xCoeffL: 0.2, constL: 0, xCoeffR: 0, constR: 9, hint: '左邊是 x 除以 5，請在兩邊同時【× 5】！', targetOp: 'mul', targetVal: '5' },
 
-      // 第三章：綜合兩步運算 (先加減後乘除, ax + b = c)
       { id: 9, chap: 3, chapName: '第三章：綜合運算', original: '2x + 7 = 19', ans: 6, leftText: '2x + 7', rightText: '19', xCoeffL: 2, constL: 7, xCoeffR: 0, constR: 19, hint: '先處理常數項！建議兩邊同時【－ 7】消去 +7，再進行除法！', targetOp: 'sub', targetVal: '7' },
       { id: 10, chap: 3, chapName: '第三章：綜合運算', original: '3x - 5 = 16', ans: 7, leftText: '3x - 5', rightText: '16', xCoeffL: 3, constL: -5, xCoeffR: 0, constR: 16, hint: '先處理 - 5：兩邊同時【＋ 5】，再兩邊【÷ 3】！', targetOp: 'add', targetVal: '5' },
       { id: 11, chap: 3, chapName: '第三章：綜合運算', original: '4x + 10 = 38', ans: 7, leftText: '4x + 10', rightText: '38', xCoeffL: 4, constL: 10, xCoeffR: 0, constR: 38, hint: '先消除 + 10：兩邊同時【－ 10】，再兩邊【÷ 4】！', targetOp: 'sub', targetVal: '10' },
       { id: 12, chap: 3, chapName: '第三章：綜合運算', original: '5x - 12 = 33', ans: 9, leftText: '5x - 12', rightText: '33', xCoeffL: 5, constL: -12, xCoeffR: 0, constR: 33, hint: '兩邊同時【＋ 12】得 5x = 45，再兩邊【÷ 5】！', targetOp: 'add', targetVal: '12' },
 
-      // 第四章：天平兩邊都有未知數 (ax + b = cx + d)
       { id: 13, chap: 4, chapName: '第四章：兩側未知數', original: '3x + 4 = x + 16', ans: 6, leftText: '3x + 4', rightText: 'x + 16', xCoeffL: 3, constL: 4, xCoeffR: 1, constR: 16, hint: '天平兩盤都有 x！請兩邊同時【－ x】，先把右邊的 x 移走！', targetOp: 'sub', targetVal: 'x' },
       { id: 14, chap: 4, chapName: '第四章：兩側未知數', original: '5x - 8 = 2x + 13', ans: 7, leftText: '5x - 8', rightText: '2x + 13', xCoeffL: 5, constL: -8, xCoeffR: 2, constR: 13, hint: '右盤有 2 個 x，兩邊同時【－ 2x】留下 3x - 8 = 13！', targetOp: 'sub', targetVal: '2x' },
       { id: 15, chap: 4, chapName: '第四章：兩側未知數', original: '4x + 9 = 2x + 25', ans: 8, leftText: '4x + 9', rightText: '2x + 25', xCoeffL: 4, constL: 9, xCoeffR: 2, constR: 25, hint: '兩邊同時【－ 2x】得 2x + 9 = 25，再依序解出 x！', targetOp: 'sub', targetVal: '2x' },
 
-      // 第五章：括號與挑戰運算
       { id: 16, chap: 5, chapName: '第五章：括號挑戰', original: '2(x + 3) = 18', ans: 6, leftText: '2(x + 3)', rightText: '18', xCoeffL: 2, constL: 6, xCoeffR: 0, constR: 18, hint: '外層乘以 2，可以先兩邊同時【÷ 2】得到 x + 3 = 9！', targetOp: 'div', targetVal: '2' },
       { id: 17, chap: 5, chapName: '第五章：括號挑戰', original: '3(x - 4) = 21', ans: 11, leftText: '3(x - 4)', rightText: '21', xCoeffL: 3, constL: -12, xCoeffR: 0, constR: 21, hint: '兩邊同時【÷ 3】得 x - 4 = 7，再兩邊【＋ 4】！', targetOp: 'div', targetVal: '3' },
       { id: 18, chap: 5, chapName: '第五章：括號挑戰', original: '4(x + 2) - 5 = 27', ans: 6, leftText: '4(x + 2) - 5', rightText: '27', xCoeffL: 4, constL: 3, xCoeffR: 0, constR: 27, hint: '先處理外面的 - 5：兩邊同時【＋ 5】得到 4(x + 2) = 32！', targetOp: 'add', targetVal: '5' }
     ];
 
-    /* ====================================================================
-       遊戲狀態管理
-       ==================================================================== */
     const state = {
       curLevelIdx: 0,
       clearedLevels: new Set(),
-      // 當前正在操作的方程式狀態 (動態代數狀態)
       currLeftCoeff: 1,
       currLeftConst: 0,
       currRightCoeff: 0,
       currRightConst: 0,
-      stepHistory: [], // 推導步驟文字陣列
-      selectedOp: 'sub', // 'add', 'sub', 'mul', 'div'
+      stepHistory: [],
+      selectedOp: 'sub',
       soundEnabled: true,
       voiceEnabled: true,
-      inputMode: 'input', // 'input' | 'canvas'
+      inputMode: 'input',
       isDrawing: false,
       hasDrawn: false,
       strokes: []
     };
 
-    // DOM 節點引用
     const dom = {
       guideModalBtn: document.getElementById('guide-modal-btn'),
       voiceToggleBtn: document.getElementById('voice-toggle-btn'),
@@ -516,9 +456,6 @@
       celebrateNextBtn: document.getElementById('celebrate-next-btn')
     };
 
-    /* ====================================================================
-       音效與語音系統 (Web Audio & SpeechSynthesis)
-       ==================================================================== */
     let preferredVoice = null;
     function initSpeech() {
       if (!('speechSynthesis' in window)) return;
@@ -566,7 +503,6 @@
           osc.start(now);
           osc.stop(now + 0.08);
         } else if (type === 'balance') {
-          // 天平平衡時的金色風鈴聲
           [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
             const subOsc = audioCtx.createOscillator();
             const subGain = audioCtx.createGain();
@@ -591,39 +527,31 @@
       } catch (e) {}
     }
 
-    /* ====================================================================
-       關卡初始化與方程式狀態管理
-       ==================================================================== */
     function loadLevel(idx) {
       if (idx < 0 || idx >= LEVELS.length) return;
       state.curLevelIdx = idx;
       const lvl = LEVELS[idx];
 
-      // 重設代數運算狀態為本關初值
       state.currLeftCoeff = lvl.xCoeffL;
       state.currLeftConst = lvl.constL;
       state.currRightCoeff = lvl.xCoeffR;
       state.currRightConst = lvl.constR;
       state.stepHistory = [`初態：${lvl.original}`];
 
-      // 更新頂部資訊
       dom.chapTag.textContent = lvl.chapName;
       dom.levelIndicatorBadge.textContent = `第 ${lvl.id} / 18 關`;
       dom.prevLevelBtn.disabled = (idx === 0);
       dom.nextLevelBtn.disabled = (idx === LEVELS.length - 1);
 
-      // 導師提示
       dom.mentorBox.classList.add('hidden');
       dom.mentorBox.innerHTML = `<strong>💡 導師提示：</strong><br>${lvl.hint}`;
 
-      // 重置輸入與訊息
       dom.axiomValInput.value = '';
       dom.directXInput.value = '';
       clearCanvas();
       hideFeedback();
       dom.solvedBadge.classList.add('hidden');
 
-      // 更新天平與方程式渲染
       updateEquationUI();
       renderScaleItems();
       renderQuickPills();
@@ -636,7 +564,6 @@
       }
     }
 
-    // 格式化目前方程式字串
     function formatSide(coeff, constant) {
       let parts = [];
       if (coeff === 1) parts.push('x');
@@ -660,25 +587,20 @@
       const rightStr = formatSide(state.currRightCoeff, state.currRightConst);
       dom.currentEquationText.textContent = `${leftStr} = ${rightStr}`;
 
-      // 檢查是否已成功化簡為 x = 答案
       const lvl = LEVELS[state.curLevelIdx];
       if (state.currLeftCoeff === 1 && state.currLeftConst === 0 && state.currRightCoeff === 0 && state.currRightConst === lvl.ans) {
         handleLevelSolved();
       }
     }
 
-    // 渲染天平左右盤的幾何砝碼與 X 能量方塊
     function renderScaleItems() {
-      // 左盤渲染
       dom.leftItemsSvgContainer.innerHTML = '';
       let leftElements = [];
 
-      // 放置 X 方塊 (每個綠色立方塊代表 1 個 x)
       const xCountL = Math.max(0, Math.min(4, Math.round(state.currLeftCoeff)));
       for (let i = 0; i < xCountL; i++) {
         leftElements.push({ type: 'x', label: 'x' });
       }
-      // 放置常數砝碼
       if (state.currLeftConst !== 0) {
         leftElements.push({ type: 'const', label: (state.currLeftConst > 0 ? `+${state.currLeftConst}` : `${state.currLeftConst}`) });
       }
@@ -703,7 +625,6 @@
         }
       });
 
-      // 右盤渲染
       dom.rightItemsSvgContainer.innerHTML = '';
       let rightElements = [];
 
@@ -736,7 +657,6 @@
       });
     }
 
-    // 渲染推導歷史步驟
     function renderHistoryList() {
       dom.stepsHistoryList.innerHTML = '';
       state.stepHistory.forEach(step => {
@@ -748,7 +668,6 @@
       dom.stepsHistoryList.scrollTop = dom.stepsHistoryList.scrollHeight;
     }
 
-    // 快捷輸入藥丸按鈕
     function renderQuickPills() {
       dom.quickTermsContainer.innerHTML = '';
       const pills = [];
@@ -771,9 +690,6 @@
       });
     }
 
-    /* ====================================================================
-       核心等量公理運算引擎
-       ==================================================================== */
     function executeAxiomOperation() {
       const valStr = dom.axiomValInput.value.trim();
       if (!valStr) {
@@ -791,16 +707,13 @@
       else if (op === 'mul') opName = `兩邊同時 × ${valStr}`;
       else if (op === 'div') opName = `兩邊同時 ÷ ${valStr}`;
 
-      // 檢查除以 0
       if (op === 'div' && numVal === 0 && !isAlgebraic) {
         showFeedback('注意：等量除法不能除以 0 喔！', 'error');
         playSound('wrong');
         return;
       }
 
-      // 執行代數運算
       if (isAlgebraic) {
-        // 代數運算通常是加減項 (如兩邊同時 - x)
         if (op === 'sub') {
           state.currLeftCoeff -= numVal;
           state.currRightCoeff -= numVal;
@@ -812,7 +725,6 @@
           return;
         }
       } else {
-        // 純常數運算
         if (op === 'sub') {
           state.currLeftConst -= numVal;
           state.currRightConst -= numVal;
@@ -832,7 +744,6 @@
         }
       }
 
-      // 記錄步驟與更新 UI
       playSound('click');
       const leftStr = formatSide(state.currLeftCoeff, state.currLeftConst);
       const rightStr = formatSide(state.currRightCoeff, state.currRightConst);
@@ -847,7 +758,6 @@
       showFeedback(`已成功執行【${opName}】，天平維持平衡！`, 'success');
     }
 
-    // 驗證玩家直接輸入的答案
     function checkDirectAnswer() {
       const val = parseFloat(dom.directXInput.value);
       if (isNaN(val)) {
@@ -857,7 +767,6 @@
 
       const lvl = LEVELS[state.curLevelIdx];
       if (val === lvl.ans) {
-        // 自動展示化簡完成
         state.currLeftCoeff = 1;
         state.currLeftConst = 0;
         state.currRightCoeff = 0;
@@ -903,9 +812,6 @@
       dom.feedbackAlert.classList.add('hidden');
     }
 
-    /* ====================================================================
-       18 關矩陣與章節切換
-       ==================================================================== */
     function renderLevelsMatrix() {
       dom.levelsMatrix.innerHTML = '';
       dom.clearedCountText.textContent = `已過關：${state.clearedLevels.size} / 18`;
@@ -944,9 +850,6 @@
       });
     }
 
-    /* ====================================================================
-       手寫板 Canvas 模組
-       ==================================================================== */
     const canvas = dom.handwritingCanvas;
     const ctx = canvas.getContext('2d');
 
@@ -1033,10 +936,6 @@
     window.addEventListener('touchmove', continueDraw, { passive: false });
     window.addEventListener('touchend', stopDraw);
 
-    /* ====================================================================
-       事件監聽與按鈕綁定
-       ==================================================================== */
-    // 等量操作符號選擇按鈕
     dom.opSelectBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         playSound('click');
@@ -1053,13 +952,11 @@
       });
     });
 
-    // 預設選中「減法」
     document.querySelector('.op-select-btn[data-op="sub"]').classList.add('bg-indigo-100', 'border-indigo-400', 'text-indigo-900');
 
     dom.executeAxiomBtn.addEventListener('click', executeAxiomOperation);
     dom.directVerifyBtn.addEventListener('click', checkDirectAnswer);
 
-    // Enter 快捷鍵
     dom.axiomValInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') executeAxiomOperation();
     });
@@ -1067,20 +964,17 @@
       if (e.key === 'Enter') checkDirectAnswer();
     });
 
-    // 重設回題目初態
     dom.resetStepsBtn.addEventListener('click', () => {
       playSound('click');
       loadLevel(state.curLevelIdx);
       showFeedback('已重置回最初方程式！', 'info');
     });
 
-    // 導師提示
     dom.mentorHintBtn.addEventListener('click', () => {
       playSound('click');
       dom.mentorBox.classList.toggle('hidden');
     });
 
-    // 上下關導航
     dom.prevLevelBtn.addEventListener('click', () => {
       playSound('click');
       loadLevel(state.curLevelIdx - 1);
@@ -1090,7 +984,6 @@
       loadLevel(state.curLevelIdx + 1);
     });
 
-    // 章節切換
     dom.chapTabBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         playSound('click');
@@ -1100,7 +993,6 @@
       });
     });
 
-    // 輸入模式切換 (鍵盤 vs 手寫)
     dom.modeInputBtn.addEventListener('click', () => {
       state.inputMode = 'input';
       dom.modeInputBtn.className = 'px-2 py-0.5 rounded-md bg-white text-indigo-600 shadow-xs';
@@ -1134,7 +1026,6 @@
       checkDirectAnswer();
     });
 
-    // 模態視窗按鈕
     dom.guideModalBtn.addEventListener('click', () => {
       playSound('click');
       dom.guideModal.classList.remove('hidden');
@@ -1154,7 +1045,6 @@
       }
     });
 
-    // 語音與音效切換
     dom.voiceToggleBtn.addEventListener('click', () => {
       state.voiceEnabled = !state.voiceEnabled;
       dom.voiceToggleBtn.textContent = state.voiceEnabled ? '🗣️' : '🔇';
@@ -1169,7 +1059,6 @@
 
     window.addEventListener('resize', initCanvasResolution);
 
-    // 啟動遊戲
     initSpeech();
     initCanvasResolution();
     loadLevel(0);
